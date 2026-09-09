@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 import hashlib
 import json
 import sqlite3
@@ -21,18 +21,35 @@ class Event:
 
 
 class EventStore:
-    """Append-only SQLite event store with a per-run SHA-256 hash chain."""
+    """Append-only SQLite event store with a per-run SHA-256 hash chain.
+
+    The store owns one SQLite connection for its lifetime. Use it as a context
+    manager (preferred) or call ``close()`` explicitly so Windows can release
+    the database file immediately.
+    """
 
     def __init__(self, path: str | Path = "seed.db") -> None:
         self.path = str(path)
-        self._con = sqlite3.connect(self.path)
+        self._con: sqlite3.Connection | None = sqlite3.connect(self.path)
         self._init_db()
 
+    def __enter__(self) -> "EventStore":
+        if self._con is None:
+            raise RuntimeError("EventStore is closed")
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        self.close()
+
     def _connect(self) -> sqlite3.Connection:
+        if self._con is None:
+            raise RuntimeError("EventStore is closed")
         return self._con
 
     def close(self) -> None:
-        self._con.close()
+        if self._con is not None:
+            self._con.close()
+            self._con = None
 
     def _init_db(self) -> None:
         with self._connect() as con:
