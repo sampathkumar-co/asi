@@ -8,12 +8,42 @@ from urllib.request import Request, urlopen
 from .base import Message, ModelResponse
 
 
+_STRUCTURED_FORMATS: dict[str, dict] = {
+    "plan": {
+        "type": "object",
+        "properties": {
+            "description": {"type": "string", "maxLength": 160},
+            "tool_name": {"type": "string", "maxLength": 64},
+            "tool_input": {"type": "object"},
+        },
+        "required": ["description", "tool_name", "tool_input"],
+        "additionalProperties": False,
+    },
+    "critic": {
+        "type": "object",
+        "properties": {
+            "done": {"type": "boolean"},
+            "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+            "reason": {"type": "string", "maxLength": 240},
+            "final_answer": {
+                "anyOf": [
+                    {"type": "string", "maxLength": 512},
+                    {"type": "null"},
+                ]
+            },
+        },
+        "required": ["done", "confidence", "reason", "final_answer"],
+        "additionalProperties": False,
+    },
+}
+
+
 class OllamaProvider:
     """Local Ollama adapter for real Gate-1 experiments.
 
-    The adapter is intentionally dependency-free and reports Ollama's own
-    prompt/evaluation token counters. Structured JSON mode is enabled only for
-    planner/critic calls, where Seed's protocol requires machine-readable JSON.
+    The adapter is dependency-free and reports Ollama's own prompt/evaluation
+    token counters. Planner and critic calls use bounded JSON schemas so small
+    local models cannot consume their output budget with unstructured prose.
     """
 
     def __init__(
@@ -58,7 +88,7 @@ class OllamaProvider:
             },
         }
         if purpose in self.json_purposes:
-            payload["format"] = "json"
+            payload["format"] = _STRUCTURED_FORMATS.get(purpose, "json")
         return payload
 
     def complete(self, messages: list[Message], *, purpose: str) -> ModelResponse:
