@@ -15,6 +15,7 @@ _IMPLEMENTATION_FILES = (
     "src/seed/providers/base.py",
     "src/seed/providers/budgeted.py",
     "src/seed/providers/ollama.py",
+    "src/seed/gate1/attestation.py",
     "src/seed/gate1/local_campaign.py",
 )
 
