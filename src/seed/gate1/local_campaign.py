@@ -82,10 +82,17 @@ def _arm(task: LocalTask, arm: str, provider: BudgetedProvider, budget: Budget, 
 def run_local_pair(task: LocalTask, provider_factory: Callable[[], ModelProvider], *, provider_id: str) -> LocalPairEvidence:
     raw_budget = _budget()
     raw_meter = BudgetedProvider(provider_factory(), raw_budget, provider_id=provider_id)
-    raw_system = "Solve directly without Seed orchestration or tools. Reason privately. Return the requested FINAL answer."
+    raw_system = (
+        "Solve directly without Seed orchestration or tools. Reason privately. "
+        "Return only a JSON object with one field named answer whose value is the requested FINAL answer."
+    )
     try:
-        response = raw_meter.complete([Message("system", raw_system), Message("user", task.prompt)], purpose="raw")
-        raw_answer, raw_status = response.text.strip(), "succeeded"
+        response = raw_meter.complete([Message("system", raw_system), Message("user", task.prompt)], purpose="raw_eval")
+        data = json.loads(response.text)
+        answer = data.get("answer") if isinstance(data, dict) else None
+        if not isinstance(answer, str) or not answer.strip():
+            raise ValueError("raw evaluation response missing answer")
+        raw_answer, raw_status = answer.strip(), "succeeded"
     except Exception as exc:
         raw_answer, raw_status = None, f"failed:{type(exc).__name__}"
     raw = _arm(task, "raw", raw_meter, raw_budget, raw_answer, raw_status)
@@ -104,20 +111,78 @@ def run_local_pair(task: LocalTask, provider_factory: Callable[[], ModelProvider
     return pair
 
 
-def run_ollama_suite(task_path: str | Path, model: str, *, num_ctx: int = 4096, num_predict: int = 2048) -> dict:
-    suite_id, tasks = load_local_tasks(task_path)
-    provider_id = f"ollama:{model}"
-    probe = OllamaProvider(model, temperature=0.0, num_ctx=num_ctx, num_predict=num_predict, think=False)
-    manifest = probe.model_manifest()
-    factory = lambda: OllamaProvider(model, temperature=0.0, num_ctx=num_ctx, num_predict=num_predict, think=False)
-    pairs = [run_local_pair(task, factory, provider_id=provider_id) for task in tasks]
+def _hash_body(body: dict) -> str:
+    unsigned = {k: v for k, v in body.items() if k != "content_hash"}
+    return hashlib.sha256(json.dumps(unsigned, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+def _atomic_write(path: Path, body: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(body, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    tmp.replace(path)
+
+
+def _body(suite_id: str, provider_id: str, model: str, manifest: dict, settings: dict, pairs: list[dict]) -> dict:
     body = {
         "suite_id": suite_id,
         "provider_id": provider_id,
         "model": model,
         "model_manifest": manifest,
-        "settings": {"temperature": 0.0, "think": False, "num_ctx": num_ctx, "num_predict": num_predict},
-        "pairs": [{"raw": asdict(p.raw), "seed": asdict(p.seed), "pair_hash": p.content_hash} for p in pairs],
+        "settings": settings,
+        "pairs": pairs,
     }
-    body["content_hash"] = hashlib.sha256(json.dumps(body, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    body["content_hash"] = _hash_body(body)
     return body
+
+
+def run_ollama_suite(
+    task_path: str | Path,
+    model: str,
+    *,
+    num_ctx: int = 4096,
+    num_predict: int = 768,
+    checkpoint_path: str | Path | None = None,
+    resume: bool = True,
+) -> dict:
+    suite_id, tasks = load_local_tasks(task_path)
+    provider_id = f"ollama:{model}"
+    probe = OllamaProvider(model, temperature=0.0, num_ctx=num_ctx, num_predict=num_predict, think=False)
+    manifest = probe.model_manifest()
+    settings = {
+        "temperature": 0.0,
+        "think": False,
+        "num_ctx": num_ctx,
+        "num_predict": num_predict,
+        "raw_protocol": "single structured answer; no tools",
+        "seed_protocol": "bounded planner/tool/critic",
+    }
+    factory = lambda: OllamaProvider(model, temperature=0.0, num_ctx=num_ctx, num_predict=num_predict, think=False)
+
+    pairs: list[dict] = []
+    checkpoint = Path(checkpoint_path) if checkpoint_path else None
+    if checkpoint and resume and checkpoint.exists():
+        prior = json.loads(checkpoint.read_text(encoding="utf-8"))
+        identity = (prior.get("suite_id"), prior.get("provider_id"), prior.get("model"), prior.get("model_manifest"), prior.get("settings"))
+        expected = (suite_id, provider_id, model, manifest, settings)
+        if identity != expected:
+            raise ValueError("checkpoint identity/settings do not match requested campaign")
+        pairs = list(prior.get("pairs", []))
+        if len({p.get("raw", {}).get("task_id") for p in pairs}) != len(pairs):
+            raise ValueError("checkpoint contains duplicate task evidence")
+
+    completed = {str(p.get("raw", {}).get("task_id")) for p in pairs}
+    task_ids = {t.task_id for t in tasks}
+    if not completed.issubset(task_ids):
+        raise ValueError("checkpoint contains task not present in requested suite")
+
+    for task in tasks:
+        if task.task_id in completed:
+            continue
+        pair = run_local_pair(task, factory, provider_id=provider_id)
+        pairs.append({"raw": asdict(pair.raw), "seed": asdict(pair.seed), "pair_hash": pair.content_hash})
+        body = _body(suite_id, provider_id, model, manifest, settings, pairs)
+        if checkpoint:
+            _atomic_write(checkpoint, body)
+
+    return _body(suite_id, provider_id, model, manifest, settings, pairs)
