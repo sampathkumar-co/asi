@@ -2,8 +2,15 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
-from seed.gate1.local_campaign import load_local_tasks, run_local_pair
+from seed.gate1.local_campaign import (
+    LocalArmEvidence,
+    LocalPairEvidence,
+    load_local_tasks,
+    run_local_pair,
+    run_ollama_suite,
+)
 from seed.providers.scripted import ScriptedProvider
 
 
@@ -14,7 +21,7 @@ class LocalCampaignTests(unittest.TestCase):
         task_file.close()
         _, tasks = load_local_tasks(task_file.name)
         providers = iter([
-            ScriptedProvider(["FINAL: 4"]),
+            ScriptedProvider(['{"answer":"FINAL: 4"}']),
             ScriptedProvider([
                 '{"description":"candidate","tool_name":"echo","tool_input":{"text":"FINAL: 4"}}',
                 '{"done":true,"confidence":0.95,"reason":"candidate present","final_answer":"FINAL: 4"}',
@@ -26,6 +33,32 @@ class LocalCampaignTests(unittest.TestCase):
         self.assertEqual(pair.seed.answer, "FINAL: 4")
         self.assertEqual(len(pair.content_hash), 64)
         Path(task_file.name).unlink(missing_ok=True)
+
+    def test_checkpoint_resumes_without_rerunning_completed_pairs(self):
+        with tempfile.TemporaryDirectory() as td:
+            tasks = Path(td) / "tasks.json"
+            checkpoint = Path(td) / "evidence.json"
+            tasks.write_text(json.dumps({"suite_id":"s","tasks":[
+                {"task_id":"T1","prompt":"one"},{"task_id":"T2","prompt":"two"}
+            ]}), encoding="utf-8")
+
+            def fake_pair(task, factory, *, provider_id):
+                limits = {"max_steps":8,"max_model_calls":12,"max_tool_calls":8,"max_tokens":8000,"max_cost_usd":0.0}
+                usage = {"steps":1,"model_calls":1,"tool_calls":0,"tokens":10,"cost_usd":0.0}
+                raw = LocalArmEvidence(task.task_id, "raw", provider_id, "m", f"FINAL: {task.task_id}", "succeeded", limits, usage, "a"*64)
+                seed = LocalArmEvidence(task.task_id, "seed", provider_id, "m", f"FINAL: {task.task_id}", "succeeded", limits, usage, "b"*64)
+                return LocalPairEvidence(raw, seed)
+
+            manifest = {"name":"m","digest":"d"*64,"size":1}
+            with patch("seed.gate1.local_campaign.OllamaProvider.model_manifest", return_value=manifest), patch("seed.gate1.local_campaign.run_local_pair", side_effect=fake_pair) as run:
+                first = run_ollama_suite(tasks, "m", checkpoint_path=checkpoint)
+                self.assertEqual(run.call_count, 2)
+                self.assertEqual(len(first["pairs"]), 2)
+                self.assertTrue(checkpoint.exists())
+            with patch("seed.gate1.local_campaign.OllamaProvider.model_manifest", return_value=manifest), patch("seed.gate1.local_campaign.run_local_pair", side_effect=fake_pair) as run:
+                second = run_ollama_suite(tasks, "m", checkpoint_path=checkpoint)
+                self.assertEqual(run.call_count, 0)
+                self.assertEqual(first["content_hash"], second["content_hash"])
 
     def test_duplicate_tasks_rejected(self):
         with tempfile.TemporaryDirectory() as td:
