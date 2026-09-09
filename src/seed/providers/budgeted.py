@@ -71,4 +71,9 @@ class BudgetedProvider:
 
     @property
     def transcript_hash(self) -> str:
-        return self._hash([asdict(r) for r in self.records])
+        deterministic = []
+        for record in self.records:
+            item = asdict(record)
+            item.pop("wall_time_s", None)
+            deterministic.append(item)
+        return self._hash(deterministic)
