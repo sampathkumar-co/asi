@@ -21,9 +21,15 @@ class PythonComputeTests(unittest.TestCase):
         self.assertTrue(result.ok)
         self.assertEqual(result.output, [4])
 
+    def test_safe_string_join_is_available(self):
+        result = python_compute({"code": "parts=['A','B','C']\nresult='-'.join(parts)"})
+        self.assertTrue(result.ok)
+        self.assertEqual(result.output, "A-B-C")
+
     def test_import_and_attribute_access_are_blocked(self):
         self.assertFalse(python_compute({"code": "import os\nresult=1"}).ok)
         self.assertFalse(python_compute({"code": "result=(1).__class__"}).ok)
+        self.assertFalse(python_compute({"code": "result='x'.encode()"}).ok)
 
     def test_result_is_required(self):
         result = python_compute({"code": "x=2+2"})
