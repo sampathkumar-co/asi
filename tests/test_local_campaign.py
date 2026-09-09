@@ -21,7 +21,7 @@ class LocalCampaignTests(unittest.TestCase):
         task_file.close()
         _, tasks = load_local_tasks(task_file.name)
         providers = iter([
-            ScriptedProvider(['{"answer":"FINAL: 4"}']),
+            ScriptedProvider(['{"analysis":"2+2=4","answer":"FINAL: 4"}']),
             ScriptedProvider([
                 '{"description":"compute verified candidate","tool_name":"python_compute","tool_input":{"code":"result={\'answer\':\'FINAL: 4\',\'checks\':{\'arithmetic\':True}}"}}',
                 '{"done":true,"confidence":0.95,"reason":"verified candidate present","final_answer":"FINAL: 4"}',
@@ -52,16 +52,28 @@ class LocalCampaignTests(unittest.TestCase):
                 return LocalPairEvidence(raw, seed)
 
             manifest = {"name":"m","digest":"d"*64,"size":1}
-            with patch("seed.gate1.local_campaign.OllamaProvider.model_manifest", return_value=manifest), patch("seed.gate1.local_campaign.run_local_pair", side_effect=fake_pair) as run:
+            patches = (
+                patch("seed.gate1.local_campaign.OllamaProvider.model_manifest", return_value=manifest),
+                patch("seed.gate1.local_campaign.run_local_pair", side_effect=fake_pair),
+            )
+            with patches[0], patches[1] as run:
                 first = run_ollama_suite(tasks, "m", checkpoint_path=checkpoint)
                 self.assertEqual(run.call_count, 2)
                 self.assertEqual(len(first["pairs"]), 2)
                 self.assertTrue(checkpoint.exists())
                 self.assertTrue(checkpoint.with_suffix(".json.progress.jsonl").exists())
+
             with patch("seed.gate1.local_campaign.OllamaProvider.model_manifest", return_value=manifest), patch("seed.gate1.local_campaign.run_local_pair", side_effect=fake_pair) as run:
                 second = run_ollama_suite(tasks, "m", checkpoint_path=checkpoint)
                 self.assertEqual(run.call_count, 0)
                 self.assertEqual(first["content_hash"], second["content_hash"])
+
+            tampered = json.loads(checkpoint.read_text(encoding="utf-8"))
+            tampered["seed_implementation"]["digest"] = "0" * 64
+            checkpoint.write_text(json.dumps(tampered), encoding="utf-8")
+            with patch("seed.gate1.local_campaign.OllamaProvider.model_manifest", return_value=manifest):
+                with self.assertRaises(ValueError):
+                    run_ollama_suite(tasks, "m", checkpoint_path=checkpoint)
 
     def test_duplicate_tasks_rejected(self):
         with tempfile.TemporaryDirectory() as td:
