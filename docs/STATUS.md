@@ -2,10 +2,13 @@
 
 Updated: 2026-09-09
 
+Current clean CI validation: **66/66 tests passing** on Python 3.11, 3.12 and 3.13.
+
 ## Meaning of status labels
 
 - **Implemented**: code exists in this repository.
 - **Infrastructure-qualified**: the gate's fail-closed deterministic qualification passes in CI.
+- **Experiment-ready**: the real-model protocol, evidence schema, frozen envelope and analysis path are implemented; external paired model runs can begin.
 - **Empirically certified**: a real model/research campaign has passed the gate's hidden/OOD scientific criteria.
 
 ## Gate 0 — COMPLETE / infrastructure-qualified
@@ -27,9 +30,7 @@ Done:
 
 The Gate-0 certificate qualifies the measurement/control instrument. It does not claim AGI, ASI, or recursive amplification.
 
-## Gate 1 — strong bounded agent foundation
-
-**Implemented; deterministic infrastructure qualification added.**
+## Gate 1 — EXPERIMENT-READY / infrastructure-qualified
 
 Done:
 - bounded planner/executor/critic loop;
@@ -42,15 +43,26 @@ Done:
 - raw-model comparison arm;
 - identical-envelope raw-vs-Seed comparison evidence;
 - fail-closed malformed output / denied tool / budget exhaustion handling;
-- `seed gate1-certify` deterministic multi-step qualification.
+- `seed gate1-certify` deterministic multi-step qualification;
+- real ChatGPT transcript/evidence schema;
+- paired real-chat validator with model/provider/surface/envelope checks;
+- evidence levels (`manual_chat`, `platform_export`, `api_attested`);
+- explicit separation between pilot evidence and certification-ready evidence;
+- transcript/pair SHA-256 hashing for tamper detection;
+- campaign-level paired bootstrap statistics;
+- minimum-pair / mean-gain / win-rate / CI certification criteria;
+- rejection of mixed models, mixed envelopes and duplicate task IDs;
+- frozen ChatGPT pilot envelope in `configs/gate1/chatgpt_pilot.toml`;
+- frozen raw-vs-Seed prompts in `docs/GATE1_CHATGPT_PROMPTS.md`;
+- full real-chat protocol in `docs/GATE1_REAL_CHAT_PROTOCOL.md`.
 
 Not yet empirically certified:
-- real ChatGPT/frontier-model raw-vs-Seed campaign;
-- private multi-domain long-horizon benchmark results;
-- repeated stochastic confidence intervals on that real-model campaign;
-- normalized efficiency analysis using externally reported real model usage.
+- execute independent fresh-chat raw and Seed runs using the same visible ChatGPT model/mode;
+- score those frozen outputs on private multi-domain Gate-0 tasks;
+- attach attested model/usage metadata where the platform exposes it;
+- run the final multi-pair confidence/efficiency analysis.
 
-See `docs/GATE1_CERTIFICATION.md`.
+A normal manually copied ChatGPT transcript is accepted as pilot evidence but cannot silently upgrade itself into full scientific certification.
 
 ## Gate 2 — scientific-method workflow
 
@@ -88,6 +100,13 @@ Done:
 - promotion evidence gate;
 - durable lineage store.
 
+## Storage policy while Sampath's laptop is offline
+
+- canonical Project Seed state stays in `sampathkumar-co/asi`;
+- GitHub Actions is the clean execution/test environment;
+- Yaswanth's machine may be used only for stateless interaction/validation commands;
+- no Gate-1 source, clone, evidence bundle, benchmark file or artifact is to be stored on Yaswanth's laptop.
+
 ## Overall
 
-Project Seed now has a qualified Gate-0 measurement layer and a substantially stronger Gate-1 agent/comparison layer. The next scientific milestone is the first real **same-model raw-vs-Seed** campaign evaluated through Gate 0.
+Gate 0 is complete. Gate 1 is now **experiment-ready**: the remaining work is not more scaffold plumbing, but the real independent same-model ChatGPT raw-vs-Seed campaign itself. Until that external evidence exists, Project Seed will not claim that Seed improves GPT in the real product.
