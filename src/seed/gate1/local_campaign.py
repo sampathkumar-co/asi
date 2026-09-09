@@ -87,11 +87,11 @@ def _record_event(task_id: str, arm: str, record: ModelCallRecord) -> dict:
         "arm": arm,
         "index": record.index,
         "purpose": record.purpose,
+        "request_hash": record.request_hash,
+        "response_hash": record.response_hash,
         "input_tokens": record.input_tokens,
         "output_tokens": record.output_tokens,
         "wall_time_s": record.wall_time_s,
-        "request_hash": record.request_hash,
-        "response_hash": record.response_hash,
     }
 
 
@@ -125,7 +125,7 @@ def run_local_pair(
     seed_meter = BudgetedProvider(provider_factory(), seed_budget, provider_id=provider_id, on_record=seed_cb)
     tools = default_registry()
     planner = JSONPlanner(seed_meter, tools.names())
-    critic = JSONCritic(seed_meter, finish_threshold=0.85)
+    critic = JSONCritic(seed_meter, finish_threshold=0.85, require_verified_answer=True)
     with EventStore(":memory:") as events:
         state = BaselineAgent(planner, RegistryExecutor(tools), critic, budget=seed_budget, events=events).run(
             Goal(task.prompt, success_criteria=task.success_criteria)
@@ -176,6 +176,7 @@ def run_ollama_suite(
     num_predict: int = 768,
     checkpoint_path: str | Path | None = None,
     resume: bool = True,
+    progress_path: str | Path | None = None,
 ) -> dict:
     suite_id, tasks = load_local_tasks(task_path)
     provider_id = f"ollama:{model}"
@@ -187,13 +188,13 @@ def run_ollama_suite(
         "num_ctx": num_ctx,
         "num_predict": num_predict,
         "raw_protocol": "single structured answer; no tools",
-        "seed_protocol": "bounded planner/tool/critic",
+        "seed_protocol": "bounded planner/tool/critic with machine-checked answer contract",
     }
     factory = lambda: OllamaProvider(model, temperature=0.0, num_ctx=num_ctx, num_predict=num_predict, think=False)
 
     pairs: list[dict] = []
     checkpoint = Path(checkpoint_path) if checkpoint_path else None
-    progress_path = checkpoint.with_suffix(checkpoint.suffix + ".progress.jsonl") if checkpoint else None
+    progress_file = Path(progress_path) if progress_path else None
     if checkpoint and resume and checkpoint.exists():
         prior = json.loads(checkpoint.read_text(encoding="utf-8"))
         identity = (prior.get("suite_id"), prior.get("provider_id"), prior.get("model"), prior.get("model_manifest"), prior.get("settings"))
@@ -210,8 +211,8 @@ def run_ollama_suite(
         raise ValueError("checkpoint contains task not present in requested suite")
 
     def emit(event: dict) -> None:
-        if progress_path:
-            _append_jsonl(progress_path, event)
+        if progress_file:
+            _append_jsonl(progress_file, event)
 
     for task in tasks:
         if task.task_id in completed:
