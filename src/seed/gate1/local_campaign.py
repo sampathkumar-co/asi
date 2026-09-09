@@ -13,7 +13,7 @@ from seed.core.budget import Budget
 from seed.core.events import EventStore
 from seed.core.models import Goal
 from seed.providers.base import Message, ModelProvider
-from seed.providers.budgeted import BudgetedProvider
+from seed.providers.budgeted import BudgetedProvider, ModelCallRecord
 from seed.providers.ollama import OllamaProvider
 from seed.tools.builtin import default_registry
 
@@ -80,9 +80,31 @@ def _arm(task: LocalTask, arm: str, provider: BudgetedProvider, budget: Budget, 
     return LocalArmEvidence(task.task_id, arm, provider.provider_id, provider.provider_id.removeprefix("ollama:"), answer, status, budget.limits(), budget.usage(), provider.transcript_hash)
 
 
-def run_local_pair(task: LocalTask, provider_factory: Callable[[], ModelProvider], *, provider_id: str) -> LocalPairEvidence:
+def _record_event(task_id: str, arm: str, record: ModelCallRecord) -> dict:
+    return {
+        "event": "model_call",
+        "task_id": task_id,
+        "arm": arm,
+        "index": record.index,
+        "purpose": record.purpose,
+        "input_tokens": record.input_tokens,
+        "output_tokens": record.output_tokens,
+        "wall_time_s": record.wall_time_s,
+        "request_hash": record.request_hash,
+        "response_hash": record.response_hash,
+    }
+
+
+def run_local_pair(
+    task: LocalTask,
+    provider_factory: Callable[[], ModelProvider],
+    *,
+    provider_id: str,
+    progress: Callable[[dict], None] | None = None,
+) -> LocalPairEvidence:
     raw_budget = _budget()
-    raw_meter = BudgetedProvider(provider_factory(), raw_budget, provider_id=provider_id)
+    raw_cb = (lambda record: progress(_record_event(task.task_id, "raw", record))) if progress else None
+    raw_meter = BudgetedProvider(provider_factory(), raw_budget, provider_id=provider_id, on_record=raw_cb)
     raw_system = (
         "Solve directly without Seed orchestration or tools. Reason privately. "
         "Return only a JSON object with one field named answer whose value is the requested FINAL answer."
@@ -99,7 +121,8 @@ def run_local_pair(task: LocalTask, provider_factory: Callable[[], ModelProvider
     raw = _arm(task, "raw", raw_meter, raw_budget, raw_answer, raw_status)
 
     seed_budget = _budget()
-    seed_meter = BudgetedProvider(provider_factory(), seed_budget, provider_id=provider_id)
+    seed_cb = (lambda record: progress(_record_event(task.task_id, "seed", record))) if progress else None
+    seed_meter = BudgetedProvider(provider_factory(), seed_budget, provider_id=provider_id, on_record=seed_cb)
     tools = default_registry()
     planner = JSONPlanner(seed_meter, tools.names())
     critic = JSONCritic(seed_meter, finish_threshold=0.85)
@@ -123,6 +146,13 @@ def _atomic_write(path: Path, body: dict) -> None:
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(body, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     tmp.replace(path)
+
+
+def _append_jsonl(path: Path, event: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(event, sort_keys=True, separators=(",", ":")) + "\n")
+        handle.flush()
 
 
 def _body(suite_id: str, provider_id: str, model: str, manifest: dict, settings: dict, pairs: list[dict]) -> dict:
@@ -163,6 +193,7 @@ def run_ollama_suite(
 
     pairs: list[dict] = []
     checkpoint = Path(checkpoint_path) if checkpoint_path else None
+    progress_path = checkpoint.with_suffix(checkpoint.suffix + ".progress.jsonl") if checkpoint else None
     if checkpoint and resume and checkpoint.exists():
         prior = json.loads(checkpoint.read_text(encoding="utf-8"))
         identity = (prior.get("suite_id"), prior.get("provider_id"), prior.get("model"), prior.get("model_manifest"), prior.get("settings"))
@@ -178,13 +209,19 @@ def run_ollama_suite(
     if not completed.issubset(task_ids):
         raise ValueError("checkpoint contains task not present in requested suite")
 
+    def emit(event: dict) -> None:
+        if progress_path:
+            _append_jsonl(progress_path, event)
+
     for task in tasks:
         if task.task_id in completed:
             continue
-        pair = run_local_pair(task, factory, provider_id=provider_id)
+        emit({"event": "pair_started", "task_id": task.task_id})
+        pair = run_local_pair(task, factory, provider_id=provider_id, progress=emit)
         pairs.append({"raw": asdict(pair.raw), "seed": asdict(pair.seed), "pair_hash": pair.content_hash})
         body = _body(suite_id, provider_id, model, manifest, settings, pairs)
         if checkpoint:
             _atomic_write(checkpoint, body)
+        emit({"event": "pair_completed", "task_id": task.task_id, "pair_hash": pair.content_hash})
 
     return _body(suite_id, provider_id, model, manifest, settings, pairs)
