@@ -71,9 +71,9 @@ def gate1_chat_validate(raw_path: str, seed_path: str) -> int:
     return 0
 
 
-def gate1_local_campaign(task_file: str, model: str, output: str | None) -> int:
-    report = run_ollama_suite(task_file, model)
-    if output:
+def gate1_local_campaign(task_file: str, model: str, output: str | None, num_predict: int) -> int:
+    report = run_ollama_suite(task_file, model, num_predict=num_predict, checkpoint_path=output, resume=True)
+    if output and not Path(output).exists():
         path = Path(output)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -116,10 +116,11 @@ def main() -> int:
     chat = sub.add_parser("gate1-chat-validate", help="Validate a paired real-ChatGPT raw-vs-Seed evidence bundle")
     chat.add_argument("--raw", required=True)
     chat.add_argument("--seed", required=True)
-    local = sub.add_parser("gate1-local-campaign", help="Run a paired Raw-vs-Seed campaign against one local Ollama model")
+    local = sub.add_parser("gate1-local-campaign", help="Run a resumable paired Raw-vs-Seed campaign against one local Ollama model")
     local.add_argument("--tasks", default="configs/gate1_local_tasks_v1.json")
     local.add_argument("--model", required=True)
-    local.add_argument("--output", default=None)
+    local.add_argument("--output", default=None, help="Evidence/checkpoint file; completed pairs are written atomically")
+    local.add_argument("--num-predict", type=int, default=768, help="Maximum output tokens per model call for both arms")
     score = sub.add_parser("gate1-local-score", help="Score local campaign evidence with an external answer key")
     score.add_argument("--evidence", required=True)
     score.add_argument("--answers", required=True)
@@ -133,7 +134,7 @@ def main() -> int:
     if args.command == "gate1-chat-validate":
         return gate1_chat_validate(args.raw, args.seed)
     if args.command == "gate1-local-campaign":
-        return gate1_local_campaign(args.tasks, args.model, args.output)
+        return gate1_local_campaign(args.tasks, args.model, args.output, args.num_predict)
     if args.command == "gate1-local-score":
         return gate1_local_score(args.evidence, args.answers, args.output)
     return {"demo": demo, "eval-demo": eval_demo, "search-demo": search_demo}[args.command]()
