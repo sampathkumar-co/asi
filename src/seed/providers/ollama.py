@@ -39,12 +39,7 @@ _STRUCTURED_FORMATS: dict[str, dict] = {
 
 
 class OllamaProvider:
-    """Local Ollama adapter for real Gate-1 experiments.
-
-    The adapter is dependency-free and reports Ollama's own prompt/evaluation
-    token counters. Planner and critic calls use bounded JSON schemas so small
-    local models cannot consume their output budget with unstructured prose.
-    """
+    """Local Ollama adapter for real Gate-1 experiments."""
 
     def __init__(
         self,
@@ -74,6 +69,26 @@ class OllamaProvider:
     @property
     def provider_id(self) -> str:
         return f"ollama:{self.model}"
+
+    def model_manifest(self) -> dict[str, str | int]:
+        """Resolve the exact locally installed artifact from Ollama's tag registry."""
+        request = Request(f"{self.base_url}/api/tags", method="GET")
+        try:
+            with urlopen(request, timeout=self.timeout_s) as response:
+                data = json.load(response)
+        except (HTTPError, URLError, TimeoutError, OSError) as exc:
+            raise RuntimeError(f"Ollama tag query failed: {exc}") from exc
+        models = data.get("models", [])
+        if not isinstance(models, list):
+            raise RuntimeError("Ollama tag response missing models list")
+        for item in models:
+            if isinstance(item, dict) and item.get("name") == self.model:
+                digest = item.get("digest")
+                if not isinstance(digest, str) or len(digest) < 16:
+                    raise RuntimeError("Ollama model manifest missing digest")
+                size = item.get("size", 0)
+                return {"name": self.model, "digest": digest, "size": max(int(size), 0)}
+        raise RuntimeError(f"Ollama model is not installed locally: {self.model}")
 
     def _payload(self, messages: list[Message], purpose: str) -> dict:
         payload: dict = {
