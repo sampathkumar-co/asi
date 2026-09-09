@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Iterable
+from typing import Iterable, Mapping
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -61,11 +61,15 @@ class OllamaProvider:
         num_predict: int = 256,
         think: bool = False,
         json_purposes: Iterable[str] = ("raw_eval", "plan", "critic"),
+        purpose_num_predict: Mapping[str, int] | None = None,
     ) -> None:
         if not model.strip():
             raise ValueError("Ollama model name must be non-empty")
         if timeout_s <= 0 or num_ctx <= 0 or num_predict <= 0:
             raise ValueError("Ollama timeout/context/output limits must be positive")
+        limits = {str(k): int(v) for k, v in dict(purpose_num_predict or {}).items()}
+        if any(v <= 0 for v in limits.values()):
+            raise ValueError("purpose-specific output limits must be positive")
         self.model = model
         self.base_url = base_url.rstrip("/")
         self.timeout_s = float(timeout_s)
@@ -74,6 +78,7 @@ class OllamaProvider:
         self.num_predict = int(num_predict)
         self.think = bool(think)
         self.json_purposes = frozenset(json_purposes)
+        self.purpose_num_predict = limits
 
     @property
     def provider_id(self) -> str:
@@ -108,7 +113,7 @@ class OllamaProvider:
             "options": {
                 "temperature": self.temperature,
                 "num_ctx": self.num_ctx,
-                "num_predict": self.num_predict,
+                "num_predict": self.purpose_num_predict.get(purpose, self.num_predict),
             },
         }
         if purpose in self.json_purposes:
