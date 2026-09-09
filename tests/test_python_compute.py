@@ -15,6 +15,12 @@ class PythonComputeTests(unittest.TestCase):
         self.assertTrue(result.ok)
         self.assertEqual(result.output, 2)
 
+    def test_safe_imports_are_canonicalized(self):
+        code = "from collections import defaultdict\nd=defaultdict(list)\nd['x'].append(4)\nresult=d.get('x')"
+        result = python_compute({"code": code})
+        self.assertTrue(result.ok)
+        self.assertEqual(result.output, [4])
+
     def test_import_and_attribute_access_are_blocked(self):
         self.assertFalse(python_compute({"code": "import os\nresult=1"}).ok)
         self.assertFalse(python_compute({"code": "result=(1).__class__"}).ok)
