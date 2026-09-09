@@ -107,12 +107,15 @@ def run_local_pair(task: LocalTask, provider_factory: Callable[[], ModelProvider
 def run_ollama_suite(task_path: str | Path, model: str, *, num_ctx: int = 4096, num_predict: int = 2048) -> dict:
     suite_id, tasks = load_local_tasks(task_path)
     provider_id = f"ollama:{model}"
+    probe = OllamaProvider(model, temperature=0.0, num_ctx=num_ctx, num_predict=num_predict, think=False)
+    manifest = probe.model_manifest()
     factory = lambda: OllamaProvider(model, temperature=0.0, num_ctx=num_ctx, num_predict=num_predict, think=False)
     pairs = [run_local_pair(task, factory, provider_id=provider_id) for task in tasks]
     body = {
         "suite_id": suite_id,
         "provider_id": provider_id,
         "model": model,
+        "model_manifest": manifest,
         "settings": {"temperature": 0.0, "think": False, "num_ctx": num_ctx, "num_predict": num_predict},
         "pairs": [{"raw": asdict(p.raw), "seed": asdict(p.seed), "pair_hash": p.content_hash} for p in pairs],
     }
