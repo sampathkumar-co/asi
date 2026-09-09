@@ -36,6 +36,13 @@ class OllamaProviderTests(unittest.TestCase):
         self.assertEqual(result.cost_usd, 0.0)
         self.assertEqual(result.metadata["model"], "qwen-local")
 
+    def test_purpose_specific_output_limit_overrides_default(self):
+        provider = OllamaProvider("qwen-local", num_predict=768, purpose_num_predict={"critic": 128})
+        with patch("seed.providers.ollama.urlopen", return_value=self._response()) as mocked:
+            provider.complete([Message("user", "critic")], purpose="critic")
+        payload = json.loads(mocked.call_args.args[0].data)
+        self.assertEqual(payload["options"]["num_predict"], 128)
+
     def test_critic_schema_bounds_reason(self):
         provider = OllamaProvider("qwen-local")
         with patch("seed.providers.ollama.urlopen", return_value=self._response()) as mocked:
@@ -73,6 +80,10 @@ class OllamaProviderTests(unittest.TestCase):
     def test_empty_model_rejected(self):
         with self.assertRaises(ValueError):
             OllamaProvider("  ")
+
+    def test_invalid_purpose_output_limit_rejected(self):
+        with self.assertRaises(ValueError):
+            OllamaProvider("qwen-local", purpose_num_predict={"critic": 0})
 
 
 if __name__ == "__main__":
