@@ -1,0 +1,29 @@
+[gate0]
+minimum_score = 0.80
+require_receipts = true
+require_holdout = true
+
+[gate1]
+max_steps = 12
+max_model_calls = 24
+max_tool_calls = 24
+max_tokens = 20000
+max_cost_usd = 2.0
+
+[gate2]
+minimum_verifier_confidence = 0.80
+require_independent_verifier = true
+require_adversarial_verifier = true
+require_reproducible_result = true
+
+[gate3]
+population = 8
+generations = 4
+minimum_holdout_gain = 0.02
+
+[gate4]
+max_mutated_files = 8
+max_mutated_bytes = 128000
+sandbox = "docker"
+network = "none"
+require_human_promotion = true

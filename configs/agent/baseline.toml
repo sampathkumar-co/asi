@@ -1,0 +1,5 @@
+max_steps = 8
+verification_passes = 1
+memory_limit = 64
+critic_threshold = 0.80
+planner_strategy = "sequential"
