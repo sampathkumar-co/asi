@@ -23,7 +23,7 @@
     },
     {
       "task_id": "T5",
-      "prompt": "Without executing code, determine the exact final printed values. def f(xs): out=[]; for i,x in enumerate(xs): if i%2==0: xs[i]=x+i; else: out.append(xs[i-1]-x); return xs,out. a=[3,1,4,1,5,9]; b=a; r=f(a); b[0]+=2; print(a,r[1],sum(b)). Return exactly: FINAL: <list-a> | <list-r1> | <sum>.",
+      "prompt": "Without executing code, determine the exact final printed values:\n\ndef f(xs):\n    out = []\n    for i, x in enumerate(xs):\n        if i % 2 == 0:\n            xs[i] = x + i\n        else:\n            out.append(xs[i-1] - x)\n    return xs, out\n\na = [3, 1, 4, 1, 5, 9]\nb = a\nr = f(a)\nb[0] += 2\nprint(a, r[1], sum(b))\n\nReturn exactly: FINAL: <list-a> | <list-r1> | <sum>.",
       "success_criteria": ["Return the exact mutated list, returned out list, and sum in the required FINAL format."]
     },
     {
