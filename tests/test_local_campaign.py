@@ -42,11 +42,13 @@ class LocalCampaignTests(unittest.TestCase):
                 {"task_id":"T1","prompt":"one"},{"task_id":"T2","prompt":"two"}
             ]}), encoding="utf-8")
 
-            def fake_pair(task, factory, *, provider_id):
+            def fake_pair(task, factory, *, provider_id, progress=None):
                 limits = {"max_steps":8,"max_model_calls":12,"max_tool_calls":8,"max_tokens":8000,"max_cost_usd":0.0}
                 usage = {"steps":1,"model_calls":1,"tool_calls":0,"tokens":10,"cost_usd":0.0}
                 raw = LocalArmEvidence(task.task_id, "raw", provider_id, "m", f"FINAL: {task.task_id}", "succeeded", limits, usage, "a"*64)
                 seed = LocalArmEvidence(task.task_id, "seed", provider_id, "m", f"FINAL: {task.task_id}", "succeeded", limits, usage, "b"*64)
+                if progress:
+                    progress({"event":"fake","task_id":task.task_id})
                 return LocalPairEvidence(raw, seed)
 
             manifest = {"name":"m","digest":"d"*64,"size":1}
@@ -55,6 +57,7 @@ class LocalCampaignTests(unittest.TestCase):
                 self.assertEqual(run.call_count, 2)
                 self.assertEqual(len(first["pairs"]), 2)
                 self.assertTrue(checkpoint.exists())
+                self.assertTrue(checkpoint.with_suffix(".json.progress.jsonl").exists())
             with patch("seed.gate1.local_campaign.OllamaProvider.model_manifest", return_value=manifest), patch("seed.gate1.local_campaign.run_local_pair", side_effect=fake_pair) as run:
                 second = run_ollama_suite(tasks, "m", checkpoint_path=checkpoint)
                 self.assertEqual(run.call_count, 0)
