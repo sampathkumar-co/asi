@@ -113,6 +113,7 @@ class JSONPlanner:
             "step": state.step,
             "recent_actions": _recent_action_view(state),
             "recent_observations": [_observation_view(o) for o in state.observations[-6:]],
+            "recent_critic_notes": list(state.notes[-4:]),
             "allowed_tools": list(self.allowed_tools),
             "tool_input_schemas": self.tool_schemas,
             "verified_compute_contract": {
@@ -133,10 +134,11 @@ class JSONPlanner:
             "expression. Use echo only for already-computed scratch evidence, not as a substitute for computation. "
             "For python_compute, write compact code, derive the answer from the task data, and assign result to an object containing: "
             "answer = the exact requested FINAL: ... string; checks = a non-empty object of meaningful independent boolean checks; "
-            "optional evidence = compact supporting values. Checks must verify the important constraints, path/ordering validity, arithmetic, "
-            "or optimality as applicable. Do not hard-code an unchecked candidate. Pay close attention to relation direction/orientation. "
-            "If recent actions produced failed, incomplete, or repeated evidence, materially change the algorithm instead of repeating it. "
-            "Keep code preferably under 1600 characters. tool_input MUST use the exact required keys shown for the selected tool."
+            "optional evidence = compact supporting values. Every checks value must literally be True or False, never a number/string. "
+            "Checks must verify the important constraints, path/ordering validity, arithmetic, or optimality as applicable. Do not hard-code "
+            "an unchecked candidate. Pay close attention to relation direction/orientation. Use recent_critic_notes as feedback. If recent actions "
+            "produced failed, incomplete, or repeated evidence, materially change the algorithm instead of repeating it. Keep code preferably "
+            "under 1600 characters. tool_input MUST use the exact required keys shown for the selected tool."
         )
         response = self.provider.complete(
             [Message("system", system), Message("user", json.dumps(prompt, default=str))],
@@ -220,6 +222,6 @@ class JSONCritic:
                 done = False
                 final_answer = None
                 confidence = min(confidence, 0.5)
-                reason = "critic attempted to finish without a verified evidence answer"
+                reason = "no verified evidence answer: checks must be non-empty booleans all true"
 
         return Critique(done, confidence, reason, None if final_answer is None else str(final_answer).strip())
