@@ -1,0 +1,45 @@
+{
+  "suite_id": "gate1-local-calibration-v1",
+  "tasks": [
+    {
+      "task_id": "T1",
+      "prompt": "Seven jobs A,B,C,D,E,F,G must be arranged in positions 1-7. D is immediately after B. A is before F. C is not first or last. G is before A. E is after F. B is before C. Exactly two positions lie between G and C. B is before G. Determine the unique order. Return exactly: FINAL: <7-letter-order>.",
+      "success_criteria": ["Return the unique valid order in the required FINAL format."]
+    },
+    {
+      "task_id": "T2",
+      "prompt": "A project has tasks: A duration 4 no prerequisites; B duration 6 no prerequisites; C duration 3 after A; D duration 5 after A; E duration 4 after both B and C; F duration 2 after C; G duration 7 after both D and E; H duration 3 after both F and E; I duration 2 after both G and H. Unlimited parallel workers are available. Find the minimum project completion time and the critical path. Return exactly: FINAL: <time> | <path-with-hyphens>.",
+      "success_criteria": ["Return the minimum completion time and one valid critical path in the required FINAL format."]
+    },
+    {
+      "task_id": "T3",
+      "prompt": "Find the unique shortest directed path from S to T. Edges with weights: S->A 4, S->B 7, S->C 3, A->D 5, A->E 9, B->A 2, B->E 3, B->F 8, C->B 2, C->D 6, D->E 1, D->T 8, E->F 2, E->T 5, F->T 2. Return exactly: FINAL: <cost> | <path-with-hyphens>.",
+      "success_criteria": ["Return the unique minimum-cost directed path and its cost in the required FINAL format."]
+    },
+    {
+      "task_id": "T4",
+      "prompt": "A ledger contains these records. Only POSTED records count. A sale contributes quantity*unit_price*(1-discount_percent/100). A refund subtracts its amount. A fee subtracts its amount. 1) A sale 3 x 40.00 discount 10% POSTED. 2) B sale 2 x 55.00 discount 0% POSTED. 3) A refund 25.00 POSTED. 4) C sale 4 x 30.00 discount 25% PENDING. 5) B fee 6.50 POSTED. 6) C sale 5 x 18.00 discount 20% POSTED. 7) A refund 12.50 VOID. 8) C sale 1 x 99.50 discount 0% POSTED. 9) C fee 4.00 POSTED. 10) B sale 2 x 75.00 discount 10% POSTED. Return exactly: FINAL: A=<2dp>,B=<2dp>,C=<2dp>,TOTAL=<2dp>.",
+      "success_criteria": ["Return the correct posted-only account totals and grand total to two decimals."]
+    },
+    {
+      "task_id": "T5",
+      "prompt": "Without executing code, determine the exact final printed values. def f(xs): out=[]; for i,x in enumerate(xs): if i%2==0: xs[i]=x+i; else: out.append(xs[i-1]-x); return xs,out. a=[3,1,4,1,5,9]; b=a; r=f(a); b[0]+=2; print(a,r[1],sum(b)). Return exactly: FINAL: <list-a> | <list-r1> | <sum>.",
+      "success_criteria": ["Return the exact mutated list, returned out list, and sum in the required FINAL format."]
+    },
+    {
+      "task_id": "T6",
+      "prompt": "Four researchers Alex, Bea, Chen, Dev present once each Monday through Thursday, each a different topic AI, Databases, Networks, Operating Systems. Chen presents Thursday. Databases is Monday. Alex presents later than Dev. AI is immediately before Alex's presentation. Bea presents neither AI nor Operating Systems. Dev does not present Networks. Chen presents Networks. Determine the unique day order and topic order. Return exactly: FINAL: <Mon-person>-<Tue-person>-<Wed-person>-<Thu-person> | <Mon-topic>-<Tue-topic>-<Wed-topic>-<Thu-topic>, using DB, AI, OS, Networks.",
+      "success_criteria": ["Return the unique person and topic orders by day in the required FINAL format."]
+    },
+    {
+      "task_id": "T7",
+      "prompt": "Find the smallest positive integer n satisfying n ≡ 2 (mod 5), n ≡ 3 (mod 7), n ≡ 4 (mod 9). Return exactly: FINAL: <n>.",
+      "success_criteria": ["Return the smallest positive integer satisfying all three congruences."]
+    },
+    {
+      "task_id": "T8",
+      "prompt": "Choose a subset of items with total weight at most 15 maximizing total value. A=(4,9), B=(5,11), C=(3,7), D=(6,14), E=(2,5), F=(4,10), G=(3,8), H=(5,13). Constraints: if H is chosen, E must also be chosen; D and B cannot both be chosen; if F is chosen, C must also be chosen; A and G cannot both be chosen. Return exactly: FINAL: <value> | <letters-with-hyphens>.",
+      "success_criteria": ["Return the feasible subset with maximum value and letters alphabetically in the required FINAL format."]
+    }
+  ]
+}
