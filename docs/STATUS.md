@@ -2,7 +2,7 @@
 
 Updated: 2026-09-09
 
-Current clean CI validation: **66/66 tests passing** on Python 3.11, 3.12 and 3.13.
+Current clean validation: **67/67 tests passing** on Sampath's Windows 11 / Python 3.13.15 and in GitHub Actions. CI is green on Ubuntu Python 3.11/3.12/3.13 plus a dedicated Windows Python 3.13 Gate-0/1 lane.
 
 ## Meaning of status labels
 
@@ -26,7 +26,8 @@ Done:
 - tamper rejection;
 - evaluator-tree integrity snapshot;
 - known-good / known-bad fail-closed canaries;
-- machine-readable Gate-0 certificate artifact.
+- machine-readable Gate-0 certificate artifact;
+- Windows-safe SQLite/EventStore lifecycle with explicit context-manager cleanup.
 
 The Gate-0 certificate qualifies the measurement/control instrument. It does not claim AGI, ASI, or recursive amplification.
 
@@ -100,13 +101,25 @@ Done:
 - promotion evidence gate;
 - durable lineage store.
 
-## Storage policy while Sampath's laptop is offline
+## Current execution/storage policy
 
-- canonical Project Seed state stays in `sampathkumar-co/asi`;
-- GitHub Actions is the clean execution/test environment;
-- Yaswanth's machine may be used only for stateless interaction/validation commands;
-- no Gate-1 source, clone, evidence bundle, benchmark file or artifact is to be stored on Yaswanth's laptop.
+- canonical Project Seed state stays in `sampathkumar-co/asi` on GitHub;
+- Sampath's laptop is the active local validation machine at `C:\Users\SAMPATH\OneDrive\Desktop\asi`;
+- the local clone must track GitHub `main` and should remain clean except ignored runtime artifacts/virtual environments;
+- GitHub Actions remains the independent clean CI environment;
+- Yaswanth's machine is no longer used while Sampath is online, and no Gate-1 project files were stored there.
+
+## Windows validation record
+
+Sampath's first Windows run exposed an SQLite file-handle cleanup bug that Ubuntu CI did not catch. The `EventStore` now has an explicit context-manager lifecycle, tests close connections deterministically, and a permanent `windows-gate01` CI job prevents regression.
+
+At commit `05a2d31c85d13b735059e831d0c1e7cfb3399a13`:
+- Sampath local Windows run: **67/67 tests passed**;
+- local Gate-0 qualification: **PASS**;
+- local Gate-1 qualification: **PASS**;
+- GitHub `windows-gate01`: **PASS**;
+- GitHub Ubuntu Python 3.11/3.12/3.13 lanes: **PASS**.
 
 ## Overall
 
-Gate 0 is complete. Gate 1 is now **experiment-ready**: the remaining work is not more scaffold plumbing, but the real independent same-model ChatGPT raw-vs-Seed campaign itself. Until that external evidence exists, Project Seed will not claim that Seed improves GPT in the real product.
+Gate 0 is complete. Gate 1 is **experiment-ready and cross-platform qualified**. The remaining Gate-1 work is the real independent same-model ChatGPT raw-vs-Seed campaign itself. Until that external evidence exists, Project Seed will not claim that Seed improves GPT in the real product.
