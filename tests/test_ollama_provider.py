@@ -44,14 +44,16 @@ class OllamaProviderTests(unittest.TestCase):
         self.assertEqual(payload["format"]["properties"]["reason"]["maxLength"], 240)
         self.assertEqual(payload["format"]["properties"]["confidence"]["maximum"], 1)
 
-    def test_raw_eval_forces_single_bounded_answer_field(self):
+    def test_raw_eval_allows_bounded_scratch_and_answer(self):
         provider = OllamaProvider("qwen-local")
-        with patch("seed.providers.ollama.urlopen", return_value=self._response('{"answer":"FINAL: x"}')) as mocked:
+        content = '{"analysis":"checked constraints","answer":"FINAL: x"}'
+        with patch("seed.providers.ollama.urlopen", return_value=self._response(content)) as mocked:
             result = provider.complete([Message("user", "solve")], purpose="raw_eval")
         payload = json.loads(mocked.call_args.args[0].data)
-        self.assertEqual(payload["format"]["required"], ["answer"])
+        self.assertEqual(payload["format"]["required"], ["analysis", "answer"])
+        self.assertEqual(payload["format"]["properties"]["analysis"]["maxLength"], 6000)
         self.assertEqual(payload["format"]["properties"]["answer"]["maxLength"], 512)
-        self.assertEqual(result.text, '{"answer":"FINAL: x"}')
+        self.assertEqual(result.text, content)
 
     def test_raw_call_does_not_force_json(self):
         provider = OllamaProvider("qwen-local")
