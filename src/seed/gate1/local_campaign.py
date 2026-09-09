@@ -194,7 +194,12 @@ def run_ollama_suite(
 
     pairs: list[dict] = []
     checkpoint = Path(checkpoint_path) if checkpoint_path else None
-    progress_file = Path(progress_path) if progress_path else None
+    if progress_path:
+        progress_file = Path(progress_path)
+    elif checkpoint:
+        progress_file = checkpoint.with_suffix(checkpoint.suffix + ".progress.jsonl")
+    else:
+        progress_file = None
     if checkpoint and resume and checkpoint.exists():
         prior = json.loads(checkpoint.read_text(encoding="utf-8"))
         identity = (prior.get("suite_id"), prior.get("provider_id"), prior.get("model"), prior.get("model_manifest"), prior.get("settings"))
