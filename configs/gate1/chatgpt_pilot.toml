@@ -1,0 +1,28 @@
+campaign_id = "gate1-chatgpt-pilot-v1"
+provider_id = "openai-chatgpt"
+surface_id = "chatgpt-web"
+model_id = "gpt-5.6-sol"
+minimum_pairs = 8
+minimum_mean_gain = 0.05
+minimum_win_rate = 0.60
+bootstrap_samples = 4000
+confidence = 0.95
+
+[limits]
+max_steps = 8
+max_model_calls = 12
+max_tool_calls = 8
+max_tokens = 8000
+max_cost_usd = 0.0
+
+[evidence]
+minimum_level_for_pilot = "manual_chat"
+minimum_level_for_certification = "platform_export"
+require_model_identity_attestation_for_certification = true
+require_usage_attestation_for_certification = true
+require_gate0_receipts_for_certification = true
+
+[storage]
+canonical_repo = "sampathkumar-co/asi"
+yaswanth_project_files_allowed = false
+private_holdouts_in_candidate_repo = false
