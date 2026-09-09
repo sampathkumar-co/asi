@@ -19,6 +19,7 @@ _ALLOWED_IMPORTS = {
 _ALLOWED_ATTRIBUTES = {
     "append", "extend", "pop", "popleft", "get", "items", "keys", "values",
     "add", "discard", "remove", "sort", "reverse", "count", "index", "setdefault",
+    "join",
 }
 _FORBIDDEN = (
     ast.Import, ast.ClassDef, ast.With, ast.AsyncWith, ast.Try, ast.Raise,
