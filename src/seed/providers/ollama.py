@@ -11,8 +11,11 @@ from .base import Message, ModelResponse
 _STRUCTURED_FORMATS: dict[str, dict] = {
     "raw_eval": {
         "type": "object",
-        "properties": {"answer": {"type": "string", "maxLength": 512}},
-        "required": ["answer"],
+        "properties": {
+            "analysis": {"type": "string", "maxLength": 6000},
+            "answer": {"type": "string", "maxLength": 512},
+        },
+        "required": ["analysis", "answer"],
         "additionalProperties": False,
     },
     "plan": {
