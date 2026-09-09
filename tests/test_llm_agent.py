@@ -14,10 +14,20 @@ class LLMAgentTests(unittest.TestCase):
         with self.assertRaises(PermissionError):
             JSONPlanner(p, ("calculator",)).next_task(AgentState(Goal("g")))
 
-    def test_planner_rejects_wrong_known_tool_input_key(self):
-        p = ScriptedProvider(['{"description":"note","tool_name":"echo","tool_input":{"message":"wrong key"}}'])
+    def test_planner_rejects_missing_required_tool_input(self):
+        p = ScriptedProvider(['{"description":"note","tool_name":"echo","tool_input":{"other":"wrong"}}'])
         with self.assertRaises(ValueError):
             JSONPlanner(p, ("echo",)).next_task(AgentState(Goal("g")))
+
+    def test_planner_normalizes_message_alias(self):
+        p = ScriptedProvider(['{"description":"note","tool_name":"echo","tool_input":{"message":"evidence"}}'])
+        task = JSONPlanner(p, ("echo",)).next_task(AgentState(Goal("g")))
+        self.assertEqual(task.tool_input, {"text": "evidence"})
+
+    def test_planner_normalizes_nested_call(self):
+        p = ScriptedProvider(['{"description":"note","tool_name":"echo","tool_input":{"tool_name":"echo","tool_input":{"text":"evidence"}}}'])
+        task = JSONPlanner(p, ("echo",)).next_task(AgentState(Goal("g")))
+        self.assertEqual(task.tool_input, {"text": "evidence"})
 
     def test_planner_accepts_exact_echo_schema(self):
         p = ScriptedProvider(['{"description":"note","tool_name":"echo","tool_input":{"text":"evidence"}}'])
