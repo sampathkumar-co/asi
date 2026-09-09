@@ -1,53 +1,46 @@
 # Gates 0-4
 
-A **gate** is both an engineering capability and a promotion criterion. Implementing the code for a gate is not the same as scientifically passing the gate.
+A gate has two levels of evidence:
+
+1. **Infrastructure qualification** — the machinery behaves correctly under deterministic canaries.
+2. **Empirical certification** — real model/research runs satisfy the scientific criterion on hidden/OOD evaluations.
 
 ## Gate 0 — Evaluation infrastructure
 
 ### Objective
 Establish trustworthy measurement before optimization begins.
 
-### Implemented
-- `EvalCase` and bounded scorer abstraction
-- `EvalSuite` runner
-- per-case and aggregate scores
-- evaluation receipts with SHA-256 content hashes
-- append-only SQLite event store with per-run hash chain
-- capability/efficiency metrics
-- metaproductivity and recursive-amplification calculations
+### Status
+**Infrastructure-qualified.**
 
-### Required before empirical certification
-- private holdout set stored outside candidate-readable workspace
-- OOD suites covering multiple task families
-- repeated runs / variance estimates for stochastic models
-- evaluator-leakage tests
-- baseline frontier-model measurements
+The fail-closed `seed gate0-certify` command validates external holdout separation, known-good/known-bad discrimination, statistical comparison, receipt integrity, tamper rejection and evaluator immutability.
 
-### Stop condition
-Do not call any candidate "improved" if evaluation provenance is missing or the candidate could modify the relevant evaluator.
+### Scientific role
+Gate 0 is the measurement instrument used to judge every later capability claim.
 
 ---
 
 ## Gate 1 — Bounded baseline agent
 
 ### Objective
-Create a clear, measurable baseline before adding architectural complexity.
+Determine whether a scaffold improves a fixed model under a controlled resource envelope.
 
 ### Implemented
-- `Goal`, `Task`, `Observation`, `AgentState`
-- planner/executor/critic interfaces
-- deterministic queue planner
-- explicit tool registry/allowlist
-- safe arithmetic and echo demonstration tools
-- step/tool/model/token/cost budget object
-- state/event logging
-- explicit success and budget-exhausted states
+- raw-model control arm;
+- planner/executor/critic Seed arm;
+- persistent state/provenance;
+- hard model/tool/step/token/cost budgets;
+- model-call metering and transcript hashes;
+- explicit tool allowlist;
+- fail-closed malformed-output and budget behavior;
+- same-provider/same-envelope comparison evidence;
+- deterministic `seed gate1-certify` canary.
 
-### Next empirical work
-Integrate one or more real model providers behind the provider-neutral interface and measure improvement relative to raw-model baselines.
+### Infrastructure criterion
+The qualification must prove that both arms use the same declared provider identity and envelope, that overspending and denied actions fail closed, and that the harness can detect a planted multi-step capability difference.
 
-### Gate criterion
-The scaffold must improve performance on long-horizon hidden tasks at acceptable normalized cost—not merely consume more inference.
+### Empirical criterion
+Using the same real model/version for both arms, Seed must outperform the raw arm on repeated hidden/OOD long-horizon tasks while remaining within the common resource envelope and showing acceptable normalized efficiency.
 
 ---
 
@@ -57,112 +50,49 @@ The scaffold must improve performance on long-horizon hidden tasks at acceptable
 Make the system reason in terms of falsifiable hypotheses and independent evidence.
 
 ### Implemented
-- hypothesis + rationale + explicit falsifiers
-- experiment plan + predicted result + success metric + controls
-- experiment result + artifact references + reproducibility indicator
-- independent verifier
-- adversarial verifier
-- acceptance requires both verifiers and reproducibility
+- hypotheses + falsifiers;
+- experiments + controls;
+- predicted results + success metrics;
+- reproducibility flag;
+- independent verifier;
+- adversarial verifier.
 
-### Next empirical work
-Use genuinely uncertain research tasks, planted experimental bugs, and replication tasks.
-
-### Gate criterion
-The system must reliably reject bad hypotheses, detect confounds, backtrack, and reproduce accepted results.
+### Empirical criterion
+Reliably reject bad hypotheses, detect confounds, backtrack, and reproduce accepted results.
 
 ---
 
 ## Gate 3 — Automatic architecture search
 
 ### Objective
-Stop assuming humans know the optimal agent architecture.
+Search agent architectures instead of assuming a fixed human design.
 
 ### Implemented
-`AgentGenome` controls:
-- max reasoning steps
-- verification passes
-- memory limit
-- critic threshold
-- planner strategy
+- declarative `AgentGenome`;
+- bounded mutations;
+- archive/deduplication;
+- capability-cost fitness;
+- multi-generation search.
 
-`ArchitectureSearch` provides:
-- deterministic seeded mutation
-- bounded parameter ranges
-- candidate IDs derived from content
-- archive preventing needless duplicate evaluation
-- capability-cost fitness
-- elitist multi-generation search
-
-### Next work
-Expand the genome carefully to model routing, context selection, memory policies, branch/merge reasoning, tool choice and stopping policies.
-
-### Gate criterion
-Discovered architectures must outperform human-written baselines on hidden/OOD suites with normalized cost.
+### Empirical criterion
+Discovered architectures must outperform human-written baselines on hidden/OOD suites under normalized cost.
 
 ---
 
 ## Gate 4 — Controlled self-modification
 
 ### Objective
-Allow the system to propose changes to its own capability code while preserving evaluator/control integrity.
+Allow capability-plane source changes without allowing candidates to rewrite their evaluator/control plane.
 
 ### Implemented
-- structured `PatchProposal`
-- file mutation allowlist
-- explicit forbidden evaluator/control/provider paths
-- path-traversal rejection
-- mutation file/byte budgets
-- optimistic concurrency via expected SHA-256
-- copy-on-write descendant workspace
-- no mutation of parent repository
-- Docker command with no network, read-only mount, dropped capabilities, `no-new-privileges`, CPU/memory/PID limits
-- explicit promotion evidence and thresholds
+- structured patches;
+- path/byte/file mutation limits;
+- evaluator/control/provider denial paths;
+- stale-hash protection;
+- copy-on-write descendants;
+- durable lineage;
+- no-network/read-only Docker execution;
+- explicit promotion evidence gate.
 
-### Immutable by default
-Candidates cannot modify:
-- `.github/`
-- `src/seed/eval/`
-- `src/seed/selfmod/`
-- `src/seed/providers/`
-- control/security documentation
-
-### Gate criterion
-A child must pass sandbox tests, independent verification, hidden/OOD evaluation, and a minimum improvement threshold before promotion. Human approval remains required by policy at this stage.
-
----
-
-# Promotion ladder
-
-```text
-proposal
-  |
-  v
-policy validation ----fail----> reject
-  |
- pass
-  v
-copy-on-write descendant
-  |
-  v
-sandbox tests --------fail----> reject
-  |
- pass
-  v
-visible eval
-  |
-  v
-hidden/OOD eval ------fail----> reject
-  |
- pass
-  v
-independent verification
-  |
-  v
-promotion evidence
-  |
-  v
-human approval at Gate 4
-  |
-  v
-archive as new parent candidate
-```
+### Empirical criterion
+A child must pass sandbox tests, independent verification and hidden/OOD evaluation before human-approved promotion.
