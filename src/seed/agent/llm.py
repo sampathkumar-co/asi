@@ -16,7 +16,7 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
     "python_compute": {
         "required": ["code"],
         "properties": {
-            "code": "safe Python code, <=4000 chars; no imports/files/network/attributes; assign JSON-serializable final value to variable result"
+            "code": "compact safe Python code, preferably <=1600 chars; no files/network/attributes; safe helpers are preloaded; assign JSON-serializable final evidence to result"
         },
     },
     "echo": {
@@ -91,7 +91,8 @@ class JSONPlanner:
             "Choose the smallest action that creates checkable evidence. Prefer python_compute for arithmetic, graph/search, scheduling, "
             "constraint enumeration, simulation, code tracing, or optimization when available. Use calculator only for one simple arithmetic "
             "expression. Use echo only for already-computed evidence/candidate answers, not as a substitute for computation. "
-            "For python_compute, write self-contained safe code and assign the final JSON-serializable evidence to variable result. "
+            "For python_compute, write compact code only: avoid comments and unnecessary boilerplate/imports, use preloaded safe helpers, "
+            "and assign the final JSON-serializable evidence to variable result. Keep code preferably under 1600 characters. "
             "tool_input MUST use the exact required keys shown for the selected tool."
         )
         response = self.provider.complete(
