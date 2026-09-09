@@ -11,7 +11,18 @@ class LLMAgentTests(unittest.TestCase):
 
     def test_planner_rejects_unlisted_tool(self):
         p = ScriptedProvider(['{"description":"shell","tool_name":"shell","tool_input":{}}'])
-        with self.assertRaises(PermissionError): JSONPlanner(p, ("calculator",)).next_task(AgentState(Goal("g")))
+        with self.assertRaises(PermissionError):
+            JSONPlanner(p, ("calculator",)).next_task(AgentState(Goal("g")))
+
+    def test_planner_rejects_wrong_known_tool_input_key(self):
+        p = ScriptedProvider(['{"description":"note","tool_name":"echo","tool_input":{"message":"wrong key"}}'])
+        with self.assertRaises(ValueError):
+            JSONPlanner(p, ("echo",)).next_task(AgentState(Goal("g")))
+
+    def test_planner_accepts_exact_echo_schema(self):
+        p = ScriptedProvider(['{"description":"note","tool_name":"echo","tool_input":{"text":"evidence"}}'])
+        task = JSONPlanner(p, ("echo",)).next_task(AgentState(Goal("g")))
+        self.assertEqual(task.tool_input, {"text": "evidence"})
 
     def test_critic_threshold_blocks_weak_done(self):
         p = ScriptedProvider(['{"done":true,"confidence":0.6,"reason":"weak","final_answer":"x"}'])
