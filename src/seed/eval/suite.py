@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 import time
 from typing import Any, Callable
 
 from .cases import EvalCase
 from .metrics import RunMetrics
 from .receipts import EvalReceipt, make_receipt
+from .resources import MeasuredOutput, ResourceAccumulator
 
 
 CandidateFn = Callable[[str], Any]
@@ -33,9 +34,15 @@ class EvalSuite:
     def run(self, candidate_id: str, candidate: CandidateFn) -> EvalOutcome:
         started = time.perf_counter()
         scores: dict[str, float] = {}
+        resources = ResourceAccumulator()
         for case in self.cases:
             try:
-                output = candidate(case.prompt)
+                value = candidate(case.prompt)
+                if isinstance(value, MeasuredOutput):
+                    resources.add(value.usage)
+                    output = value.output
+                else:
+                    output = value
                 raw = float(case.scorer(output))
                 score = min(1.0, max(0.0, raw))
             except Exception:
@@ -43,6 +50,17 @@ class EvalSuite:
             scores[case.case_id] = score
         wall = time.perf_counter() - started
         total = sum(scores.values()) / len(scores)
-        metrics = RunMetrics(capability_score=total, cases=len(scores), wall_time_s=wall)
-        receipt = make_receipt(self.suite_id, candidate_id, total, scores, {"wall_time_s": wall, "cases": len(scores)})
+        usage = resources.snapshot(wall_time_s=wall)
+        metrics = RunMetrics(
+            capability_score=total,
+            cases=len(scores),
+            wall_time_s=wall,
+            model_calls=usage.model_calls,
+            tool_calls=usage.tool_calls,
+            tokens=usage.tokens,
+            cost_usd=usage.cost_usd,
+            human_interventions=usage.human_interventions,
+            compute_seconds=usage.compute_seconds,
+        )
+        receipt = make_receipt(self.suite_id, candidate_id, total, scores, asdict(metrics))
         return EvalOutcome(total, scores, metrics, receipt)

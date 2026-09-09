@@ -18,5 +18,12 @@ jobs:
       - run: python -m pip install -e .
       - run: python -m unittest discover -s tests -v
       - run: seed eval-demo
+      - run: seed gate0-certify --repo-root . --output artifacts/gate0-certificate.json
+      - run: python -c "import json; d=json.load(open('artifacts/gate0-certificate.json')); assert d['passed'] is True"
       - run: seed demo
       - run: seed search-demo
+      - if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate0-certificate
+          path: artifacts/gate0-certificate.json

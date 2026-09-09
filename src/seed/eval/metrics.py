@@ -13,6 +13,7 @@ class RunMetrics:
     tokens: int = 0
     cost_usd: float = 0.0
     human_interventions: int = 0
+    compute_seconds: float = 0.0
 
     @property
     def efficiency(self) -> float:
