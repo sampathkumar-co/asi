@@ -1,7 +1,9 @@
 import unittest
-from seed.agent.llm import JSONPlanner, JSONCritic
-from seed.core.models import AgentState, Goal
+
+from seed.agent.llm import JSONCritic, JSONPlanner
+from seed.core.models import AgentState, Goal, Observation
 from seed.providers.scripted import ScriptedProvider
+
 
 class LLMAgentTests(unittest.TestCase):
     def test_planner_enforces_tool_allowlist(self):
@@ -40,4 +42,23 @@ class LLMAgentTests(unittest.TestCase):
         self.assertFalse(c.done)
         self.assertIsNone(c.final_answer)
 
-if __name__ == "__main__": unittest.main()
+    def test_verified_critic_accepts_only_checked_observation_answer(self):
+        state = AgentState(Goal("g"))
+        state.observations.append(Observation("t", True, {"answer": "FINAL: 4", "checks": {"arithmetic": True}}))
+        p = ScriptedProvider(['{"done":true,"confidence":0.95,"reason":"verified","final_answer":"FINAL: 4"}'])
+        c = JSONCritic(p, require_verified_answer=True).review(state)
+        self.assertTrue(c.done)
+        self.assertEqual(c.final_answer, "FINAL: 4")
+
+    def test_verified_critic_rejects_unchecked_or_invented_answer(self):
+        state = AgentState(Goal("g"))
+        state.observations.append(Observation("t", True, {"answer": "FINAL: 4", "checks": {"arithmetic": False}}))
+        p = ScriptedProvider(['{"done":true,"confidence":0.99,"reason":"looks good","final_answer":"FINAL: 5"}'])
+        c = JSONCritic(p, require_verified_answer=True).review(state)
+        self.assertFalse(c.done)
+        self.assertIsNone(c.final_answer)
+        self.assertLessEqual(c.confidence, 0.5)
+
+
+if __name__ == "__main__":
+    unittest.main()
