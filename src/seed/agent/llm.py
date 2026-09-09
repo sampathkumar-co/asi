@@ -16,7 +16,7 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
     "python_compute": {
         "required": ["code"],
         "properties": {
-            "code": "compact safe Python code, preferably <=1600 chars; no files/network/attributes; safe helpers are preloaded; assign JSON-serializable final evidence to result"
+            "code": "compact safe Python code, preferably <=1600 chars; safe helpers/methods only; assign verified evidence object to result"
         },
     },
     "echo": {
@@ -29,6 +29,39 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
 def _observation_view(obs: Observation) -> dict[str, object]:
     """Remove volatile IDs/timestamps so temperature-0 model prompts are reproducible."""
     return {"ok": obs.ok, "output": obs.output, "error": obs.error}
+
+
+def _recent_action_view(state: AgentState) -> list[dict[str, object]]:
+    count = min(4, len(state.tasks), len(state.observations))
+    if count == 0:
+        return []
+    tasks = state.tasks[-count:]
+    observations = state.observations[-count:]
+    return [
+        {
+            "description": task.description,
+            "tool_name": task.tool_name,
+            "outcome": _observation_view(obs),
+        }
+        for task, obs in zip(tasks, observations)
+    ]
+
+
+def _verified_answers(state: AgentState) -> tuple[str, ...]:
+    answers: list[str] = []
+    for obs in state.observations:
+        if not obs.ok or not isinstance(obs.output, dict):
+            continue
+        answer = obs.output.get("answer")
+        checks = obs.output.get("checks")
+        if not isinstance(answer, str) or not answer.strip().startswith("FINAL:"):
+            continue
+        if not isinstance(checks, dict) or not checks:
+            continue
+        if not all(value is True for value in checks.values()):
+            continue
+        answers.append(answer.strip())
+    return tuple(answers)
 
 
 def _normalize_tool_name(tool: object, allowed_tools: tuple[str, ...]) -> str:
@@ -75,11 +108,18 @@ class JSONPlanner:
     def next_task(self, state: AgentState) -> Task:
         prompt = {
             "goal": state.goal.description,
+            "success_criteria": list(state.goal.success_criteria),
             "constraints": list(state.goal.constraints),
             "step": state.step,
+            "recent_actions": _recent_action_view(state),
             "recent_observations": [_observation_view(o) for o in state.observations[-6:]],
             "allowed_tools": list(self.allowed_tools),
             "tool_input_schemas": self.tool_schemas,
+            "verified_compute_contract": {
+                "answer": "exact requested FINAL: ... string",
+                "checks": "non-empty object of meaningful boolean validations; every value must be true",
+                "evidence": "optional compact supporting data",
+            },
             "schema": {
                 "description": "concise string, <=160 chars",
                 "tool_name": "exactly one allowed tool",
@@ -90,10 +130,13 @@ class JSONPlanner:
             "Return exactly one compact JSON object matching the supplied schema. Do not emit markdown or analysis outside JSON. "
             "Choose the smallest action that creates checkable evidence. Prefer python_compute for arithmetic, graph/search, scheduling, "
             "constraint enumeration, simulation, code tracing, or optimization when available. Use calculator only for one simple arithmetic "
-            "expression. Use echo only for already-computed evidence/candidate answers, not as a substitute for computation. "
-            "For python_compute, write compact code only: avoid comments and unnecessary boilerplate/imports, use preloaded safe helpers, "
-            "and assign the final JSON-serializable evidence to variable result. Keep code preferably under 1600 characters. "
-            "tool_input MUST use the exact required keys shown for the selected tool."
+            "expression. Use echo only for already-computed scratch evidence, not as a substitute for computation. "
+            "For python_compute, write compact code, derive the answer from the task data, and assign result to an object containing: "
+            "answer = the exact requested FINAL: ... string; checks = a non-empty object of meaningful independent boolean checks; "
+            "optional evidence = compact supporting values. Checks must verify the important constraints, path/ordering validity, arithmetic, "
+            "or optimality as applicable. Do not hard-code an unchecked candidate. Pay close attention to relation direction/orientation. "
+            "If recent actions produced failed, incomplete, or repeated evidence, materially change the algorithm instead of repeating it. "
+            "Keep code preferably under 1600 characters. tool_input MUST use the exact required keys shown for the selected tool."
         )
         response = self.provider.complete(
             [Message("system", system), Message("user", json.dumps(prompt, default=str))],
@@ -120,17 +163,26 @@ class JSONPlanner:
 
 
 class JSONCritic:
-    """Evidence-only critic with a strict bounded-confidence schema."""
+    """Evidence-only critic with an optional deterministic verified-answer gate."""
 
-    def __init__(self, provider: ModelProvider, *, finish_threshold: float = 0.85) -> None:
+    def __init__(
+        self,
+        provider: ModelProvider,
+        *,
+        finish_threshold: float = 0.85,
+        require_verified_answer: bool = False,
+    ) -> None:
         self.provider = provider
         self.finish_threshold = finish_threshold
+        self.require_verified_answer = bool(require_verified_answer)
 
     def review(self, state: AgentState) -> Critique:
+        verified = _verified_answers(state) if self.require_verified_answer else ()
         prompt = {
             "goal": state.goal.description,
             "success_criteria": list(state.goal.success_criteria),
             "observations": [_observation_view(o) for o in state.observations[-10:]],
+            "verified_candidate_answers": list(verified),
             "schema": {
                 "done": "boolean",
                 "confidence": "number 0..1",
@@ -140,9 +192,10 @@ class JSONCritic:
         }
         system = (
             "Return exactly one compact JSON object and no markdown. Judge ONLY the supplied observations; do not solve the goal from scratch. "
-            "Treat failed tool observations as no evidence. Set done=true only when successful observations contain a complete candidate answer "
-            "or enough deterministic results to construct it and every constraint can be checked. If evidence is incomplete or internally inconsistent, "
-            "set done=false, confidence<=0.5, final_answer=null. Never invent numbers not present in successful observations. Keep reason under 240 chars."
+            "Treat failed tool observations as no evidence. If verified_candidate_answers is present, set done=true only by copying one of those "
+            "answers exactly; never construct, repair, or invent a different final answer. Otherwise set done=true only when successful observations "
+            "contain complete checkable evidence. If evidence is incomplete or internally inconsistent, set done=false, confidence<=0.5, "
+            "final_answer=null. Keep reason under 240 chars."
         )
         response = self.provider.complete(
             [Message("system", system), Message("user", json.dumps(prompt, default=str))],
@@ -160,4 +213,13 @@ class JSONCritic:
         done = bool(data.get("done", False)) and confidence >= self.finish_threshold
         reason = str(data.get("reason", ""))[:240]
         final_answer = data.get("final_answer") if done else None
-        return Critique(done, confidence, reason, None if final_answer is None else str(final_answer))
+
+        if self.require_verified_answer and done:
+            candidate = None if final_answer is None else str(final_answer).strip()
+            if candidate not in verified:
+                done = False
+                final_answer = None
+                confidence = min(confidence, 0.5)
+                reason = "critic attempted to finish without a verified evidence answer"
+
+        return Critique(done, confidence, reason, None if final_answer is None else str(final_answer).strip())
