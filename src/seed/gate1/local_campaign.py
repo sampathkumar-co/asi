@@ -10,6 +10,7 @@ from seed.agent.baseline import BaselineAgent
 from seed.agent.components import RegistryExecutor
 from seed.agent.llm import JSONCritic, JSONPlanner
 from seed.core.budget import Budget
+from seed.core.events import EventStore
 from seed.core.models import Goal
 from seed.providers.base import Message, ModelProvider
 from seed.providers.budgeted import BudgetedProvider
@@ -102,9 +103,10 @@ def run_local_pair(task: LocalTask, provider_factory: Callable[[], ModelProvider
     tools = default_registry()
     planner = JSONPlanner(seed_meter, tools.names())
     critic = JSONCritic(seed_meter, finish_threshold=0.85)
-    state = BaselineAgent(planner, RegistryExecutor(tools), critic, budget=seed_budget).run(
-        Goal(task.prompt, success_criteria=task.success_criteria)
-    )
+    with EventStore(":memory:") as events:
+        state = BaselineAgent(planner, RegistryExecutor(tools), critic, budget=seed_budget, events=events).run(
+            Goal(task.prompt, success_criteria=task.success_criteria)
+        )
     seed = _arm(task, "seed", seed_meter, seed_budget, state.final_answer, state.status.value)
     pair = LocalPairEvidence(raw, seed)
     pair.validate()
