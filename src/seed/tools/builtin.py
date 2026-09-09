@@ -4,6 +4,7 @@ import ast
 import operator
 from typing import Any
 
+from .python_compute import python_compute
 from .registry import ToolRegistry, ToolResult
 
 
@@ -53,5 +54,6 @@ def echo(payload: dict[str, Any]) -> ToolResult:
 def default_registry() -> ToolRegistry:
     reg = ToolRegistry()
     reg.register("calculator", calculator)
+    reg.register("python_compute", python_compute)
     reg.register("echo", echo)
     return reg
