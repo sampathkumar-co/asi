@@ -12,6 +12,7 @@ from seed.eval.cases import EvalCase, exact_match, numeric_match
 from seed.eval.gate0 import run_gate0_qualification, write_gate0_certificate
 from seed.eval.suite import EvalSuite
 from seed.gate1.qualification import run_gate1_qualification, write_gate1_certificate
+from seed.gate1.realchat import load_pair
 from seed.search.architecture import AgentGenome, ArchitectureSearch
 from seed.tools.builtin import default_registry
 
@@ -49,6 +50,24 @@ def gate1_certify(output: str | None) -> int:
     return 0 if certificate.passed else 1
 
 
+def gate1_chat_validate(raw_path: str, seed_path: str) -> int:
+    pair = load_pair(raw_path, seed_path)
+    report = {
+        "valid_pair": True,
+        "task_id": pair.raw.task_id,
+        "provider_id": pair.raw.provider_id,
+        "model_id": pair.raw.model_id,
+        "surface_id": pair.raw.surface_id,
+        "minimum_evidence_level": pair.minimum_evidence_level,
+        "certification_ready": pair.certification_ready,
+        "content_hash": pair.content_hash,
+        "raw_hash": pair.raw.content_hash,
+        "seed_hash": pair.seed.content_hash,
+    }
+    print(json.dumps(report, indent=2, sort_keys=True))
+    return 0
+
+
 def search_demo() -> int:
     def evaluator(g: AgentGenome) -> tuple[float, float]:
         capability = min(1.0, 0.50 + 0.03 * g.verification_passes + 0.01 * min(g.max_steps, 12))
@@ -71,12 +90,17 @@ def main() -> int:
     gate0.add_argument("--output", default=None)
     gate1 = sub.add_parser("gate1-certify", help="Run the fail-closed Gate-1 agent-infrastructure qualification")
     gate1.add_argument("--output", default=None)
+    chat = sub.add_parser("gate1-chat-validate", help="Validate a paired real-ChatGPT raw-vs-Seed evidence bundle")
+    chat.add_argument("--raw", required=True)
+    chat.add_argument("--seed", required=True)
     sub.add_parser("search-demo", help="Run the Gate-3 architecture-search demo")
     args = parser.parse_args()
     if args.command == "gate0-certify":
         return gate0_certify(args.repo_root, args.output)
     if args.command == "gate1-certify":
         return gate1_certify(args.output)
+    if args.command == "gate1-chat-validate":
+        return gate1_chat_validate(args.raw, args.seed)
     return {"demo": demo, "eval-demo": eval_demo, "search-demo": search_demo}[args.command]()
 
 
