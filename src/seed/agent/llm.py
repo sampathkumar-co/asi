@@ -20,6 +20,20 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
 }
 
 
+def _normalize_tool_input(tool: str, payload: dict) -> dict:
+    """Canonicalize a few semantically equivalent small-model call shapes."""
+    normalized = dict(payload)
+    nested_tool = normalized.get("tool_name")
+    nested_input = normalized.get("tool_input")
+    if nested_tool == tool and isinstance(nested_input, dict):
+        normalized = dict(nested_input)
+    if tool == "echo" and "text" not in normalized and isinstance(normalized.get("message"), str):
+        normalized["text"] = normalized.pop("message")
+    if tool == "calculator" and "expression" not in normalized and isinstance(normalized.get("expr"), str):
+        normalized["expression"] = normalized.pop("expr")
+    return normalized
+
+
 class JSONPlanner:
     """Provider-neutral planner requiring a strict compact JSON action schema."""
 
@@ -75,6 +89,7 @@ class JSONPlanner:
         payload = data.get("tool_input", {})
         if not isinstance(desc, str) or not isinstance(payload, dict):
             raise ValueError("Planner output schema invalid")
+        payload = _normalize_tool_input(str(tool), payload)
         required = self.tool_schemas.get(str(tool), {}).get("required", [])
         if isinstance(required, list) and any(key not in payload for key in required):
             raise ValueError(f"Planner tool_input missing required key for {tool}")
