@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from typing import Mapping
 
-from seed.core.models import AgentState, Task
+from seed.core.models import AgentState, Observation, Task
 from seed.providers.base import Message, ModelProvider
 from .interfaces import Critique
 
@@ -13,6 +13,12 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
         "required": ["expression"],
         "properties": {"expression": "string arithmetic expression, maximum 200 characters"},
     },
+    "python_compute": {
+        "required": ["code"],
+        "properties": {
+            "code": "safe Python code, <=4000 chars; no imports/files/network/attributes; assign JSON-serializable final value to variable result"
+        },
+    },
     "echo": {
         "required": ["text"],
         "properties": {"text": "string containing useful scratch evidence or a candidate answer"},
@@ -20,17 +26,31 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
 }
 
 
+def _observation_view(obs: Observation) -> dict[str, object]:
+    """Remove volatile IDs/timestamps so temperature-0 model prompts are reproducible."""
+    return {"ok": obs.ok, "output": obs.output, "error": obs.error}
+
+
+def _normalize_tool_name(tool: object, allowed_tools: tuple[str, ...]) -> str:
+    value = str(tool)
+    if value == "python" and "python_compute" in allowed_tools:
+        return "python_compute"
+    return value
+
+
 def _normalize_tool_input(tool: str, payload: dict) -> dict:
-    """Canonicalize a few semantically equivalent small-model call shapes."""
+    """Canonicalize semantically equivalent small-model call shapes."""
     normalized = dict(payload)
     nested_tool = normalized.get("tool_name")
     nested_input = normalized.get("tool_input")
-    if nested_tool == tool and isinstance(nested_input, dict):
+    if nested_tool in (tool, "python" if tool == "python_compute" else tool) and isinstance(nested_input, dict):
         normalized = dict(nested_input)
     if tool == "echo" and "text" not in normalized and isinstance(normalized.get("message"), str):
         normalized["text"] = normalized.pop("message")
     if tool == "calculator" and "expression" not in normalized and isinstance(normalized.get("expr"), str):
         normalized["expression"] = normalized.pop("expr")
+    if tool == "python_compute" and "code" not in normalized and isinstance(normalized.get("python"), str):
+        normalized["code"] = normalized.pop("python")
     return normalized
 
 
@@ -57,7 +77,7 @@ class JSONPlanner:
             "goal": state.goal.description,
             "constraints": list(state.goal.constraints),
             "step": state.step,
-            "recent_observations": [o.__dict__ for o in state.observations[-6:]],
+            "recent_observations": [_observation_view(o) for o in state.observations[-6:]],
             "allowed_tools": list(self.allowed_tools),
             "tool_input_schemas": self.tool_schemas,
             "schema": {
@@ -67,10 +87,12 @@ class JSONPlanner:
             },
         }
         system = (
-            "Return exactly one compact JSON object matching the supplied schema. "
-            "Do not emit markdown or analysis outside JSON. Keep description concise. "
-            "tool_input MUST use the exact required keys shown for the selected tool; "
-            "never invent aliases such as message when the schema requires text."
+            "Return exactly one compact JSON object matching the supplied schema. Do not emit markdown or analysis outside JSON. "
+            "Choose the smallest action that creates checkable evidence. Prefer python_compute for arithmetic, graph/search, scheduling, "
+            "constraint enumeration, simulation, code tracing, or optimization when available. Use calculator only for one simple arithmetic "
+            "expression. Use echo only for already-computed evidence/candidate answers, not as a substitute for computation. "
+            "For python_compute, write self-contained safe code and assign the final JSON-serializable evidence to variable result. "
+            "tool_input MUST use the exact required keys shown for the selected tool."
         )
         response = self.provider.complete(
             [Message("system", system), Message("user", json.dumps(prompt, default=str))],
@@ -82,18 +104,18 @@ class JSONPlanner:
             raise ValueError("Planner returned invalid JSON") from exc
         if not isinstance(data, dict):
             raise ValueError("Planner output must be a JSON object")
-        tool = data.get("tool_name")
+        tool = _normalize_tool_name(data.get("tool_name"), self.allowed_tools)
         if tool not in self.allowed_tools:
             raise PermissionError(f"Planner requested non-allowlisted tool: {tool}")
         desc = data.get("description")
         payload = data.get("tool_input", {})
         if not isinstance(desc, str) or not isinstance(payload, dict):
             raise ValueError("Planner output schema invalid")
-        payload = _normalize_tool_input(str(tool), payload)
-        required = self.tool_schemas.get(str(tool), {}).get("required", [])
+        payload = _normalize_tool_input(tool, payload)
+        required = self.tool_schemas.get(tool, {}).get("required", [])
         if isinstance(required, list) and any(key not in payload for key in required):
             raise ValueError(f"Planner tool_input missing required key for {tool}")
-        return Task(desc[:160], str(tool), payload)
+        return Task(desc[:160], tool, payload)
 
 
 class JSONCritic:
@@ -107,7 +129,7 @@ class JSONCritic:
         prompt = {
             "goal": state.goal.description,
             "success_criteria": list(state.goal.success_criteria),
-            "observations": [o.__dict__ for o in state.observations[-10:]],
+            "observations": [_observation_view(o) for o in state.observations[-10:]],
             "schema": {
                 "done": "boolean",
                 "confidence": "number 0..1",
@@ -116,10 +138,10 @@ class JSONCritic:
             },
         }
         system = (
-            "Return exactly one compact JSON object and no markdown. Judge ONLY the supplied observations; "
-            "do not solve the goal from scratch inside the critic. Set done=true only when observations contain "
-            "a complete candidate answer with enough evidence to satisfy the success criteria. If evidence is "
-            "incomplete, set done=false, confidence<=0.5, and final_answer=null. Keep reason under 240 characters."
+            "Return exactly one compact JSON object and no markdown. Judge ONLY the supplied observations; do not solve the goal from scratch. "
+            "Treat failed tool observations as no evidence. Set done=true only when successful observations contain a complete candidate answer "
+            "or enough deterministic results to construct it and every constraint can be checked. If evidence is incomplete or internally inconsistent, "
+            "set done=false, confidence<=0.5, final_answer=null. Never invent numbers not present in successful observations. Keep reason under 240 chars."
         )
         response = self.provider.complete(
             [Message("system", system), Message("user", json.dumps(prompt, default=str))],
