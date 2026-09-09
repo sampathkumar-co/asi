@@ -16,6 +16,7 @@ from seed.providers.base import Message, ModelProvider
 from seed.providers.budgeted import BudgetedProvider, ModelCallRecord
 from seed.providers.ollama import OllamaProvider
 from seed.tools.builtin import default_registry
+from .attestation import implementation_manifest
 
 
 @dataclass(frozen=True)
@@ -106,8 +107,8 @@ def run_local_pair(
     raw_cb = (lambda record: progress(_record_event(task.task_id, "raw", record))) if progress else None
     raw_meter = BudgetedProvider(provider_factory(), raw_budget, provider_id=provider_id, on_record=raw_cb)
     raw_system = (
-        "Solve directly without Seed orchestration or tools. Reason privately. "
-        "Return only a JSON object with one field named answer whose value is the requested FINAL answer."
+        "Solve directly without Seed orchestration or tools. Use the bounded analysis field as scratch reasoning. "
+        "Return only a JSON object with fields analysis and answer; answer must be the requested FINAL: ... string."
     )
     try:
         response = raw_meter.complete([Message("system", raw_system), Message("user", task.prompt)], purpose="raw_eval")
@@ -155,12 +156,21 @@ def _append_jsonl(path: Path, event: dict) -> None:
         handle.flush()
 
 
-def _body(suite_id: str, provider_id: str, model: str, manifest: dict, settings: dict, pairs: list[dict]) -> dict:
+def _body(
+    suite_id: str,
+    provider_id: str,
+    model: str,
+    manifest: dict,
+    implementation: dict,
+    settings: dict,
+    pairs: list[dict],
+) -> dict:
     body = {
         "suite_id": suite_id,
         "provider_id": provider_id,
         "model": model,
         "model_manifest": manifest,
+        "seed_implementation": implementation,
         "settings": settings,
         "pairs": pairs,
     }
@@ -180,17 +190,37 @@ def run_ollama_suite(
 ) -> dict:
     suite_id, tasks = load_local_tasks(task_path)
     provider_id = f"ollama:{model}"
-    probe = OllamaProvider(model, temperature=0.0, num_ctx=num_ctx, num_predict=num_predict, think=False)
+    purpose_caps = {
+        "raw_eval": int(num_predict),
+        "plan": min(640, int(num_predict)),
+        "critic": min(128, int(num_predict)),
+    }
+    probe = OllamaProvider(
+        model,
+        temperature=0.0,
+        num_ctx=num_ctx,
+        num_predict=num_predict,
+        think=False,
+        purpose_num_predict=purpose_caps,
+    )
     manifest = probe.model_manifest()
+    implementation = implementation_manifest()
     settings = {
         "temperature": 0.0,
         "think": False,
         "num_ctx": num_ctx,
-        "num_predict": num_predict,
-        "raw_protocol": "single structured answer; no tools",
+        "purpose_num_predict": purpose_caps,
+        "raw_protocol": "one bounded analysis+answer call; no tools",
         "seed_protocol": "bounded planner/tool/critic with machine-checked answer contract",
     }
-    factory = lambda: OllamaProvider(model, temperature=0.0, num_ctx=num_ctx, num_predict=num_predict, think=False)
+    factory = lambda: OllamaProvider(
+        model,
+        temperature=0.0,
+        num_ctx=num_ctx,
+        num_predict=num_predict,
+        think=False,
+        purpose_num_predict=purpose_caps,
+    )
 
     pairs: list[dict] = []
     checkpoint = Path(checkpoint_path) if checkpoint_path else None
@@ -202,10 +232,17 @@ def run_ollama_suite(
         progress_file = None
     if checkpoint and resume and checkpoint.exists():
         prior = json.loads(checkpoint.read_text(encoding="utf-8"))
-        identity = (prior.get("suite_id"), prior.get("provider_id"), prior.get("model"), prior.get("model_manifest"), prior.get("settings"))
-        expected = (suite_id, provider_id, model, manifest, settings)
+        identity = (
+            prior.get("suite_id"),
+            prior.get("provider_id"),
+            prior.get("model"),
+            prior.get("model_manifest"),
+            prior.get("seed_implementation"),
+            prior.get("settings"),
+        )
+        expected = (suite_id, provider_id, model, manifest, implementation, settings)
         if identity != expected:
-            raise ValueError("checkpoint identity/settings do not match requested campaign")
+            raise ValueError("checkpoint identity/settings/implementation do not match requested campaign")
         pairs = list(prior.get("pairs", []))
         if len({p.get("raw", {}).get("task_id") for p in pairs}) != len(pairs):
             raise ValueError("checkpoint contains duplicate task evidence")
@@ -225,9 +262,9 @@ def run_ollama_suite(
         emit({"event": "pair_started", "task_id": task.task_id})
         pair = run_local_pair(task, factory, provider_id=provider_id, progress=emit)
         pairs.append({"raw": asdict(pair.raw), "seed": asdict(pair.seed), "pair_hash": pair.content_hash})
-        body = _body(suite_id, provider_id, model, manifest, settings, pairs)
+        body = _body(suite_id, provider_id, model, manifest, implementation, settings, pairs)
         if checkpoint:
             _atomic_write(checkpoint, body)
         emit({"event": "pair_completed", "task_id": task.task_id, "pair_hash": pair.content_hash})
 
-    return _body(suite_id, provider_id, model, manifest, settings, pairs)
+    return _body(suite_id, provider_id, model, manifest, implementation, settings, pairs)
