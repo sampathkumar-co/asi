@@ -23,8 +23,8 @@ class LocalCampaignTests(unittest.TestCase):
         providers = iter([
             ScriptedProvider(['{"answer":"FINAL: 4"}']),
             ScriptedProvider([
-                '{"description":"candidate","tool_name":"echo","tool_input":{"text":"FINAL: 4"}}',
-                '{"done":true,"confidence":0.95,"reason":"candidate present","final_answer":"FINAL: 4"}',
+                '{"description":"compute verified candidate","tool_name":"python_compute","tool_input":{"code":"result={\'answer\':\'FINAL: 4\',\'checks\':{\'arithmetic\':True}}"}}',
+                '{"done":true,"confidence":0.95,"reason":"verified candidate present","final_answer":"FINAL: 4"}',
             ]),
         ])
         pair = run_local_pair(tasks[0], lambda: next(providers), provider_id="ollama:test-model")
