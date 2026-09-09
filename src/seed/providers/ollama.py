@@ -9,6 +9,12 @@ from .base import Message, ModelResponse
 
 
 _STRUCTURED_FORMATS: dict[str, dict] = {
+    "raw_eval": {
+        "type": "object",
+        "properties": {"answer": {"type": "string", "maxLength": 512}},
+        "required": ["answer"],
+        "additionalProperties": False,
+    },
     "plan": {
         "type": "object",
         "properties": {
@@ -51,7 +57,7 @@ class OllamaProvider:
         num_ctx: int = 4096,
         num_predict: int = 256,
         think: bool = False,
-        json_purposes: Iterable[str] = ("plan", "critic"),
+        json_purposes: Iterable[str] = ("raw_eval", "plan", "critic"),
     ) -> None:
         if not model.strip():
             raise ValueError("Ollama model name must be non-empty")
