@@ -29,15 +29,18 @@ Find the smallest positive integer n satisfying n ≡ 2 (mod 5), n ≡ 3 (mod 7)
 Choose a subset of items with total weight at most 15 maximizing total value. A=(4,9), B=(5,11), C=(3,7), D=(6,14), E=(2,5), F=(4,10), G=(3,8), H=(5,13). Constraints: if H is chosen, E must also be chosen; D and B cannot both be chosen; if F is chosen, C must also be chosen; A and G cannot both be chosen. Return exactly: `FINAL: <value> | <letters-with-hyphens>`.
 
 ## Frozen comparison envelope
-- same exact local model and quantization for Raw and Seed;
+- same exact local model artifact/digest for Raw and Seed;
 - temperature 0;
 - thinking mode disabled for both arms;
 - context 4096;
+- maximum output per individual model call: 768 tokens for both arms;
 - maximum 8 Seed steps;
 - maximum 12 model calls;
 - maximum 8 tool calls;
-- maximum 8000 total metered tokens;
+- maximum 8000 total metered tokens per arm;
 - cost USD 0;
-- Raw may use its token budget in a single direct call; Seed may allocate the same total budget across bounded calls;
+- Raw gets one direct model call, no Seed tools/orchestration, and is constrained only to a one-field structured answer envelope so verbosity cannot create a truncation confound;
+- Seed may allocate the same total budget across bounded planner/tool/critic calls;
+- every completed Raw/Seed pair is atomically checkpointed and a restart resumes only unfinished task IDs after validating suite/model/digest/settings;
 - outputs are frozen before trusted scoring;
 - candidate code never receives the answer key.
