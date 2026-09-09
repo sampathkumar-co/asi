@@ -21,18 +21,28 @@ class OllamaProviderTests(unittest.TestCase):
         }
         return io.BytesIO(json.dumps(body).encode("utf-8"))
 
-    def test_plan_uses_json_mode_and_reports_usage(self):
+    def test_plan_uses_bounded_json_schema_and_reports_usage(self):
         provider = OllamaProvider("qwen-local", temperature=0, num_ctx=2048, num_predict=128)
         with patch("seed.providers.ollama.urlopen", return_value=self._response()) as mocked:
             result = provider.complete([Message("user", "plan")], purpose="plan")
         request = mocked.call_args.args[0]
         payload = json.loads(request.data)
-        self.assertEqual(payload["format"], "json")
+        self.assertIsInstance(payload["format"], dict)
+        self.assertEqual(payload["format"]["type"], "object")
+        self.assertEqual(payload["format"]["properties"]["description"]["maxLength"], 160)
         self.assertFalse(payload["think"])
         self.assertEqual(payload["options"]["temperature"], 0.0)
         self.assertEqual(result.total_tokens, 26)
         self.assertEqual(result.cost_usd, 0.0)
         self.assertEqual(result.metadata["model"], "qwen-local")
+
+    def test_critic_schema_bounds_reason(self):
+        provider = OllamaProvider("qwen-local")
+        with patch("seed.providers.ollama.urlopen", return_value=self._response()) as mocked:
+            provider.complete([Message("user", "critic")], purpose="critic")
+        payload = json.loads(mocked.call_args.args[0].data)
+        self.assertEqual(payload["format"]["properties"]["reason"]["maxLength"], 240)
+        self.assertEqual(payload["format"]["properties"]["confidence"]["maximum"], 1)
 
     def test_raw_call_does_not_force_json(self):
         provider = OllamaProvider("qwen-local")
