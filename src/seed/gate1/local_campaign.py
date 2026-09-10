@@ -10,6 +10,7 @@ from typing import Callable
 from seed.agent.baseline import BaselineAgent
 from seed.agent.components import RegistryExecutor
 from seed.agent.llm import JSONCritic, JSONPlanner
+from seed.agent.tool_routing import select_tools
 from seed.core.budget import Budget
 from seed.core.events import EventStore
 from seed.core.models import Goal
@@ -126,7 +127,8 @@ def run_local_pair(
     seed_cb = (lambda record: progress(_record_event(task.task_id, "seed", record))) if progress else None
     seed_meter = BudgetedProvider(provider_factory(), seed_budget, provider_id=provider_id, on_record=seed_cb)
     tools = default_registry()
-    planner = JSONPlanner(seed_meter, tools.names())
+    routed_tools = select_tools(task.prompt, tools.names())
+    planner = JSONPlanner(seed_meter, routed_tools)
     critic = JSONCritic(seed_meter, finish_threshold=0.85, require_verified_answer=True)
     with EventStore(":memory:") as events:
         state = BaselineAgent(planner, RegistryExecutor(tools), critic, budget=seed_budget, events=events).run(
@@ -223,8 +225,9 @@ def run_ollama_suite(
         "think": False,
         "num_ctx": num_ctx,
         "purpose_num_predict": purpose_caps,
+        "tool_routing": "deterministic goal-based relevant subset plus python_compute/calculator fallbacks",
         "raw_protocol": "one bounded analysis+answer call; no tools",
-        "seed_protocol": "bounded planner/tool/critic with machine-checked answer contract",
+        "seed_protocol": "bounded routed planner/tool/critic with machine-checked answer contract",
     }
     factory = lambda: OllamaProvider(
         model,
