@@ -65,6 +65,28 @@ class AssignmentCSPTests(unittest.TestCase):
         self.assertTrue(result.ok)
         self.assertEqual(result.output["answer"], "FINAL: Bea-Dev-Alex-Chen | DB-AI-OS-Networks")
 
+    def test_not_in_topics_alias_expands_to_not_same_any(self):
+        result = default_registry().call(
+            "assignment_csp",
+            {
+                "groups": {
+                    "people": ["Alex", "Bea", "Chen", "Dev"],
+                    "topics": ["AI", "Databases", "Networks", "Operating Systems"],
+                },
+                "positions": [1, 2, 3, 4],
+                "constraints": [
+                    "position_eq(Chen,4)", "position_eq(Databases,1)", "after(Alex,Dev)",
+                    "immediately_before(AI,Alex)", "not_in_topics(Bea,[AI, Operating Systems])",
+                    "not_in_topics(Dev,[Networks])", "position_eq(Chen,Networks)",
+                ],
+                "labels": {"Databases": "DB", "Operating Systems": "OS"},
+                "render_groups": [{"name": "people", "group": "people"}, {"name": "topics", "group": "topics"}],
+                "answer_template": "FINAL: {people} | {topics}",
+            },
+        )
+        self.assertTrue(result.ok)
+        self.assertEqual(result.output["answer"], "FINAL: Bea-Dev-Alex-Chen | DB-AI-OS-Networks")
+
     def test_nonunique_assignment_rejected(self):
         result = default_registry().call(
             "assignment_csp",
