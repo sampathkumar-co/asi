@@ -25,6 +25,11 @@ def extract_final(output: str | None) -> str | None:
     return matches[-1].strip() if matches else None
 
 
+def _accepted_value(value: str) -> str:
+    final = extract_final(value)
+    return final if final is not None else value.strip()
+
+
 def score_answer(output: str | None, accepted: str | Sequence[str]) -> float:
     final = extract_final(output)
     if final is None:
@@ -33,7 +38,7 @@ def score_answer(output: str | None, accepted: str | Sequence[str]) -> float:
     if not candidates or any(not isinstance(x, str) for x in candidates):
         raise ValueError("accepted answers must be a string or non-empty sequence of strings")
     actual = _canonical(final)
-    return 1.0 if any(actual == _canonical(x) for x in candidates) else 0.0
+    return 1.0 if any(actual == _canonical(_accepted_value(x)) for x in candidates) else 0.0
 
 
 def score_local_campaign(evidence_path: str | Path, answer_path: str | Path) -> dict:
