@@ -107,6 +107,21 @@ class ToolTests(unittest.TestCase):
         self.assertEqual(result.output["answer"], "FINAL: Bea-Dev-Alex-Chen | DB-AI-OS-Networks")
         self.assertTrue(all(result.output["checks"].values()))
 
+    def test_finite_csp_normalizes_literal_right_and_parallel_labels(self):
+        result = default_registry().call(
+            "finite_csp",
+            {
+                "domains": {"A": [1, 2], "B": [1, 2]},
+                "all_different": [["A", "B"]],
+                "constraints": [{"op": "eq", "left": "A", "right": "1"}],
+                "sequences": [{"name": "order", "variables": ["A", "B"], "order": [1, 2], "labels": ["Alpha", "Beta"]}],
+                "answer_template": "FINAL: {order}",
+            },
+        )
+        self.assertTrue(result.ok)
+        self.assertEqual(result.output["answer"], "FINAL: Alpha-Beta")
+        self.assertTrue(all(result.output["checks"].values()))
+
     def test_finite_csp_rejects_nonunique_problem(self):
         result = default_registry().call(
             "finite_csp",
