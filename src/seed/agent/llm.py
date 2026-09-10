@@ -39,6 +39,16 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
             "path_separator": "optional separator, default '-'",
         },
     },
+    "finite_csp": {
+        "required": ["domains", "all_different", "constraints", "sequences", "answer_template"],
+        "properties": {
+            "domains": "object variable->small array of allowed values; for ordering puzzles use positions such as [1,2,3,4]",
+            "all_different": "array of variable-name arrays that must all take distinct values",
+            "constraints": "array using ops eq, ne, lt, gt, offset_eq, abs_diff, not_in. eq/ne use left plus right OR value; offset_eq means left=right+value; abs_diff means abs(left-right)=value; not_in uses var and values",
+            "sequences": "array of {name,variables,order,optional labels,optional separator}; for each order value the tool finds the variable occupying it and renders its label",
+            "answer_template": "string using sequence placeholders such as FINAL: {people} | {topics}",
+        },
+    },
     "shortest_path": {
         "required": ["edges", "source", "target", "answer_template"],
         "properties": {
@@ -159,13 +169,15 @@ class JSONPlanner:
             "Return exactly one compact JSON object matching the supplied schema; no markdown or outside analysis. "
             "Choose the smallest action that creates checkable evidence. When a specialized exact tool is allowed, prefer it over writing Python: "
             "shortest_path for nonnegative weighted directed shortest paths; dag_longest_path for precedence/project critical paths; crt for systems "
-            "of congruences; aggregate_records for filtered grouped sums/ledger-style arithmetic. Translate task data faithfully into the tool schema "
-            "and preserve the exact requested FINAL formatting via answer_template. Use python_compute as the general fallback for constraint enumeration, "
-            "simulation, code tracing, combinatorial optimization, or computations not covered by an exact tool. Use calculator only for one simple "
-            "expression. For python_compute, derive the candidate from task data, avoid backslash line continuations, and finish with one result object "
-            "containing exact FINAL answer plus non-empty meaningful boolean checks all computed against the selected candidate. Never hard-code an "
-            "unchecked guess. Pay attention to relation direction, filtering/status rules, signs, percentages, required abbreviations, and output format. "
-            "Use recent critic feedback and materially change failed/repeated approaches. tool_input MUST use the exact required keys."
+            "of congruences; aggregate_records for filtered grouped sums/ledger arithmetic; finite_csp for logic grids, permutations, schedules, and "
+            "small finite-domain ordering constraints. For finite_csp, model each entity/topic as a variable whose value is its position/day, put each "
+            "same-kind set in all_different, translate clues declaratively, and use sequences to render entities in position order. Translate task data "
+            "faithfully and preserve exact FINAL formatting via answer_template. Use python_compute only as the general fallback for computations not "
+            "covered by an exact tool. Use calculator only for one simple expression. For python_compute, derive the candidate from task data, avoid "
+            "backslash line continuations, and finish with one result object containing exact FINAL answer plus non-empty meaningful boolean checks "
+            "computed against the selected candidate. Never hard-code an unchecked guess. Pay attention to relation direction, filtering/status rules, "
+            "signs, percentages, required abbreviations, and output format. Use recent critic feedback and materially change failed/repeated approaches. "
+            "tool_input MUST use the exact required keys."
         )
         response = self.provider.complete(
             [Message("system", system), Message("user", json.dumps(prompt, default=str))],
