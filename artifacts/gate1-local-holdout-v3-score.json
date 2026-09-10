@@ -1,0 +1,97 @@
+{
+  "answer_key_sha256": "cdf0879ab3fb166ef4d16cd830c2f2fd7d5ef469db1b1dbf1d89376fa9f61258",
+  "ci_high": 0.8125,
+  "ci_low": 0.1875,
+  "content_hash": "b9029ad107cd3467977cf1c3b88bcf6504a2a6ef5b280f47f1b3a1b0704fe8f4",
+  "evidence_hash": "2103c567d92d4796819671e32c3000f3b74e234fcd369f11ed9a07061661dba6",
+  "evidence_sha256": "e4efeaede8623344d9de5019a86b1ad096f973706c5156633f3dd5f714c0f871",
+  "mean_gain": 0.5,
+  "pair_count": 16,
+  "per_task": [
+    {
+      "raw_score": 0.0,
+      "seed_score": 0.0,
+      "task_id": "V301"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 0.0,
+      "task_id": "V302"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "V303"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "V304"
+    },
+    {
+      "raw_score": 1.0,
+      "seed_score": 1.0,
+      "task_id": "V305"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "V306"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "V307"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "V308"
+    },
+    {
+      "raw_score": 1.0,
+      "seed_score": 0.0,
+      "task_id": "V309"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 0.0,
+      "task_id": "V310"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "V311"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "V312"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "V313"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "V314"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 0.0,
+      "task_id": "V315"
+    },
+    {
+      "raw_score": 1.0,
+      "seed_score": 1.0,
+      "task_id": "V316"
+    }
+  ],
+  "raw_mean": 0.1875,
+  "scoring_adapter": "bare-key container only; repository score_answer + paired_bootstrap(4000,seed=0)",
+  "seed_mean": 0.6875,
+  "suite_id": "gate1-local-holdout-v3",
+  "win_rate": 0.5625
+}

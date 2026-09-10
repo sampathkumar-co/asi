@@ -17,28 +17,30 @@ Completed:
 - exact reusable tools for shortest paths, project critical paths, CRT, semantic transactions/reconciliation, aggregation, assignment/CSP, exact Python tracing and constrained subset optimization;
 - deterministic relevant-tool routing and sandboxed computation fallback.
 
-Latest unseen holdout result:
-- Raw 1/16 (6.25%);
-- Seed 5/16 (31.25%);
-- +25 percentage-point observed gain;
-- 31.25% strict Seed win rate;
-- 95% paired-bootstrap CI [0.00, 0.50];
-- **promotion FAIL** under the frozen >=60% win-rate and CI-low >0 rule.
+Latest unseen holdout result (v3):
+- Raw 3/16 (18.75%);
+- Seed 11/16 (68.75%);
+- +50 percentage-point observed gain;
+- 9/16 = 56.25% strict Seed win rate;
+- 95% paired-bootstrap CI [+18.75 pp, +81.25 pp];
+- **promotion FAIL** only because the frozen >=60% strict-win criterion was not met.
 
-### Milestone A2 — Gate-1 vNext candidate
+### Milestone A2 — vNext / holdout-v3 cycle
 
-**Status: implementation frozen; new-holdout preparation next.**
+**Status: completed; promotion not passed.**
 
-Candidate source: `83ec193d6300b0658af8d4d3c45109880b28363f`. Implementation digest: `a82be2b8cd2a60e4fa4021a0d6bfa0434c73032afbf0ec29771626385dccd708`. Local validation is **131/131 tests passing** and **10/10 deterministic Gate-1 canaries passing**.
+The vNext candidate at `83ec193d6300b0658af8d4d3c45109880b28363f` substantially improved unseen accuracy and moved the confidence interval fully above zero. Holdout v3 is now retired to development use. Full result: [`GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](GATE1_LOCAL_HOLDOUT_V3_RESULT.md).
 
-H01-H16 were used only as retired development evidence. Generic fixes now cover critical-path finalization, transaction/reconciliation semantics, exact Python tracing, constrained subset optimization, ordering-format fidelity and stable capability routing. Details: [`GATE1_VNEXT_DEVELOPMENT.md`](GATE1_VNEXT_DEVELOPMENT.md).
+### Milestone A3 — next Gate-1 candidate
 
-Before the next promotion attempt:
-1. keep the vNext candidate frozen;
-2. generate a **new** private holdout with materially different instances;
-3. independently audit answer correctness and uniqueness/optimality;
-4. preregister task/key hashes, model digest, envelope and unchanged thresholds;
-5. run all paired tasks without architecture changes;
+Use v3 only as development evidence. Diagnose the four both-wrong cases, the single Raw-only win, and the four Seed budget-exhaustion outcomes without copying hidden answers into prompts or tools. Preserve the exact evidence-only finalization and control-plane separation.
+
+Before another promotion attempt:
+1. freeze the revised candidate source + implementation digest;
+2. generate a **new** private holdout v4 with materially different instances;
+3. independently audit correctness, uniqueness and optimality;
+4. preregister task/key hashes, model digest, envelope and thresholds;
+5. run all pairs without architecture changes;
 6. score once and publish the result even if it fails.
 
 ## Milestone B — Gate 2 research benchmark

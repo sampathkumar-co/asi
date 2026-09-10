@@ -28,9 +28,9 @@ Determine whether a scaffold improves a fixed model under a controlled resource 
 ### Status
 **Infrastructure-qualified and empirically tested; NOT empirically certified.**
 
-A preregistered unseen 16-pair local Qwen3-8B holdout completed on 2026-09-10. Raw scored 1/16, Seed scored 5/16, for a +25 percentage-point mean gain. However strict Seed win rate was 31.25% and the 95% paired-bootstrap CI for gain was [0.00, 0.50]. The frozen >=60% win-rate and CI-lower-bound >0 requirements were not met.
+The latest preregistered unseen 16-pair local Qwen3-8B holdout v3 completed on 2026-09-10. Raw scored 3/16 and Seed scored 11/16, a +50 percentage-point mean gain. The 95% paired-bootstrap CI for gain was [+18.75 pp, +81.25 pp], clearing zero. However strict Seed win rate was 9/16 = 56.25%, below the frozen >=60% requirement. Gate 1 therefore does not promote.
 
-See [`GATE1_LOCAL_HOLDOUT_V2_RESULT.md`](GATE1_LOCAL_HOLDOUT_V2_RESULT.md).
+See [`GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](GATE1_LOCAL_HOLDOUT_V3_RESULT.md).
 
 ### Implemented
 - raw-model control arm;
@@ -40,7 +40,7 @@ See [`GATE1_LOCAL_HOLDOUT_V2_RESULT.md`](GATE1_LOCAL_HOLDOUT_V2_RESULT.md).
 - model-call metering and transcript hashes;
 - local Ollama adapter and exact model digest attestation;
 - explicit relevant-tool routing and allowlists;
-- exact reusable graph/scheduling/CRT/aggregation/CSP tools;
+- exact reusable graph/scheduling/CRT, semantic transaction/reconciliation, Python-trace, subset-optimization and CSP tools;
 - sandboxed computation fallback;
 - fail-closed malformed-output and budget behavior;
 - same-provider/same-envelope comparison evidence;

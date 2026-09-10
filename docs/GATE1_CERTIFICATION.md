@@ -113,13 +113,15 @@ The frozen candidate/model run, tasks, answer key and evidence were not altered.
 
 This incident is retained as part of the audit trail rather than hidden because evaluator correctness is part of Gate 0/1 trustworthiness.
 
-## Current vNext candidate
+## Current vNext candidate and holdout v3
 
-After holdout v2 was retired to development use, the observed failure classes were addressed generically. The resulting candidate is frozen at source commit `83ec193d6300b0658af8d4d3c45109880b28363f` with Seed implementation digest `a82be2b8cd2a60e4fa4021a0d6bfa0434c73032afbf0ec29771626385dccd708`.
+After holdout v2 was retired to development use, the observed failure classes were addressed generically. The resulting candidate is frozen at source commit `83ec193d6300b0658af8d4d3c45109880b28363f` with Seed implementation digest `a82be2b8cd2a60e4fa4021a0d6bfa0434c73032afbf0ec29771626385dccd708`. It passed **131/131** local regression tests and **10/10** deterministic Gate-1 infrastructure canaries before v3 inference.
 
-The candidate passes **131/131** local regression tests and **10/10** deterministic Gate-1 infrastructure canaries. Development-only probes on retired H01-H16 cases verify the new transaction/reconciliation, exact Python-trace, subset-optimization and output-finalization paths. This is not promotion evidence. See [`GATE1_VNEXT_DEVELOPMENT.md`](GATE1_VNEXT_DEVELOPMENT.md).
+Holdout v3 was generated privately, corrected for ambiguity before exposure, independently audited 16/16, and preregistered at commit `f10457f41d167551657e7e0e2b7741f79ed25b7b`. The final sealed campaign produced Raw **3/16 (18.75%)** vs Seed **11/16 (68.75%)**, a **+50 pp** gain with 95% paired-bootstrap CI **[+18.75 pp, +81.25 pp]**.
 
-The next certification attempt must use a new private holdout v3 generated and preregistered after this candidate identity was frozen.
+The strict Seed paired win rate was **9/16 = 56.25%**, below the frozen **>=60%** threshold. All other promotion requirements passed. Gate 1 therefore remains **NOT empirically certified**. See [`GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](GATE1_LOCAL_HOLDOUT_V3_RESULT.md).
+
+The private v3 key used a bare task-to-answer JSON mapping while the CLI scorer expects a wrapper object. This was discovered after sealing and before scoring. The key bytes were not changed; a read-only adapter verified the preregistered key SHA and used the repository's existing canonical answer scorer and 4,000-sample paired bootstrap. This compatibility issue is retained in the v3 audit record.
 
 ## Failure semantics
 
@@ -132,11 +134,11 @@ A failed planner/critic/tool path cannot silently become a successful answer.
 
 ## What remains for Gate-1 empirical certification
 
-The H01-H16 holdout is now development evidence and may not be reused as a fresh certification set.
+Both H01-H16/v2 and V301-V316/v3 are retired development evidence and may not be reused as fresh certification sets.
 
-The next candidate must address the observed unseen weaknesses generically, then be frozen before a new private holdout is generated and audited. The next promotion attempt must again use a new preregistered task/key pair and must retain the same or explicitly preregistered promotion criteria.
+v3 demonstrates a strong aggregate and statistically positive capability effect, but Gate 1 intentionally also requires broad paired reliability. The next candidate must address the remaining generic failure/budget-exhaustion classes without answer leakage, then be frozen before a new private holdout v4 is generated, audited and preregistered.
 
-Gate 1 will remain failed until a campaign actually satisfies those criteria. Positive individual task wins or a positive mean delta alone are not enough.
+Gate 1 will remain failed until a campaign actually satisfies every frozen criterion. In particular, the 56.25% v3 strict-win rate is not rounded up or treated as equivalent to the 60% threshold.
 
 ## Storage policy
 

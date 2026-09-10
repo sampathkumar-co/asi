@@ -97,6 +97,14 @@ Post-v2 development is frozen at source commit `83ec193d6300b0658af8d4d3c4510988
 
 Retired-holdout development probes verify the intended generic fixes for critical-path finalization, transaction/reconciliation semantics, ordering-format fidelity, exact Python tracing and structured subset optimization. These probes are development evidence only. See [`GATE1_VNEXT_DEVELOPMENT.md`](GATE1_VNEXT_DEVELOPMENT.md).
 
+### Preregistered unseen holdout v3
+
+Frozen vNext source: `83ec193d6300b0658af8d4d3c45109880b28363f`; implementation digest: `a82be2b8cd2a60e4fa4021a0d6bfa0434c73032afbf0ec29771626385dccd708`; preregistration commit: `f10457f41d167551657e7e0e2b7741f79ed25b7b`.
+
+Final score: Raw **3/16 = 18.75%**, Seed **11/16 = 68.75%**, mean gain **+50 pp**, strict Seed win rate **56.25%**, 95% paired-bootstrap CI **[+18.75 pp, +81.25 pp]**. Pair count, gain, CI, identity/integrity, and resource criteria passed. The frozen >=60% strict-win criterion failed, so **Gate 1 remains NOT EMPIRICALLY CERTIFIED**.
+
+Full audit: [`GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](GATE1_LOCAL_HOLDOUT_V3_RESULT.md).
+
 ## Gate 2 — scientific-method workflow
 
 **Implemented + tested protocol; not empirically certified.**
@@ -147,8 +155,8 @@ Implemented:
 
 ## Current Gate-1 next step
 
-The vNext candidate is frozen and locally qualified. H01-H16 remain retired development evidence and may not be reused as certification data. The next action is to generate, independently audit and preregister a **new private holdout v3** against the frozen vNext candidate, then run the same-model Raw-vs-Seed promotion campaign without architecture changes.
+Holdout v3 is now retired development evidence and must not be reused as fresh certification data. Gate 1 remains active because v3 missed the strict-win threshold by one Seed-only win. The next candidate should use v3 only to diagnose generic remaining failure classes, preserve the stronger vNext gains, and then face a **new independently audited/preregistered holdout v4** under unchanged or explicitly preregistered criteria.
 
 ## Overall
 
-Gate 0 is complete. Gate 1 is **infrastructure-qualified, experiment-ready and empirically tested, but not empirically certified**. Project Seed has measured a positive unseen-task capability delta for the scaffold on a small local model, but it has not yet met the project's own threshold for a reliable promotion claim. Gates 2-4 remain foundations awaiting later empirical qualification.
+Gate 0 is complete. Gate 1 is **infrastructure-qualified, experiment-ready and empirically tested, but not empirically certified**. The latest unseen holdout shows a large and statistically positive aggregate scaffold effect (Seed 68.75% vs Raw 18.75%, +50 pp; CI lower bound +18.75 pp), but broad paired reliability is still below the project's frozen promotion standard (56.25% strict wins vs 60% required). Gates 2-4 remain foundations awaiting later empirical qualification.

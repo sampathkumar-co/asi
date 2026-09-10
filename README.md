@@ -38,24 +38,22 @@ Gate 0 passed its fail-closed qualification and remains the measurement/control 
 
 ## Latest Gate-1 empirical result
 
-On 2026-09-10, the frozen Seed candidate at source commit `8c18f91ad72c31007243e4bf2b8388b1421efd00` was compared with a Raw control using the exact same local `qwen3:8b` model artifact and the same hard 8,000-token arm envelope.
+On 2026-09-10, the frozen vNext Seed candidate at source commit `83ec193d6300b0658af8d4d3c45109880b28363f` was evaluated on a new 16-pair private holdout v3 against the exact same local `qwen3:8b` Raw control and hard 8,000-token arm envelope.
 
-The 16-pair private holdout was generated and independently audited before inference, with task/key hashes preregistered in GitHub commit `8f38b01604964b1e6aabbef10d842051c52fb25c`.
+The final v3 task/key hashes were independently audited 16/16 before inference and preregistered in GitHub commit `f10457f41d167551657e7e0e2b7741f79ed25b7b`.
 
 Result:
 
-- Raw: **1/16 = 6.25%**
-- Seed: **5/16 = 31.25%**
-- observed mean gain: **+25 percentage points**
-- strict Seed win rate: **31.25%**
-- 95% paired-bootstrap CI for gain: **[0.00, 0.50]**
-- Gate-1 promotion: **FAIL** because win rate < 60% and CI lower bound is not > 0
+- Raw: **3/16 = 18.75%**
+- Seed: **11/16 = 68.75%**
+- observed mean gain: **+50 percentage points**
+- strict Seed win rate: **9/16 = 56.25%**
+- 95% paired-bootstrap CI for gain: **[+18.75 pp, +81.25 pp]**
+- Gate-1 promotion: **FAIL** because the frozen strict-win threshold is >=60%
 
-This is positive unseen-task evidence for some scaffold/tooling effects, but it is not enough for empirical Gate-1 certification. See [`docs/GATE1_LOCAL_HOLDOUT_V2_RESULT.md`](docs/GATE1_LOCAL_HOLDOUT_V2_RESULT.md) for the full audit trail and [`artifacts/gate1-local-holdout-v2-score.json`](artifacts/gate1-local-holdout-v2-score.json) for the public score-only artifact.
+All other frozen criteria passed, including pair count, mean gain, CI lower bound >0, identity/integrity, and resource-envelope checks. With 16 pairs the win-rate threshold requires 10 strict Seed wins; v3 produced 9. The threshold is not weakened after observing the result.
 
-### Current Gate-1 vNext candidate
-
-Post-v2 development is frozen at source commit `83ec193d6300b0658af8d4d3c45109880b28363f` with implementation digest `a82be2b8cd2a60e4fa4021a0d6bfa0434c73032afbf0ec29771626385dccd708`. It passes **131/131** local tests and **10/10** deterministic Gate-1 canaries. The v2 holdout is retired to development use; the next empirical promotion attempt must use a newly generated, independently audited and preregistered holdout v3. See [`docs/GATE1_VNEXT_DEVELOPMENT.md`](docs/GATE1_VNEXT_DEVELOPMENT.md).
+See [`docs/GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](docs/GATE1_LOCAL_HOLDOUT_V3_RESULT.md) and [`artifacts/gate1-local-holdout-v3-score.json`](artifacts/gate1-local-holdout-v3-score.json). Gate 1 therefore remains empirically tested but **not certified**.
 
 ## Gate-0 measurement layer
 
