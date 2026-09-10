@@ -61,7 +61,27 @@ class _SafeImportStripper(ast.NodeTransformer):
         return None
 
 
+def _normalize_model_code(code: str) -> str:
+    """Repair harmless serialization artifacts without changing program structure.
+
+    Small JSON-constrained models sometimes emit two or more literal backslashes
+    at the end of a Python continuation line. Python accepts exactly one. Collapse
+    only a trailing run of 2+ backslashes immediately before a newline; strings
+    ending in a quote are unaffected.
+    """
+    code = code.replace("\r\n", "\n").replace("\r", "\n")
+    out: list[str] = []
+    for line in code.split("\n"):
+        trimmed = line.rstrip()
+        trailing = len(trimmed) - len(trimmed.rstrip("\\"))
+        if trailing >= 2:
+            trimmed = trimmed[:-trailing] + "\\"
+        out.append(trimmed if trailing else line)
+    return "\n".join(out)
+
+
 def _sanitize(code: str) -> str:
+    code = _normalize_model_code(code)
     if not code or len(code) > _MAX_CODE_CHARS:
         raise ValueError("code must be 1..4000 characters")
     tree = ast.parse(code, mode="exec")
