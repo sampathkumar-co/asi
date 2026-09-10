@@ -1,0 +1,95 @@
+{
+  "answer_key_sha256": "f93e0aaeac12721882c37f2cca2f3f7b8ae28357793214d4c4ea8f4c91c96eac",
+  "ci_high": 0.75,
+  "ci_low": 0.25,
+  "content_hash": "8143ddeb19a76099feb4b54f911b01eeaa97c1c95d6f9b29f12e3d65f7ce7faa",
+  "evidence_hash": "c3cfa3e2332d6ad4d54ac77ce294007f96cc6ce514a5cd3fd7e46d20b79d7e6f",
+  "mean_gain": 0.5,
+  "pair_count": 16,
+  "per_task": [
+    {
+      "raw_score": 0.0,
+      "seed_score": 0.0,
+      "task_id": "W401"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "W402"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 0.0,
+      "task_id": "W403"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 0.0,
+      "task_id": "W404"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "W405"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "W406"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "W407"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "W408"
+    },
+    {
+      "raw_score": 1.0,
+      "seed_score": 1.0,
+      "task_id": "W409"
+    },
+    {
+      "raw_score": 1.0,
+      "seed_score": 1.0,
+      "task_id": "W410"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "W411"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 0.0,
+      "task_id": "W412"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 0.0,
+      "task_id": "W413"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "W414"
+    },
+    {
+      "raw_score": 1.0,
+      "seed_score": 1.0,
+      "task_id": "W415"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "W416"
+    }
+  ],
+  "raw_mean": 0.1875,
+  "seed_mean": 0.6875,
+  "suite_id": "gate1-local-holdout-v4",
+  "win_rate": 0.5
+}

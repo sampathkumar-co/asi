@@ -28,11 +28,11 @@ Determine whether a scaffold improves a fixed model under a controlled resource 
 ### Status
 **Infrastructure-qualified and empirically tested; NOT empirically certified.**
 
-The latest preregistered unseen 16-pair local Qwen3-8B holdout v3 completed on 2026-09-10. Raw scored 3/16 and Seed scored 11/16, a +50 percentage-point mean gain. The 95% paired-bootstrap CI for gain was [+18.75 pp, +81.25 pp], clearing zero. However strict Seed win rate was 9/16 = 56.25%, below the frozen >=60% requirement. Gate 1 therefore does not promote.
+The latest preregistered unseen 16-pair local Qwen3-8B holdout v4 completed on 2026-09-10. Raw scored 3/16 and Seed scored 11/16, a +50 percentage-point mean gain. The 95% paired-bootstrap CI for gain was [+25.00 pp, +75.00 pp], clearing zero. However strict Seed win rate was 8/16 = 50.00%, below the frozen >=60% requirement. Gate 1 therefore does not promote.
 
-See [`GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](GATE1_LOCAL_HOLDOUT_V3_RESULT.md).
+See [`GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](GATE1_LOCAL_HOLDOUT_V4_RESULT.md).
 
-Post-v3 reliability development is frozen at `b4242af758b1222f8ecea0bf7306e917a36ed9d8` with implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`; it passes **134/134** local tests and **10/10** deterministic Gate-1 checks. Retired-v3 diagnostics are development evidence only. See [`GATE1_V4_DEVELOPMENT.md`](GATE1_V4_DEVELOPMENT.md).
+The evaluated v4 candidate is frozen at `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`, and remains green at **134/134** local tests and **10/10** deterministic Gate-1 checks.
 
 ### Implemented
 - raw-model control arm;

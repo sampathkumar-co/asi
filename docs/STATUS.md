@@ -105,9 +105,15 @@ Final score: Raw **3/16 = 18.75%**, Seed **11/16 = 68.75%**, mean gain **+50 pp*
 
 Full audit: [`GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](GATE1_LOCAL_HOLDOUT_V3_RESULT.md).
 
-### Gate-1 v4 development candidate
+### Gate-1 v4 certification campaign
 
-Post-v3 reliability fixes are frozen at source commit `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`. The candidate passes **134/134** local regression tests and **10/10** deterministic Gate-1 checks; qualification hash `357b3beac3bbcfb04ccf09b6e00a74dd7fdd95b2ef9ae72f7dd15fc9cff16799`. Retired v3 probes close the targeted shortest-route routing and assignment/CSP reliability failures. These probes are not promotion evidence. See [`GATE1_V4_DEVELOPMENT.md`](GATE1_V4_DEVELOPMENT.md).
+Frozen source: `b4242af758b1222f8ecea0bf7306e917a36ed9d8`; implementation digest: `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`; preregistration commit: `e346ffabb2f77bded32d29e58e8009dc2731fd20`.
+
+The private v4 holdout was generated after candidate freeze, independently audited **16/16**, and scored only after all 16 pairs sealed. Final score: Raw **3/16 = 18.75%**, Seed **11/16 = 68.75%**, mean gain **+50 pp**, strict Seed win rate **8/16 = 50.00%**, 95% paired-bootstrap CI **[+25.00 pp, +75.00 pp]**.
+
+Pair count, gain, CI, identity/integrity and resource criteria passed. The frozen >=60% strict-win criterion failed, so **Gate 1 remains NOT EMPIRICALLY CERTIFIED**. Full audit: [`GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](GATE1_LOCAL_HOLDOUT_V4_RESULT.md).
+
+The candidate remains green at **134/134** local tests and **10/10** deterministic Gate-1 checks after the run.
 
 ## Gate 2 — scientific-method workflow
 
@@ -159,8 +165,8 @@ Implemented:
 
 ## Current Gate-1 next step
 
-Holdout v3 is retired development evidence and may not be reused for certification. The post-v3 v4 candidate is now frozen and locally qualified. The next valid Gate-1 action is to generate a **new private holdout v4**, independently audit it, preregister its hashes with the frozen candidate/model/envelope/thresholds, then run the unchanged Raw-vs-Seed campaign and score once.
+Holdouts v2, v3 and v4 are retired development evidence and may not be reused for certification. v4 independently reproduced a large statistically positive aggregate Seed effect but failed broad paired reliability at 8/16 strict wins. The next candidate must diagnose generic v4 failure/budget-exhaustion classes without answer leakage, then face a **new independently audited and preregistered holdout v5** under frozen criteria.
 
 ## Overall
 
-Gate 0 is complete. Gate 1 is **infrastructure-qualified, experiment-ready and empirically tested, but not empirically certified**. The latest unseen holdout shows a large and statistically positive aggregate scaffold effect (Seed 68.75% vs Raw 18.75%, +50 pp; CI lower bound +18.75 pp), but broad paired reliability is still below the project's frozen promotion standard (56.25% strict wins vs 60% required). Gates 2-4 remain foundations awaiting later empirical qualification.
+Gate 0 is complete. Gate 1 is **infrastructure-qualified, experiment-ready and repeatedly empirically tested, but not empirically certified**. The latest unseen v4 holdout again shows Seed 68.75% vs Raw 18.75% (+50 pp) with a confidence interval fully above zero, but strict paired reliability remains below the project's 60% promotion standard (50.00%). Gates 2-4 remain foundations awaiting later empirical qualification.

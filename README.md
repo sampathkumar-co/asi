@@ -38,26 +38,25 @@ Gate 0 passed its fail-closed qualification and remains the measurement/control 
 
 ## Latest Gate-1 empirical result
 
-On 2026-09-10, the frozen vNext Seed candidate at source commit `83ec193d6300b0658af8d4d3c45109880b28363f` was evaluated on a new 16-pair private holdout v3 against the exact same local `qwen3:8b` Raw control and hard 8,000-token arm envelope.
+On 2026-09-10, the frozen v4 Seed candidate at source commit `b4242af758b1222f8ecea0bf7306e917a36ed9d8` was evaluated on a new 16-pair private holdout v4 against the exact same local `qwen3:8b` Raw control under the hard 8,000-token arm envelope.
 
-The final v3 task/key hashes were independently audited 16/16 before inference and preregistered in GitHub commit `f10457f41d167551657e7e0e2b7741f79ed25b7b`.
+The private v4 suite was independently audited 16/16 before inference and preregistered at commit `e346ffabb2f77bded32d29e58e8009dc2731fd20`.
 
 Result:
-
 - Raw: **3/16 = 18.75%**
 - Seed: **11/16 = 68.75%**
 - observed mean gain: **+50 percentage points**
-- strict Seed win rate: **9/16 = 56.25%**
-- 95% paired-bootstrap CI for gain: **[+18.75 pp, +81.25 pp]**
+- strict Seed win rate: **8/16 = 50.00%**
+- 95% paired-bootstrap CI: **[+25.00 pp, +75.00 pp]**
 - Gate-1 promotion: **FAIL** because the frozen strict-win threshold is >=60%
 
-All other frozen criteria passed, including pair count, mean gain, CI lower bound >0, identity/integrity, and resource-envelope checks. With 16 pairs the win-rate threshold requires 10 strict Seed wins; v3 produced 9. The threshold is not weakened after observing the result.
+Pair count, mean gain, CI, identity/integrity and resource-envelope criteria all passed. With 16 pairs, promotion requires at least 10 strict Seed wins; v4 produced 8. The threshold is not weakened after observing the result.
 
-See [`docs/GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](docs/GATE1_LOCAL_HOLDOUT_V3_RESULT.md) and [`artifacts/gate1-local-holdout-v3-score.json`](artifacts/gate1-local-holdout-v3-score.json). Gate 1 therefore remains empirically tested but **not certified**.
+See [`docs/GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](docs/GATE1_LOCAL_HOLDOUT_V4_RESULT.md) and [`artifacts/gate1-local-holdout-v4-score.json`](artifacts/gate1-local-holdout-v4-score.json). Gate 1 remains empirically tested but **not certified**.
 
-### Current Gate-1 v4 candidate
+### Frozen v4 candidate
 
-Post-v3 reliability development is frozen at source commit `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`. It passes **134/134** local tests and **10/10** deterministic Gate-1 checks. Retired-v3 probes close the targeted graph-routing and assignment/CSP failure classes, but they are development evidence only. The next promotion attempt must use a new independently audited and preregistered holdout v4. See [`docs/GATE1_V4_DEVELOPMENT.md`](docs/GATE1_V4_DEVELOPMENT.md).
+The evaluated v4 candidate is source commit `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`. It passes **134/134** local tests and **10/10** deterministic Gate-1 checks. See [`docs/GATE1_V4_DEVELOPMENT.md`](docs/GATE1_V4_DEVELOPMENT.md).
 
 ## Gate-0 measurement layer
 

@@ -2,7 +2,11 @@
 
 Updated: 2026-09-10
 
-Status: **FROZEN FOR A NEW UNSEEN HOLDOUT; NOT PROMOTION EVIDENCE**
+Status: **HISTORICAL DEVELOPMENT/FREEZE RECORD; v4 HOLDOUT COMPLETED — PROMOTION FAIL**
+
+## Subsequent outcome
+
+The frozen candidate was later evaluated on the independently audited/preregistered holdout v4. Promotion failed at 8/16 strict Seed wins despite Seed 11/16 vs Raw 3/16 and a +50 pp gain. See [`GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](GATE1_LOCAL_HOLDOUT_V4_RESULT.md).
 
 ## Why v4 exists
 

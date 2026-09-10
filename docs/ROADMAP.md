@@ -17,32 +17,29 @@ Completed:
 - exact reusable tools for shortest paths, project critical paths, CRT, semantic transactions/reconciliation, aggregation, assignment/CSP, exact Python tracing and constrained subset optimization;
 - deterministic relevant-tool routing and sandboxed computation fallback.
 
-Latest unseen holdout result (v3):
+Latest unseen holdout result (v4):
 - Raw 3/16 (18.75%);
 - Seed 11/16 (68.75%);
 - +50 percentage-point observed gain;
-- 9/16 = 56.25% strict Seed win rate;
-- 95% paired-bootstrap CI [+18.75 pp, +81.25 pp];
-- **promotion FAIL** only because the frozen >=60% strict-win criterion was not met.
+- 8/16 = 50.00% strict Seed win rate;
+- 95% paired-bootstrap CI [+25.00 pp, +75.00 pp];
+- **promotion FAIL** because the frozen >=60% strict-win criterion was not met.
 
 ### Milestone A2 — vNext / holdout-v3 cycle
 
 **Status: completed; promotion not passed.**
 
-The vNext candidate at `83ec193d6300b0658af8d4d3c45109880b28363f` substantially improved unseen accuracy and moved the confidence interval fully above zero. Holdout v3 is now retired to development use. Full result: [`GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](GATE1_LOCAL_HOLDOUT_V3_RESULT.md).
+The vNext candidate at `83ec193d6300b0658af8d4d3c45109880b28363f` substantially improved unseen accuracy and moved the confidence interval fully above zero. Holdout v3 is retired development evidence. Full result: [`GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](GATE1_LOCAL_HOLDOUT_V3_RESULT.md).
 
-### Milestone A3 — Gate-1 v4 candidate
+### Milestone A3 — Gate-1 v4 cycle
 
-**Status: candidate frozen; new holdout v4 not yet generated.**
+**Status: completed; promotion not passed.**
 
-Post-v3 reliability work is frozen at `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`. Local validation is **134/134** and deterministic Gate-1 qualification is **10/10**. Retired-v3 probes close the targeted graph-routing and assignment/CSP failures; they remain development evidence only.
+The post-v3 reliability candidate at `b4242af758b1222f8ecea0bf7306e917a36ed9d8` passed **134/134** local tests and **10/10** deterministic qualification checks. Holdout v4 was independently audited 16/16 and preregistered before inference. It reproduced Seed 11/16 vs Raw 3/16 and a +50 pp gain with CI fully above zero, but strict Seed wins were only 8/16. Full result: [`GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](GATE1_LOCAL_HOLDOUT_V4_RESULT.md).
 
-Before another promotion attempt:
-1. generate a **new** private holdout v4 with materially different instances;
-2. independently audit correctness, uniqueness and optimality;
-3. preregister task/key hashes, model digest, candidate digest, envelope and thresholds;
-4. run all pairs without architecture changes;
-5. score once and publish the result even if it fails.
+### Milestone A4 — next Gate-1 candidate
+
+Use v4 only as retired development evidence. Diagnose generic remaining failures and budget exhaustion without task-answer leakage. Freeze the revised candidate before generating a **new** private holdout v5, independently audit it, preregister all identities/criteria, run unchanged, and publish the score even if it fails.
 
 ## Milestone B — Gate 2 research benchmark
 
