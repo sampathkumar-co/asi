@@ -15,6 +15,23 @@ class PythonComputeTests(unittest.TestCase):
         self.assertTrue(result.ok)
         self.assertEqual(result.output, 2)
 
+    def test_dag_longest_path_helper(self):
+        code = (
+            "w={'S':2,'A':4,'B':3,'T':5}\n"
+            "p={'S':[],'A':['S'],'B':['S'],'T':['A','B']}\n"
+            "result=dag_longest_path(w,p,'T')"
+        )
+        result = python_compute({"code": code})
+        self.assertTrue(result.ok)
+        self.assertEqual(result.output["weight"], 11)
+        self.assertEqual(result.output["path"], ["S", "A", "T"])
+        self.assertTrue(all(result.output["checks"].values()))
+
+    def test_dag_longest_path_rejects_cycle(self):
+        result = python_compute({"code": "result=dag_longest_path({'A':1,'B':2},{'A':['B'],'B':['A']},'B')"})
+        self.assertFalse(result.ok)
+        self.assertIn("acyclic", result.error)
+
     def test_safe_imports_are_canonicalized(self):
         code = "from collections import defaultdict\nd=defaultdict(list)\nd['x'].append(4)\nresult=d.get('x')"
         result = python_compute({"code": code})
