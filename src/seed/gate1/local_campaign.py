@@ -4,6 +4,7 @@ from dataclasses import asdict, dataclass
 import hashlib
 import json
 from pathlib import Path
+import time
 from typing import Callable
 
 from seed.agent.baseline import BaselineAgent
@@ -143,10 +144,22 @@ def _hash_body(body: dict) -> str:
 
 
 def _atomic_write(path: Path, body: dict) -> None:
+    """Atomically replace a checkpoint, tolerating brief Windows reader locks."""
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(body, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    tmp.replace(path)
+    last_error: PermissionError | None = None
+    for attempt in range(8):
+        try:
+            tmp.replace(path)
+            return
+        except PermissionError as exc:
+            last_error = exc
+            if attempt == 7:
+                break
+            time.sleep(min(0.05 * (2 ** attempt), 0.5))
+    assert last_error is not None
+    raise last_error
 
 
 def _append_jsonl(path: Path, event: dict) -> None:
