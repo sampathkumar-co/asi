@@ -3,7 +3,7 @@
 A gate has two levels of evidence:
 
 1. **Infrastructure qualification** — the machinery behaves correctly under deterministic canaries.
-2. **Empirical certification** — real model/research runs satisfy the scientific criterion on hidden/OOD evaluations.
+2. **Empirical certification** — real model/research runs satisfy the preregistered scientific criterion on hidden/OOD evaluations.
 
 ## Gate 0 — Evaluation infrastructure
 
@@ -11,7 +11,7 @@ A gate has two levels of evidence:
 Establish trustworthy measurement before optimization begins.
 
 ### Status
-**Infrastructure-qualified.**
+**COMPLETE / infrastructure-qualified.**
 
 The fail-closed `seed gate0-certify` command validates external holdout separation, known-good/known-bad discrimination, statistical comparison, receipt integrity, tamper rejection and evaluator immutability.
 
@@ -25,22 +25,44 @@ Gate 0 is the measurement instrument used to judge every later capability claim.
 ### Objective
 Determine whether a scaffold improves a fixed model under a controlled resource envelope.
 
+### Status
+**Infrastructure-qualified and empirically tested; NOT empirically certified.**
+
+A preregistered unseen 16-pair local Qwen3-8B holdout completed on 2026-09-10. Raw scored 1/16, Seed scored 5/16, for a +25 percentage-point mean gain. However strict Seed win rate was 31.25% and the 95% paired-bootstrap CI for gain was [0.00, 0.50]. The frozen >=60% win-rate and CI-lower-bound >0 requirements were not met.
+
+See [`GATE1_LOCAL_HOLDOUT_V2_RESULT.md`](GATE1_LOCAL_HOLDOUT_V2_RESULT.md).
+
 ### Implemented
 - raw-model control arm;
 - planner/executor/critic Seed arm;
 - persistent state/provenance;
 - hard model/tool/step/token/cost budgets;
 - model-call metering and transcript hashes;
-- explicit tool allowlist;
+- local Ollama adapter and exact model digest attestation;
+- explicit relevant-tool routing and allowlists;
+- exact reusable graph/scheduling/CRT/aggregation/CSP tools;
+- sandboxed computation fallback;
 - fail-closed malformed-output and budget behavior;
 - same-provider/same-envelope comparison evidence;
-- deterministic `seed gate1-certify` canary.
+- per-pair checkpoint/resume;
+- implementation digest attestation;
+- external-key scoring and paired bootstrap;
+- deterministic `seed gate1-certify` infrastructure canary.
 
 ### Infrastructure criterion
 The qualification must prove that both arms use the same declared provider identity and envelope, that overspending and denied actions fail closed, and that the harness can detect a planted multi-step capability difference.
 
 ### Empirical criterion
-Using the same real model/version for both arms, Seed must outperform the raw arm on repeated hidden/OOD long-horizon tasks while remaining within the common resource envelope and showing acceptable normalized efficiency.
+Before inference, freeze the candidate implementation, exact model artifact, private task/key hashes, resource envelope and promotion thresholds. Using the same model artifact for both arms, Seed must outperform Raw on a new hidden/OOD campaign while remaining inside the common resource envelope.
+
+The current promotion rule requires:
+- at least 16 valid paired tasks;
+- mean Seed capability gain >= 5 percentage points;
+- strict Seed paired win rate >= 60%;
+- 95% paired-bootstrap CI lower bound > 0;
+- no integrity or resource-envelope violation.
+
+A failed holdout becomes development evidence. Its tasks cannot be reused as fresh certification data after architecture changes.
 
 ---
 
@@ -48,6 +70,9 @@ Using the same real model/version for both arms, Seed must outperform the raw ar
 
 ### Objective
 Make the system reason in terms of falsifiable hypotheses and independent evidence.
+
+### Status
+**Foundation implemented; not empirically certified.**
 
 ### Implemented
 - hypotheses + falsifiers;
@@ -58,7 +83,7 @@ Make the system reason in terms of falsifiable hypotheses and independent eviden
 - adversarial verifier.
 
 ### Empirical criterion
-Reliably reject bad hypotheses, detect confounds, backtrack, and reproduce accepted results.
+Reliably reject bad hypotheses, detect confounds, backtrack, and reproduce accepted results on hidden/OOD research tasks.
 
 ---
 
@@ -66,6 +91,9 @@ Reliably reject bad hypotheses, detect confounds, backtrack, and reproduce accep
 
 ### Objective
 Search agent architectures instead of assuming a fixed human design.
+
+### Status
+**Foundation implemented; not empirically certified.**
 
 ### Implemented
 - declarative `AgentGenome`;
@@ -75,7 +103,7 @@ Search agent architectures instead of assuming a fixed human design.
 - multi-generation search.
 
 ### Empirical criterion
-Discovered architectures must outperform human-written baselines on hidden/OOD suites under normalized cost.
+Discovered architectures must outperform human-written baselines on new hidden/OOD suites under normalized cost.
 
 ---
 
@@ -83,6 +111,9 @@ Discovered architectures must outperform human-written baselines on hidden/OOD s
 
 ### Objective
 Allow capability-plane source changes without allowing candidates to rewrite their evaluator/control plane.
+
+### Status
+**Control foundation implemented; not empirically certified.**
 
 ### Implemented
 - structured patches;
@@ -95,4 +126,4 @@ Allow capability-plane source changes without allowing candidates to rewrite the
 - explicit promotion evidence gate.
 
 ### Empirical criterion
-A child must pass sandbox tests, independent verification and hidden/OOD evaluation before human-approved promotion.
+A child must pass sandbox tests, independent verification and a new hidden/OOD evaluation before human-approved promotion.
