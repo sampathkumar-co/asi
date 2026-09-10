@@ -31,6 +31,85 @@ import json, sys
 from collections import defaultdict, deque
 from heapq import heappush, heappop
 from itertools import permutations, combinations, product
+
+
+def dag_longest_path(weights, predecessors, target=None):
+    if not isinstance(weights, dict) or not weights:
+        raise ValueError("weights must be a non-empty dict")
+    if not isinstance(predecessors, dict):
+        raise ValueError("predecessors must be a dict")
+    nodes = list(weights.keys())
+    node_set = set(nodes)
+    extra = set(predecessors.keys()) - node_set
+    if extra:
+        raise ValueError("predecessors contains unknown nodes")
+    preds = {}
+    for node in nodes:
+        raw = predecessors.get(node, [])
+        if not isinstance(raw, (list, tuple)):
+            raise ValueError("each predecessor list must be a list or tuple")
+        values = list(raw)
+        if node in values or any(p not in node_set for p in values):
+            raise ValueError("invalid predecessor reference")
+        preds[node] = values
+    successors = {node: [] for node in nodes}
+    indegree = {node: len(preds[node]) for node in nodes}
+    for node in nodes:
+        for pred in preds[node]:
+            successors[pred].append(node)
+    ready = sorted([node for node in nodes if indegree[node] == 0], key=str)
+    topo = []
+    while ready:
+        node = ready.pop(0)
+        topo.append(node)
+        for succ in sorted(successors[node], key=str):
+            indegree[succ] -= 1
+            if indegree[succ] == 0:
+                ready.append(succ)
+                ready.sort(key=str)
+    if len(topo) != len(nodes):
+        raise ValueError("graph must be acyclic")
+    score = {}
+    parent = {}
+    for node in topo:
+        if preds[node]:
+            best = min(preds[node], key=lambda p: (-score[p], str(p)))
+            score[node] = score[best] + weights[node]
+            parent[node] = best
+        else:
+            score[node] = weights[node]
+            parent[node] = None
+    if target is None:
+        target = min(nodes, key=lambda n: (-score[n], str(n)))
+    if target not in node_set:
+        raise ValueError("target must be a graph node")
+    path = []
+    cursor = target
+    while cursor is not None:
+        path.append(cursor)
+        cursor = parent[cursor]
+    path.reverse()
+    path_weight = sum(weights[node] for node in path)
+    path_edges_valid = all(path[i] in preds[path[i + 1]] for i in range(len(path) - 1))
+    recurrence_valid = all(
+        score[node] == weights[node] + (max(score[p] for p in preds[node]) if preds[node] else 0)
+        for node in topo
+    )
+    return {
+        "weight": score[target],
+        "path": path,
+        "topological_order": topo,
+        "scores": score,
+        "checks": {
+            "acyclic": len(topo) == len(nodes),
+            "target_reached": bool(path) and path[-1] == target,
+            "path_edges_valid": path_edges_valid,
+            "weight_matches_path": path_weight == score[target],
+            "dynamic_program_valid": recurrence_valid,
+        },
+    }
+
+
 SAFE = {
     "abs": abs, "all": all, "any": any, "bool": bool, "dict": dict,
     "enumerate": enumerate, "float": float, "int": int, "len": len,
@@ -40,6 +119,7 @@ SAFE = {
     "defaultdict": defaultdict, "deque": deque,
     "heappush": heappush, "heappop": heappop,
     "permutations": permutations, "combinations": combinations, "product": product,
+    "dag_longest_path": dag_longest_path,
 }
 payload = json.loads(sys.stdin.read())
 ns = {"__builtins__": SAFE}
@@ -62,13 +142,7 @@ class _SafeImportStripper(ast.NodeTransformer):
 
 
 def _normalize_model_code(code: str) -> str:
-    """Repair harmless serialization artifacts without changing program structure.
-
-    Small JSON-constrained models sometimes emit two or more literal backslashes
-    at the end of a Python continuation line. Python accepts exactly one. Collapse
-    only a trailing run of 2+ backslashes immediately before a newline; strings
-    ending in a quote are unaffected.
-    """
+    """Repair harmless serialization artifacts without changing program structure."""
     code = code.replace("\r\n", "\n").replace("\r", "\n")
     out: list[str] = []
     for line in code.split("\n"):
