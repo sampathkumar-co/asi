@@ -23,9 +23,9 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
         "properties": {
             "groups": "object group-name->array of entity names, exactly one entity per position; use exact requested output tokens as entity names when practical",
             "positions": "ordered array of positions/day indexes such as [1,2,3,4]",
-            "constraints": "array using position_eq(entity,position), before(left,right), after(left,right), immediately_before(left,right), immediately_after(left,right), same_position(left,right), not_same(left,right), distance(left,right,value), not_in_positions(entity,positions)",
+            "constraints": "prefer JSON objects: position_eq {op,entity,position}; before/after/immediately_before/immediately_after/same_position/not_same {op,left,right}; distance adds value; not_in_positions uses entity,positions. Compact strings like after(Alex,Dev) are also accepted",
             "labels": "optional object internal-entity->exact output token for aliases/abbreviations",
-            "render_groups": "array of {name,group,optional separator}; each group is rendered in positions order",
+            "render_groups": "array of {name,group,optional separator}; group should be the group NAME string, e.g. {'name':'people','group':'people'}",
             "answer_template": "string using render placeholders such as FINAL: {people} | {topics}",
         },
     },
@@ -181,13 +181,15 @@ class JSONPlanner:
             "Choose the smallest action that creates checkable evidence. When a specialized exact tool is allowed, prefer it over writing Python. "
             "Use shortest_path for nonnegative weighted directed shortest paths, dag_longest_path for project critical paths, crt for congruences, "
             "aggregate_records for filtered grouped sums, and assignment_csp for logic grids or ordering puzzles. For assignment_csp, do NOT invent "
-            "slot variables such as Mon-person. Instead put the actual entities into groups, provide the ordered positions separately, and express clues "
-            "directly: position_eq, before/after, immediately_before/immediately_after, same_position, not_same, distance, or not_in_positions. If the "
-            "task requires aliases/abbreviations, either use those exact tokens as entity names or provide labels mapping internal names to exact output "
-            "tokens. Use render_groups to emit each group in position order. Use finite_csp only when the high-level assignment form cannot express the "
-            "problem. Use python_compute only as the general fallback. Preserve exact FINAL formatting via answer_template. Never hard-code an unchecked "
-            "guess. Pay close attention to relation direction, filtering/status rules, signs, percentages, abbreviations, and requested output format. "
-            "Use recent critic feedback and materially change failed/repeated approaches. tool_input MUST use the exact required keys."
+            "slot variables such as Mon-person. Put actual entities into groups and positions separately. Relation direction is literal: if the clue says "
+            "'Alex later than Dev', emit after(Alex,Dev), NEVER after(Dev,Alex); 'AI immediately before Alex' means immediately_before(AI,Alex). "
+            "Use same_position(X,Y) when two entities occur on the same day/position; position_eq(X,4) only when the second argument is an actual "
+            "position value. Prefer constraint JSON objects, though compact function strings are accepted. render_groups.group should be the exact group "
+            "name string such as 'people' or 'topics', not a list of day labels. If the task requires aliases/abbreviations, either use those exact "
+            "tokens as entity names or provide labels mapping internal names to exact output tokens. Use finite_csp only when the high-level assignment "
+            "form cannot express the problem. Use python_compute only as the general fallback. Preserve exact FINAL formatting via answer_template. "
+            "Never hard-code an unchecked guess. Pay close attention to relation direction, filtering/status rules, signs, percentages, abbreviations, "
+            "and requested output format. Use recent critic feedback and materially change failed/repeated approaches. tool_input MUST use exact keys."
         )
         response = self.provider.complete(
             [Message("system", system), Message("user", json.dumps(prompt, default=str))],
