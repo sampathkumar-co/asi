@@ -105,6 +105,35 @@ def shortest_path_tool(payload: dict[str, Any]) -> ToolResult:
         return ToolResult(False, error=str(exc))
 
 
+def _normalize_duration_suffix_nodes(weights: dict[str, Any], predecessors: dict[str, Any], target: Any) -> tuple[dict[str, Any], dict[str, Any], Any]:
+    """Normalize compact task-duration labels like J6 -> node J with duration 6.
+
+    Activates only when every node encodes a numeric suffix equal to its supplied
+    weight and the stripped identifiers remain unique. Otherwise input is unchanged.
+    """
+    import re
+    if len(weights) < 3:
+        return weights, predecessors, target
+    mapping: dict[str, str] = {}
+    for raw, weight in weights.items():
+        name = str(raw)
+        match = re.fullmatch(r"([A-Za-z_][A-Za-z_-]*?)(-?\d+(?:\.\d+)?)", name)
+        if not match:
+            return weights, predecessors, target
+        try:
+            if float(match.group(2)) != float(weight):
+                return weights, predecessors, target
+        except (TypeError, ValueError):
+            return weights, predecessors, target
+        mapping[name] = match.group(1)
+    if len(set(mapping.values())) != len(mapping):
+        return weights, predecessors, target
+    new_weights = {mapping[str(k)]: v for k, v in weights.items()}
+    new_preds = {mapping.get(str(k), str(k)): [mapping.get(str(x), str(x)) for x in v] for k, v in predecessors.items()}
+    new_target = mapping.get(str(target), target) if target is not None else None
+    return new_weights, new_preds, new_target
+
+
 def weighted_dag_longest_path(
     weights: dict[str, int | float],
     predecessors: dict[str, list[str]],
@@ -193,6 +222,7 @@ def dag_longest_path_tool(payload: dict[str, Any]) -> ToolResult:
         if not isinstance(weights, dict) or not isinstance(predecessors, dict):
             raise ValueError("weights and predecessors are required objects")
         target = payload.get("target")
+        weights, predecessors, target = _normalize_duration_suffix_nodes(weights, predecessors, target)
         template = str(payload.get("answer_template", "FINAL: {weight} | {path}"))
         separator = str(payload.get("path_separator", "-"))
         if len(template) > 256 or "{weight}" not in template or "{path}" not in template:

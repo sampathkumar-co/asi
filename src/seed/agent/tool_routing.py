@@ -14,32 +14,40 @@ def select_tools(goal: str, available: tuple[str, ...]) -> tuple[str, ...]:
         if name in available:
             chosen.add(name)
 
-    add("python_compute")
     add("calculator")
+    specialized: set[str] = set()
+
+    def exact(name: str) -> None:
+        if name in available:
+            chosen.add(name)
+            specialized.add(name)
 
     graph_terms = ("path", "route", "network", "edge", "edges", "arc", "arcs")
-    shortest_terms = ("shortest", "minimum-cost", "minimum cost", "least-cost", "least cost", "lowest-cost", "lowest cost")
+    shortest_terms = ("shortest", "minimum-cost", "minimum cost", "least-cost", "least cost", "lowest-cost", "lowest cost", "cheapest")
     weighted_terms = ("weighted", "weight", "cost", "=", "->")
     if (any(term in text for term in shortest_terms) and any(term in text for term in graph_terms) and any(term in text for term in weighted_terms)) or "edges with weights" in text:
-        add("shortest_path")
-    if any(token in text for token in ("critical path", "project completion", "prerequisite", "prerequisites", "unlimited parallel")):
-        add("dag_longest_path")
+        exact("shortest_path")
+    schedule_signal = any(token in text for token in ("critical path", "critical-path", "project completion", "completion time", "minimum-time", "prerequisite", "prerequisites", "unlimited parallel", "unlimited workers")) or ("duration" in text and any(token in text for token in (" after ", " follows ")))
+    if schedule_signal:
+        exact("dag_longest_path")
     if any(token in text for token in ("≡", " mod ", "modulo", "congruence", "remainder")):
-        add("crt")
+        exact("crt")
     if any(token in text for token in ("ledger", "transaction", "reconcile", "reconciliation", "approved", "cleared", "credit", "debit", "refund", "fee", "discount_percent", "discount ")):
-        add("transaction_ledger")
+        exact("transaction_ledger")
     elif any(token in text for token in ("grouped sum", "aggregate records")):
-        add("aggregate_records")
+        exact("aggregate_records")
     if any(token in text for token in (
         "logic grid", "logic-grid", "arranged in positions", "unique order", "unique day order",
         "each a different topic", "presents once each", "exactly two positions", "immediately before",
     )):
-        add("assignment_csp")
+        exact("assignment_csp")
     if "print(" in text and any(token in text for token in ("def ", "for ", "while ", "python", "trace")):
-        add("python_trace")
+        exact("python_trace")
     if any(token in text for token in ("capacity", "maximum total value", "max total value", "weight <=", "weight ?", "subset")) and any(token in text for token in ("item", "items", "value")):
-        add("subset_optimize")
+        exact("subset_optimize")
     if any(token in text for token in ("echo", "scratch evidence")):
-        add("echo")
+        exact("echo")
+    if not specialized:
+        add("python_compute")
 
     return tuple(name for name in available if name in chosen)

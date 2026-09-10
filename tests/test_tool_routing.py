@@ -23,7 +23,7 @@ class ToolRoutingTests(unittest.TestCase):
     def test_shortest_path_routes_exact_graph_tool(self):
         tools = select_tools("Find the unique shortest path from S to T using weighted directed edges.", AVAILABLE)
         self.assertIn("shortest_path", tools)
-        self.assertIn("python_compute", tools)
+        self.assertNotIn("python_compute", tools)
         self.assertNotIn("crt", tools)
 
     def test_shortest_route_paraphrases_route_exact_graph_tool(self):
@@ -54,7 +54,7 @@ class ToolRoutingTests(unittest.TestCase):
     def test_logic_grid_routes_assignment_csp(self):
         tools = select_tools("Four researchers present once each Monday through Thursday, each a different topic. Determine the unique day order.", AVAILABLE)
         self.assertIn("assignment_csp", tools)
-        self.assertIn("python_compute", tools)
+        self.assertNotIn("python_compute", tools)
         self.assertNotIn("finite_csp", tools)
 
     def test_position_order_routes_assignment_csp(self):
@@ -64,7 +64,7 @@ class ToolRoutingTests(unittest.TestCase):
     def test_subset_optimization_routes_exact_tool(self):
         tools = select_tools("Items have weight and value; choose a subset maximizing total value under capacity and logical constraints.", AVAILABLE)
         self.assertIn("subset_optimize", tools)
-        self.assertIn("python_compute", tools)
+        self.assertNotIn("python_compute", tools)
 
 
 if __name__ == "__main__":

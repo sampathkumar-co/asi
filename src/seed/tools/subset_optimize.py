@@ -55,6 +55,8 @@ def subset_optimize(payload: dict[str, Any]) -> ToolResult:
         def num(x):
             return str(int(x)) if float(x).is_integer() else str(x)
         sep=str(payload.get('item_separator',''))
+        if sep.isspace() and chosen and all(len(name) == 1 for name in chosen):
+            sep=''
         items_s=sep.join(chosen)
         template=str(payload.get('answer_template','FINAL: {value} | {items}'))
         answer=template.replace('{value}',num(value)).replace('{weight}',num(weight)).replace('{items}',items_s)
