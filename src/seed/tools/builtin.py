@@ -5,6 +5,7 @@ import operator
 from typing import Any
 
 from .aggregate import aggregate_records
+from .assignment import assignment_csp_tool
 from .csp import finite_csp_tool
 from .graph import dag_longest_path_tool, shortest_path_tool
 from .math_exact import crt_tool
@@ -58,6 +59,7 @@ def echo(payload: dict[str, Any]) -> ToolResult:
 def default_registry() -> ToolRegistry:
     reg = ToolRegistry()
     reg.register("aggregate_records", aggregate_records)
+    reg.register("assignment_csp", assignment_csp_tool)
     reg.register("calculator", calculator)
     reg.register("crt", crt_tool)
     reg.register("dag_longest_path", dag_longest_path_tool)
