@@ -16,7 +16,7 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
     "python_compute": {
         "required": ["code"],
         "properties": {
-            "code": "compact safe Python code, preferably <=1600 chars; avoid backslash line continuations; end by assigning one verified evidence object to result"
+            "code": "compact safe Python code, preferably <=1600 chars; avoid backslash line continuations; safe helper dag_longest_path(weights, predecessors, target=None) returns weight/path/checks/scores; end by assigning one verified evidence object to result"
         },
     },
     "echo": {
@@ -122,6 +122,9 @@ class JSONPlanner:
                 "evidence": "optional compact supporting data",
                 "required_assignment": "the final assignment in python_compute must be result={'answer': answer, 'checks': checks, 'evidence': optional_evidence}",
             },
+            "safe_compute_helpers": {
+                "dag_longest_path": "dag_longest_path(weights, predecessors, target=None) where predecessors[node] lists prerequisite nodes; returns weight, path, scores, topological_order, and boolean checks"
+            },
             "schema": {
                 "description": "concise string, <=160 chars",
                 "tool_name": "exactly one allowed tool",
@@ -133,6 +136,9 @@ class JSONPlanner:
             "Choose the smallest action that creates checkable evidence. Prefer python_compute for arithmetic, graph/search, scheduling, "
             "constraint enumeration, simulation, code tracing, or optimization when available. Use calculator only for one simple arithmetic "
             "expression. Use echo only for already-computed scratch evidence, not as a substitute for computation. "
+            "For precedence DAGs or project scheduling, prefer the built-in dag_longest_path(weights, predecessors, target) helper instead of "
+            "reimplementing topological dynamic programming. predecessors[node] MUST mean the prerequisite nodes that must finish before node. "
+            "The helper returns verified weight/path/checks; wrap those checks into the final result object and format the requested FINAL answer. "
             "For python_compute: use ordinary Python blocks or parentheses and NEVER use backslash line continuations. Derive the candidate from "
             "the task data; do not hard-code an unchecked guess. Compute meaningful boolean checks against the selected candidate itself. The code "
             "MUST finish by assigning exactly one evidence object to result, shaped like "
