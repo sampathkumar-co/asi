@@ -55,6 +55,10 @@ All other frozen criteria passed, including pair count, mean gain, CI lower boun
 
 See [`docs/GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](docs/GATE1_LOCAL_HOLDOUT_V3_RESULT.md) and [`artifacts/gate1-local-holdout-v3-score.json`](artifacts/gate1-local-holdout-v3-score.json). Gate 1 therefore remains empirically tested but **not certified**.
 
+### Current Gate-1 v4 candidate
+
+Post-v3 reliability development is frozen at source commit `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`. It passes **134/134** local tests and **10/10** deterministic Gate-1 checks. Retired-v3 probes close the targeted graph-routing and assignment/CSP failure classes, but they are development evidence only. The next promotion attempt must use a new independently audited and preregistered holdout v4. See [`docs/GATE1_V4_DEVELOPMENT.md`](docs/GATE1_V4_DEVELOPMENT.md).
+
 ## Gate-0 measurement layer
 
 Gate 0 provides:

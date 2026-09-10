@@ -136,7 +136,7 @@ A failed planner/critic/tool path cannot silently become a successful answer.
 
 Both H01-H16/v2 and V301-V316/v3 are retired development evidence and may not be reused as fresh certification sets.
 
-v3 demonstrates a strong aggregate and statistically positive capability effect, but Gate 1 intentionally also requires broad paired reliability. The next candidate must address the remaining generic failure/budget-exhaustion classes without answer leakage, then be frozen before a new private holdout v4 is generated, audited and preregistered.
+v3 demonstrates a strong aggregate and statistically positive capability effect, but Gate 1 intentionally also requires broad paired reliability. Post-v3 reliability work is now frozen at source commit `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`, with **134/134** local tests and **10/10** deterministic Gate-1 checks. Retired-v3 probes show the targeted graph-routing and assignment/CSP failure classes closed in development. The next certification evidence must come from a new private holdout v4 generated, audited and preregistered after this freeze.
 
 Gate 1 will remain failed until a campaign actually satisfies every frozen criterion. In particular, the 56.25% v3 strict-win rate is not rounded up or treated as equivalent to the 60% threshold.
 

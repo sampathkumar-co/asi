@@ -31,17 +31,18 @@ Latest unseen holdout result (v3):
 
 The vNext candidate at `83ec193d6300b0658af8d4d3c45109880b28363f` substantially improved unseen accuracy and moved the confidence interval fully above zero. Holdout v3 is now retired to development use. Full result: [`GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](GATE1_LOCAL_HOLDOUT_V3_RESULT.md).
 
-### Milestone A3 — next Gate-1 candidate
+### Milestone A3 — Gate-1 v4 candidate
 
-Use v3 only as development evidence. Diagnose the four both-wrong cases, the single Raw-only win, and the four Seed budget-exhaustion outcomes without copying hidden answers into prompts or tools. Preserve the exact evidence-only finalization and control-plane separation.
+**Status: candidate frozen; new holdout v4 not yet generated.**
+
+Post-v3 reliability work is frozen at `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`. Local validation is **134/134** and deterministic Gate-1 qualification is **10/10**. Retired-v3 probes close the targeted graph-routing and assignment/CSP failures; they remain development evidence only.
 
 Before another promotion attempt:
-1. freeze the revised candidate source + implementation digest;
-2. generate a **new** private holdout v4 with materially different instances;
-3. independently audit correctness, uniqueness and optimality;
-4. preregister task/key hashes, model digest, envelope and thresholds;
-5. run all pairs without architecture changes;
-6. score once and publish the result even if it fails.
+1. generate a **new** private holdout v4 with materially different instances;
+2. independently audit correctness, uniqueness and optimality;
+3. preregister task/key hashes, model digest, candidate digest, envelope and thresholds;
+4. run all pairs without architecture changes;
+5. score once and publish the result even if it fails.
 
 ## Milestone B — Gate 2 research benchmark
 

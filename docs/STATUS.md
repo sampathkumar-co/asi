@@ -105,6 +105,10 @@ Final score: Raw **3/16 = 18.75%**, Seed **11/16 = 68.75%**, mean gain **+50 pp*
 
 Full audit: [`GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](GATE1_LOCAL_HOLDOUT_V3_RESULT.md).
 
+### Gate-1 v4 development candidate
+
+Post-v3 reliability fixes are frozen at source commit `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`. The candidate passes **134/134** local regression tests and **10/10** deterministic Gate-1 checks; qualification hash `357b3beac3bbcfb04ccf09b6e00a74dd7fdd95b2ef9ae72f7dd15fc9cff16799`. Retired v3 probes close the targeted shortest-route routing and assignment/CSP reliability failures. These probes are not promotion evidence. See [`GATE1_V4_DEVELOPMENT.md`](GATE1_V4_DEVELOPMENT.md).
+
 ## Gate 2 — scientific-method workflow
 
 **Implemented + tested protocol; not empirically certified.**
@@ -155,7 +159,7 @@ Implemented:
 
 ## Current Gate-1 next step
 
-Holdout v3 is now retired development evidence and must not be reused as fresh certification data. Gate 1 remains active because v3 missed the strict-win threshold by one Seed-only win. The next candidate should use v3 only to diagnose generic remaining failure classes, preserve the stronger vNext gains, and then face a **new independently audited/preregistered holdout v4** under unchanged or explicitly preregistered criteria.
+Holdout v3 is retired development evidence and may not be reused for certification. The post-v3 v4 candidate is now frozen and locally qualified. The next valid Gate-1 action is to generate a **new private holdout v4**, independently audit it, preregister its hashes with the frozen candidate/model/envelope/thresholds, then run the unchanged Raw-vs-Seed campaign and score once.
 
 ## Overall
 
