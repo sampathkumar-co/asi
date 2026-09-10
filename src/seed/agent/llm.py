@@ -16,7 +16,7 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
     "python_compute": {
         "required": ["code"],
         "properties": {
-            "code": "compact safe Python code, preferably <=1600 chars; safe helpers/methods only; assign verified evidence object to result"
+            "code": "compact safe Python code, preferably <=1600 chars; avoid backslash line continuations; end by assigning one verified evidence object to result"
         },
     },
     "echo": {
@@ -120,6 +120,7 @@ class JSONPlanner:
                 "answer": "exact requested FINAL: ... string",
                 "checks": "non-empty object of meaningful boolean validations; every value must be true",
                 "evidence": "optional compact supporting data",
+                "required_assignment": "the final assignment in python_compute must be result={'answer': answer, 'checks': checks, 'evidence': optional_evidence}",
             },
             "schema": {
                 "description": "concise string, <=160 chars",
@@ -132,13 +133,16 @@ class JSONPlanner:
             "Choose the smallest action that creates checkable evidence. Prefer python_compute for arithmetic, graph/search, scheduling, "
             "constraint enumeration, simulation, code tracing, or optimization when available. Use calculator only for one simple arithmetic "
             "expression. Use echo only for already-computed scratch evidence, not as a substitute for computation. "
-            "For python_compute, write compact code, derive the answer from the task data, and assign result to an object containing: "
-            "answer = the exact requested FINAL: ... string; checks = a non-empty object of meaningful independent boolean checks; "
-            "optional evidence = compact supporting values. Every checks value must literally be True or False, never a number/string. "
-            "Checks must verify the important constraints, path/ordering validity, arithmetic, or optimality as applicable. Do not hard-code "
-            "an unchecked candidate. Pay close attention to relation direction/orientation. Use recent_critic_notes as feedback. If recent actions "
-            "produced failed, incomplete, or repeated evidence, materially change the algorithm instead of repeating it. Keep code preferably "
-            "under 1600 characters. tool_input MUST use the exact required keys shown for the selected tool."
+            "For python_compute: use ordinary Python blocks or parentheses and NEVER use backslash line continuations. Derive the candidate from "
+            "the task data; do not hard-code an unchecked guess. Compute meaningful boolean checks against the selected candidate itself. The code "
+            "MUST finish by assigning exactly one evidence object to result, shaped like "
+            "result={'answer': 'FINAL: ...', 'checks': {'check_name': True, ...}, 'evidence': optional_data}. "
+            "Do not assign result to a bare string/list/number and do not leave checks in a separate variable without putting them in result. "
+            "Every checks value must literally be True or False, never a number/string. Checks must verify the important constraints, path/ordering "
+            "validity, arithmetic, or optimality as applicable. When enumerating candidates, verify the chosen candidate, not the final loop variable. "
+            "Pay close attention to relation direction/orientation. Use recent_critic_notes as feedback. If recent actions produced failed, incomplete, "
+            "or repeated evidence, materially change the algorithm instead of repeating it. Keep code preferably under 1600 characters. tool_input "
+            "MUST use the exact required keys shown for the selected tool."
         )
         response = self.provider.complete(
             [Message("system", system), Message("user", json.dumps(prompt, default=str))],
