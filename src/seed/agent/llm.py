@@ -18,6 +18,17 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
             "answer_template": "string containing {TOTAL} and any group placeholders such as {A}",
         },
     },
+    "assignment_csp": {
+        "required": ["groups", "positions", "constraints", "render_groups", "answer_template"],
+        "properties": {
+            "groups": "object group-name->array of entity names, exactly one entity per position; use exact requested output tokens as entity names when practical",
+            "positions": "ordered array of positions/day indexes such as [1,2,3,4]",
+            "constraints": "array using position_eq(entity,position), before(left,right), after(left,right), immediately_before(left,right), immediately_after(left,right), same_position(left,right), not_same(left,right), distance(left,right,value), not_in_positions(entity,positions)",
+            "labels": "optional object internal-entity->exact output token for aliases/abbreviations",
+            "render_groups": "array of {name,group,optional separator}; each group is rendered in positions order",
+            "answer_template": "string using render placeholders such as FINAL: {people} | {topics}",
+        },
+    },
     "calculator": {
         "required": ["expression"],
         "properties": {"expression": "string arithmetic expression, maximum 200 characters"},
@@ -42,11 +53,11 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
     "finite_csp": {
         "required": ["domains", "all_different", "constraints", "sequences", "answer_template"],
         "properties": {
-            "domains": "object variable->small array of allowed values; for ordering puzzles use positions such as [1,2,3,4]",
+            "domains": "object variable->small array of allowed values",
             "all_different": "array of variable-name arrays that must all take distinct values",
-            "constraints": "array using ops eq, ne, lt, gt, offset_eq, abs_diff, not_in. For a literal constant use value, not right. For 'X immediately before Y', use offset_eq with left=Y,right=X,value=1; plain lt is only 'before'.",
-            "sequences": "array of {name,variables,order,optional labels,optional separator}; labels should be an object variable->exact output token when aliases/abbreviations are required",
-            "answer_template": "string using sequence placeholders such as FINAL: {people} | {topics}",
+            "constraints": "array using ops eq, ne, lt, gt, offset_eq, abs_diff, not_in",
+            "sequences": "array of {name,variables,order,optional labels,optional separator}",
+            "answer_template": "string using sequence placeholders",
         },
     },
     "shortest_path": {
@@ -167,20 +178,16 @@ class JSONPlanner:
         }
         system = (
             "Return exactly one compact JSON object matching the supplied schema; no markdown or outside analysis. "
-            "Choose the smallest action that creates checkable evidence. When a specialized exact tool is allowed, prefer it over writing Python: "
-            "shortest_path for nonnegative weighted directed shortest paths; dag_longest_path for precedence/project critical paths; crt for systems "
-            "of congruences; aggregate_records for filtered grouped sums/ledger arithmetic; finite_csp for logic grids, permutations, schedules, and "
-            "small finite-domain ordering constraints. For finite_csp, model each entity/topic as a variable whose value is its position/day and put "
-            "each same-kind set in all_different. A fixed literal uses value (for example eq left=X value=4); right always names another variable. "
-            "Translate exact adjacency faithfully: 'X immediately before Y' means Y=X+1, so use offset_eq left=Y right=X value=1, never plain lt. "
-            "Use sequences to render variables in position order. If the task requires exact aliases, abbreviations, or output tokens, either name the "
-            "variables with those exact tokens or provide sequence.labels as a variable->exact-output-token object; do not emit longer internal names. "
-            "Translate task data faithfully and preserve exact FINAL formatting via answer_template. Use python_compute only as the general fallback for "
-            "computations not covered by an exact tool. Use calculator only for one simple expression. For python_compute, derive the candidate from task "
-            "data, avoid backslash line continuations, and finish with one result object containing exact FINAL answer plus non-empty meaningful boolean "
-            "checks computed against the selected candidate. Never hard-code an unchecked guess. Pay attention to relation direction, filtering/status "
-            "rules, signs, percentages, required abbreviations, and output format. Use recent critic feedback and materially change failed/repeated "
-            "approaches. tool_input MUST use the exact required keys."
+            "Choose the smallest action that creates checkable evidence. When a specialized exact tool is allowed, prefer it over writing Python. "
+            "Use shortest_path for nonnegative weighted directed shortest paths, dag_longest_path for project critical paths, crt for congruences, "
+            "aggregate_records for filtered grouped sums, and assignment_csp for logic grids or ordering puzzles. For assignment_csp, do NOT invent "
+            "slot variables such as Mon-person. Instead put the actual entities into groups, provide the ordered positions separately, and express clues "
+            "directly: position_eq, before/after, immediately_before/immediately_after, same_position, not_same, distance, or not_in_positions. If the "
+            "task requires aliases/abbreviations, either use those exact tokens as entity names or provide labels mapping internal names to exact output "
+            "tokens. Use render_groups to emit each group in position order. Use finite_csp only when the high-level assignment form cannot express the "
+            "problem. Use python_compute only as the general fallback. Preserve exact FINAL formatting via answer_template. Never hard-code an unchecked "
+            "guess. Pay close attention to relation direction, filtering/status rules, signs, percentages, abbreviations, and requested output format. "
+            "Use recent critic feedback and materially change failed/repeated approaches. tool_input MUST use the exact required keys."
         )
         response = self.provider.complete(
             [Message("system", system), Message("user", json.dumps(prompt, default=str))],
