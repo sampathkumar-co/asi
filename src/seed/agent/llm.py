@@ -44,8 +44,8 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
         "properties": {
             "domains": "object variable->small array of allowed values; for ordering puzzles use positions such as [1,2,3,4]",
             "all_different": "array of variable-name arrays that must all take distinct values",
-            "constraints": "array using ops eq, ne, lt, gt, offset_eq, abs_diff, not_in. eq/ne use left plus right OR value; offset_eq means left=right+value; abs_diff means abs(left-right)=value; not_in uses var and values",
-            "sequences": "array of {name,variables,order,optional labels,optional separator}; for each order value the tool finds the variable occupying it and renders its label",
+            "constraints": "array using ops eq, ne, lt, gt, offset_eq, abs_diff, not_in. For a literal constant use value, not right. For 'X immediately before Y', use offset_eq with left=Y,right=X,value=1; plain lt is only 'before'.",
+            "sequences": "array of {name,variables,order,optional labels,optional separator}; labels should be an object variable->exact output token when aliases/abbreviations are required",
             "answer_template": "string using sequence placeholders such as FINAL: {people} | {topics}",
         },
     },
@@ -170,14 +170,17 @@ class JSONPlanner:
             "Choose the smallest action that creates checkable evidence. When a specialized exact tool is allowed, prefer it over writing Python: "
             "shortest_path for nonnegative weighted directed shortest paths; dag_longest_path for precedence/project critical paths; crt for systems "
             "of congruences; aggregate_records for filtered grouped sums/ledger arithmetic; finite_csp for logic grids, permutations, schedules, and "
-            "small finite-domain ordering constraints. For finite_csp, model each entity/topic as a variable whose value is its position/day, put each "
-            "same-kind set in all_different, translate clues declaratively, and use sequences to render entities in position order. Translate task data "
-            "faithfully and preserve exact FINAL formatting via answer_template. Use python_compute only as the general fallback for computations not "
-            "covered by an exact tool. Use calculator only for one simple expression. For python_compute, derive the candidate from task data, avoid "
-            "backslash line continuations, and finish with one result object containing exact FINAL answer plus non-empty meaningful boolean checks "
-            "computed against the selected candidate. Never hard-code an unchecked guess. Pay attention to relation direction, filtering/status rules, "
-            "signs, percentages, required abbreviations, and output format. Use recent critic feedback and materially change failed/repeated approaches. "
-            "tool_input MUST use the exact required keys."
+            "small finite-domain ordering constraints. For finite_csp, model each entity/topic as a variable whose value is its position/day and put "
+            "each same-kind set in all_different. A fixed literal uses value (for example eq left=X value=4); right always names another variable. "
+            "Translate exact adjacency faithfully: 'X immediately before Y' means Y=X+1, so use offset_eq left=Y right=X value=1, never plain lt. "
+            "Use sequences to render variables in position order. If the task requires exact aliases, abbreviations, or output tokens, either name the "
+            "variables with those exact tokens or provide sequence.labels as a variable->exact-output-token object; do not emit longer internal names. "
+            "Translate task data faithfully and preserve exact FINAL formatting via answer_template. Use python_compute only as the general fallback for "
+            "computations not covered by an exact tool. Use calculator only for one simple expression. For python_compute, derive the candidate from task "
+            "data, avoid backslash line continuations, and finish with one result object containing exact FINAL answer plus non-empty meaningful boolean "
+            "checks computed against the selected candidate. Never hard-code an unchecked guess. Pay attention to relation direction, filtering/status "
+            "rules, signs, percentages, required abbreviations, and output format. Use recent critic feedback and materially change failed/repeated "
+            "approaches. tool_input MUST use the exact required keys."
         )
         response = self.provider.complete(
             [Message("system", system), Message("user", json.dumps(prompt, default=str))],
