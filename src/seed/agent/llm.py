@@ -29,6 +29,35 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
             "answer_template": "string using render placeholders such as FINAL: {people} | {topics}",
         },
     },
+    "transaction_ledger": {
+        "required": ["include_statuses", "answer_template"],
+        "properties": {
+            "records_text": "preferred: copy original semicolon-separated transaction text verbatim",
+            "records": "fallback array of semantic {group,status,kind, amount OR quantity+unit_price, optional discount_percent}",
+            "include_statuses": "array of statuses that count",
+            "decimal_places": "optional integer 0..8, default 2",
+            "answer_template": "string containing {TOTAL} and group placeholders",
+        },
+    },
+    "python_trace": {
+        "required": ["code"],
+        "properties": {
+            "code": "copy the supplied safe Python source verbatim; do not rewrite or simulate it",
+            "print_index": "optional zero-based print-call index; omit to use the last print",
+            "separator": "optional separator between arguments of the selected print, default ' | '",
+        },
+    },
+    "subset_optimize": {
+        "required": ["items", "capacity", "constraints", "answer_template"],
+        "properties": {
+            "items": "array of {name,weight,value}",
+            "capacity": "nonnegative total-weight limit",
+            "constraints": "object with implies:[[A,B],...] meaning A=>B and exclusive:[[A,B],...] meaning not both",
+            "answer_template": "string using {value}, {weight}, and/or {items}",
+            "item_separator": "optional separator for chosen item names, default empty string",
+            "require_unique": "optional boolean, default true",
+        },
+    },
     "calculator": {
         "required": ["expression"],
         "properties": {"expression": "string arithmetic expression, maximum 200 characters"},
@@ -106,13 +135,16 @@ def _verified_answers(state: AgentState) -> tuple[str, ...]:
             continue
         answer = obs.output.get("answer")
         checks = obs.output.get("checks")
-        if not isinstance(answer, str) or not answer.strip().startswith("FINAL:"):
+        if not isinstance(answer, str):
             continue
         if not isinstance(checks, dict) or not checks:
             continue
         if not all(value is True for value in checks.values()):
             continue
-        answers.append(answer.strip())
+        candidate = answer.strip()
+        if not candidate.startswith("FINAL:"):
+            candidate = "FINAL: " + candidate
+        answers.append(candidate)
     return tuple(answers)
 
 
@@ -180,7 +212,9 @@ class JSONPlanner:
             "Return exactly one compact JSON object matching the supplied schema; no markdown or outside analysis. "
             "Choose the smallest action that creates checkable evidence. When a specialized exact tool is allowed, prefer it over writing Python. "
             "Use shortest_path for nonnegative weighted directed shortest paths, dag_longest_path for project critical paths, crt for congruences, "
-            "aggregate_records for filtered grouped sums, and assignment_csp for logic grids or ordering puzzles. For assignment_csp, do NOT invent "
+            "transaction_ledger for ledgers/reconciliation/credits/debits/sales/refunds/fees, python_trace for exact supplied Python tracing, "
+            "subset_optimize for capacity-constrained subset maximization, aggregate_records for generic filtered grouped sums, and assignment_csp for logic grids or ordering puzzles. "
+            "For assignment_csp, do NOT invent "
             "slot variables such as Mon-person. Put actual entities into groups and positions separately. Relation direction is literal: if the clue says "
             "'Alex later than Dev', emit after(Alex,Dev), NEVER after(Dev,Alex); 'AI immediately before Alex' means immediately_before(AI,Alex). "
             "Cross-group exclusions are NOT position exclusions: if an entity X is not category Y, emit not_same(X,Y), not not_in_positions; if X is "
@@ -191,7 +225,9 @@ class JSONPlanner:
             "assignment_csp: use {} if no aliases are needed; if the task explicitly requests output tokens/abbreviations, map every internal entity "
             "whose requested output differs to that exact token. Do not silently substitute synonyms or expanded names. Use finite_csp only when the "
             "high-level assignment form cannot express the problem. Use python_compute only as the general fallback. Preserve exact FINAL formatting "
-            "via answer_template. Never hard-code an unchecked guess. Pay close attention to relation direction, filtering/status rules, signs, "
+            "via answer_template. For transaction_ledger, prefer records_text by copying the original semicolon-separated transaction text verbatim; "
+            "use structured records only when the source is not parseable prose, and never swap group identities. For python_trace, copy the supplied source verbatim and do not simulate or rewrite it. "
+            "For subset_optimize, distinguish implication A=>B from mutual exclusion A/B. Never hard-code an unchecked guess. Pay close attention to relation direction, filtering/status rules, signs, "
             "percentages, abbreviations, and requested output format. Use recent critic feedback and materially change failed/repeated approaches."
         )
         response = self.provider.complete(

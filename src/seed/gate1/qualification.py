@@ -72,7 +72,7 @@ def run_gate1_qualification() -> Gate1Certificate:
         seed_budget,
         provider_id=provider_id,
     )
-    planner = JSONPlanner(seed_provider, default_registry().names())
+    planner = JSONPlanner(seed_provider, ("calculator",))
     critic = JSONCritic(seed_provider, finish_threshold=0.85)
     seed_state = BaselineAgent(planner, RegistryExecutor(default_registry()), critic, budget=seed_budget).run(goal)
     seed_evidence = _arm("seed", seed_provider, seed_budget, _score(seed_state.final_answer), seed_state.status)
@@ -108,7 +108,7 @@ def run_gate1_qualification() -> Gate1Certificate:
         provider_id=provider_id,
     )
     limited_state = BaselineAgent(
-        JSONPlanner(limited_provider, default_registry().names()),
+        JSONPlanner(limited_provider, ("calculator",)),
         RegistryExecutor(default_registry()),
         JSONCritic(limited_provider),
         budget=limited_budget,

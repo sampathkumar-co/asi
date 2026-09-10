@@ -10,6 +10,9 @@ from .csp import finite_csp_tool
 from .graph import dag_longest_path_tool, shortest_path_tool
 from .math_exact import crt_tool
 from .python_compute import python_compute
+from .python_trace import python_trace
+from .subset_optimize import subset_optimize
+from .transactions import transaction_ledger
 from .registry import ToolRegistry, ToolResult
 
 
@@ -65,6 +68,9 @@ def default_registry() -> ToolRegistry:
     reg.register("dag_longest_path", dag_longest_path_tool)
     reg.register("finite_csp", finite_csp_tool)
     reg.register("shortest_path", shortest_path_tool)
+    reg.register("subset_optimize", subset_optimize)
+    reg.register("transaction_ledger", transaction_ledger)
+    reg.register("python_trace", python_trace)
     reg.register("python_compute", python_compute)
     reg.register("echo", echo)
     return reg

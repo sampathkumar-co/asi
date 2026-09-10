@@ -13,6 +13,9 @@ AVAILABLE = (
     "finite_csp",
     "python_compute",
     "shortest_path",
+    "subset_optimize",
+    "transaction_ledger",
+    "python_trace",
 )
 
 
@@ -33,9 +36,10 @@ class ToolRoutingTests(unittest.TestCase):
         self.assertIn("crt", tools)
         self.assertNotIn("aggregate_records", tools)
 
-    def test_ledger_routes_aggregation(self):
+    def test_ledger_routes_semantic_transaction_tool(self):
         tools = select_tools("Only POSTED ledger records count; sales, refund and fee records follow.", AVAILABLE)
-        self.assertIn("aggregate_records", tools)
+        self.assertIn("transaction_ledger", tools)
+        self.assertNotIn("aggregate_records", tools)
         self.assertNotIn("dag_longest_path", tools)
 
     def test_logic_grid_routes_assignment_csp(self):
@@ -48,9 +52,10 @@ class ToolRoutingTests(unittest.TestCase):
         tools = select_tools("Seven jobs must be arranged in positions 1-7. Exactly two positions lie between G and C.", AVAILABLE)
         self.assertIn("assignment_csp", tools)
 
-    def test_generic_constraint_task_keeps_small_fallback_set(self):
-        tools = select_tools("Choose a feasible subset maximizing total value under several logical constraints.", AVAILABLE)
-        self.assertEqual(tools, ("calculator", "python_compute"))
+    def test_subset_optimization_routes_exact_tool(self):
+        tools = select_tools("Items have weight and value; choose a subset maximizing total value under capacity and logical constraints.", AVAILABLE)
+        self.assertIn("subset_optimize", tools)
+        self.assertIn("python_compute", tools)
 
 
 if __name__ == "__main__":

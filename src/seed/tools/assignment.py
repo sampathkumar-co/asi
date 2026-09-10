@@ -150,9 +150,11 @@ def assignment_csp_tool(payload: dict[str, Any]) -> ToolResult:
                 group = str(raw_group)
             if not name or group not in clean_groups:
                 raise ValueError("render group name/group invalid")
-            separator = str(spec.get("separator", "-"))
             ordered = sorted(clean_groups[group], key=lambda entity: positions.index(solution[entity]))
-            rendered[name] = separator.join(str(labels.get(entity, entity)) for entity in ordered)
+            rendered_values = [str(labels.get(entity, entity)) for entity in ordered]
+            default_separator = "" if rendered_values and all(len(value) == 1 for value in rendered_values) else "-"
+            separator = str(spec.get("separator", default_separator))
+            rendered[name] = separator.join(rendered_values)
 
         answer = template
         for name, value in rendered.items():

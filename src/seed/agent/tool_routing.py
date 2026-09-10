@@ -23,13 +23,19 @@ def select_tools(goal: str, available: tuple[str, ...]) -> tuple[str, ...]:
         add("dag_longest_path")
     if any(token in text for token in ("≡", " mod ", "modulo", "congruence", "remainder")):
         add("crt")
-    if any(token in text for token in ("ledger", "posted", "refund", "fee", "discount_percent", "discount ")):
+    if any(token in text for token in ("ledger", "transaction", "reconcile", "reconciliation", "approved", "cleared", "credit", "debit", "refund", "fee", "discount_percent", "discount ")):
+        add("transaction_ledger")
+    elif any(token in text for token in ("grouped sum", "aggregate records")):
         add("aggregate_records")
     if any(token in text for token in (
         "logic grid", "logic-grid", "arranged in positions", "unique order", "unique day order",
         "each a different topic", "presents once each", "exactly two positions", "immediately before",
     )):
         add("assignment_csp")
+    if "print(" in text and any(token in text for token in ("def ", "for ", "while ", "python", "trace")):
+        add("python_trace")
+    if any(token in text for token in ("capacity", "maximum total value", "max total value", "weight <=", "weight ?", "subset")) and any(token in text for token in ("item", "items", "value")):
+        add("subset_optimize")
     if any(token in text for token in ("echo", "scratch evidence")):
         add("echo")
 
