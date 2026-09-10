@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from .registry import ToolResult
@@ -7,6 +8,27 @@ from .registry import ToolResult
 _MAX_VARIABLES = 16
 _MAX_DOMAIN = 16
 _MAX_SEARCH_NODES = 250_000
+
+
+def _coerce_literal(value: Any) -> Any:
+    if not isinstance(value, str):
+        return value
+    try:
+        return json.loads(value)
+    except Exception:
+        return value
+
+
+def _normalize_constraint(c: dict[str, Any], variables: set[str]) -> dict[str, Any]:
+    out = dict(c)
+    op = str(out.get("op", ""))
+    if "value" in out:
+        out["value"] = _coerce_literal(out["value"])
+    if op in {"eq", "ne"} and "right" in out and str(out["right"]) not in variables and "value" not in out:
+        out["value"] = _coerce_literal(out.pop("right"))
+    if op == "not_in" and isinstance(out.get("values"), list):
+        out["values"] = [_coerce_literal(v) for v in out["values"]]
+    return out
 
 
 def _validate_constraint(c: dict[str, Any], variables: set[str]) -> None:
@@ -30,8 +52,9 @@ def _validate_constraint(c: dict[str, Any], variables: set[str]) -> None:
         raise ValueError("constraint right must be a variable")
     if op in {"eq", "ne"} and not (has_right or has_value):
         raise ValueError(f"{op} requires right or value")
-    if op in {"offset_eq", "abs_diff"} and not has_value:
-        raise ValueError(f"{op} requires numeric value")
+    if op in {"offset_eq", "abs_diff"}:
+        if not has_value or type(c["value"]) not in (int, float):
+            raise ValueError(f"{op} requires numeric value")
 
 
 def _constraint_ok(c: dict[str, Any], assignment: dict[str, Any]) -> bool | None:
@@ -79,7 +102,7 @@ def solve_finite_csp(
         name = str(raw_name)
         if not name or not isinstance(raw_domain, list) or not raw_domain or len(raw_domain) > _MAX_DOMAIN:
             raise ValueError("each domain must contain 1..16 values")
-        values = list(raw_domain)
+        values = [_coerce_literal(v) for v in raw_domain]
         if len(values) != len({repr(v) for v in values}):
             raise ValueError("domain values must be unique")
         clean[name] = values
@@ -95,10 +118,15 @@ def solve_finite_csp(
         if len(names) != len(set(names)) or any(name not in variables for name in names):
             raise ValueError("invalid all_different group")
         groups.append(names)
-    for c in constraints:
-        if not isinstance(c, dict):
+
+    normalized: list[dict[str, Any]] = []
+    for raw in constraints:
+        if not isinstance(raw, dict):
             raise ValueError("constraints must be objects")
+        c = _normalize_constraint(raw, variables)
         _validate_constraint(c, variables)
+        normalized.append(c)
+    constraints = normalized
 
     occurrences = {name: 0 for name in clean}
     for group in groups:
@@ -149,6 +177,7 @@ def solve_finite_csp(
         "solution_count_capped": len(solutions),
         "unique": len(solutions) == 1,
         "search_nodes": nodes,
+        "constraints": constraints,
     }
 
 
@@ -179,13 +208,18 @@ def finite_csp_tool(payload: dict[str, Any]) -> ToolResult:
             order_values = spec.get("order")
             if not name or not isinstance(variables, list) or not isinstance(order_values, list):
                 raise ValueError("sequence requires name, variables, and order")
+            variables = [str(v) for v in variables]
             labels = spec.get("labels", {})
+            if isinstance(labels, list):
+                if len(labels) != len(variables):
+                    raise ValueError("parallel sequence labels must match variables length")
+                labels = {var: labels[i] for i, var in enumerate(variables)}
             if not isinstance(labels, dict):
-                raise ValueError("sequence labels must be an object")
+                raise ValueError("sequence labels must be an object or parallel array")
             separator = str(spec.get("separator", "-"))
             parts: list[str] = []
-            for expected in order_values:
-                matches = [str(var) for var in variables if str(var) in solution and solution[str(var)] == expected]
+            for expected in [_coerce_literal(v) for v in order_values]:
+                matches = [var for var in variables if var in solution and solution[var] == expected]
                 if len(matches) != 1:
                     raise ValueError("sequence order does not map to exactly one variable")
                 var = matches[0]
@@ -200,7 +234,8 @@ def finite_csp_tool(payload: dict[str, Any]) -> ToolResult:
         if "{" in answer or "}" in answer:
             raise ValueError("answer_template contains unresolved placeholders")
 
-        assignment_check = all(_constraint_ok(c, solution) is True for c in constraints)
+        normalized_constraints = solved["constraints"]
+        assignment_check = all(_constraint_ok(c, solution) is True for c in normalized_constraints)
         all_diff_check = all(
             len([solution[name] for name in group]) == len({repr(solution[name]) for name in group})
             for group in all_different
@@ -212,6 +247,8 @@ def finite_csp_tool(payload: dict[str, Any]) -> ToolResult:
             "all_different_hold": all_diff_check,
             "sequences_rendered": len(rendered) == len(sequences),
         }
-        return ToolResult(True, output={"answer": answer, "checks": checks, "evidence": {**solved, "sequences": rendered}})
+        evidence = {k: v for k, v in solved.items() if k != "constraints"}
+        evidence["sequences"] = rendered
+        return ToolResult(True, output={"answer": answer, "checks": checks, "evidence": evidence})
     except Exception as exc:
         return ToolResult(False, error=str(exc))
