@@ -26,6 +26,11 @@ def select_tools(goal: str, available: tuple[str, ...]) -> tuple[str, ...]:
         add("crt")
     if any(token in text for token in ("ledger", "posted", "refund", "fee", "discount_percent", "discount ")):
         add("aggregate_records")
+    if any(token in text for token in (
+        "logic grid", "logic-grid", "arranged in positions", "unique order", "unique day order",
+        "each a different topic", "presents once each", "exactly two positions", "immediately before",
+    )):
+        add("finite_csp")
     if any(token in text for token in ("echo", "scratch evidence")):
         add("echo")
 
