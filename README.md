@@ -29,16 +29,33 @@ The core engineering rule is that **the system being optimized is less privilege
 | Gate | Purpose | Status |
 |---|---|---|
 | **0** | Measurement before optimization | **COMPLETE — infrastructure-qualified** |
-| 1 | Strong baseline agent | Foundation implemented; empirical campaign next |
-| 2 | Scientific-method / verification | Foundation implemented |
-| 3 | Automatic architecture search | Foundation implemented |
-| 4 | Controlled self-modification | Foundation implemented |
+| **1** | Strong bounded baseline agent | **Empirically tested; promotion NOT passed** |
+| 2 | Scientific-method / verification | Foundation implemented; empirical campaign pending |
+| 3 | Automatic architecture search | Foundation implemented; empirical campaign pending |
+| 4 | Controlled self-modification | Foundation implemented; empirical campaign pending |
 
-Gate 0 passed its fail-closed qualification on Python 3.11, 3.12 and 3.13 with **46/46 tests passing**. See [`docs/GATE0_CERTIFICATION.md`](docs/GATE0_CERTIFICATION.md) for the exact evidence and scope boundary.
+Gate 0 passed its fail-closed qualification and remains the measurement/control instrument for later gates. Gate 1 has now been tested on a preregistered unseen local-model holdout, but the frozen promotion rule was not satisfied.
+
+## Latest Gate-1 empirical result
+
+On 2026-09-10, the frozen Seed candidate at source commit `8c18f91ad72c31007243e4bf2b8388b1421efd00` was compared with a Raw control using the exact same local `qwen3:8b` model artifact and the same hard 8,000-token arm envelope.
+
+The 16-pair private holdout was generated and independently audited before inference, with task/key hashes preregistered in GitHub commit `8f38b01604964b1e6aabbef10d842051c52fb25c`.
+
+Result:
+
+- Raw: **1/16 = 6.25%**
+- Seed: **5/16 = 31.25%**
+- observed mean gain: **+25 percentage points**
+- strict Seed win rate: **31.25%**
+- 95% paired-bootstrap CI for gain: **[0.00, 0.50]**
+- Gate-1 promotion: **FAIL** because win rate < 60% and CI lower bound is not > 0
+
+This is positive unseen-task evidence for some scaffold/tooling effects, but it is not enough for empirical Gate-1 certification. See [`docs/GATE1_LOCAL_HOLDOUT_V2_RESULT.md`](docs/GATE1_LOCAL_HOLDOUT_V2_RESULT.md) for the full audit trail and [`artifacts/gate1-local-holdout-v2-score.json`](artifacts/gate1-local-holdout-v2-score.json) for the public score-only artifact.
 
 ## Gate-0 measurement layer
 
-Gate 0 now provides:
+Gate 0 provides:
 
 - external private/OOD holdout loading;
 - repeated evaluation and confidence summaries;
@@ -51,7 +68,7 @@ Gate 0 now provides:
 - explicit model/tool/token/API-cost/human/compute resource accounting;
 - a machine-readable qualification certificate.
 
-Run it with:
+Run the repository checks with:
 
 ```bash
 python -m venv .venv
@@ -62,7 +79,7 @@ python -m unittest discover -s tests -v
 seed gate0-certify --repo-root . --output artifacts/gate0-certificate.json
 ```
 
-No external LLM API is required for Gate-0 infrastructure qualification.
+No external LLM API is required for Gate-0 infrastructure qualification. Gate-1 local experiments can use an Ollama model through the provider adapter.
 
 ## Architecture
 
@@ -103,7 +120,7 @@ No external LLM API is required for Gate-0 infrastructure qualification.
 
 ## Gates 1-4 foundation
 
-- **Gate 1:** goal/state models, persistent memory, planner/executor/critic interfaces, provider-neutral strict-JSON planner/critic, explicit budgets and tool allowlists.
+- **Gate 1:** provider-neutral model interface; local Ollama adapter; goal/state models; planner/executor/critic loop; deterministic relevant-tool routing; persistent provenance; implementation/model attestation; strict evidence-only critic; exact reusable tools for graphs, scheduling, CRT, aggregation and assignment/CSP; sandboxed computation fallback; hard budgets and checkpointed paired campaigns.
 - **Gate 2:** falsifiable hypotheses, experiment plans, controls, predictions, reproducibility and independent/adversarial verification.
 - **Gate 3:** declarative `AgentGenome`, bounded seeded mutation, archive and capability/cost fitness search.
 - **Gate 4:** copy-on-write descendants, mutation allow/deny policy, stale-hash protection, lineage, no in-place parent mutation, Docker no-network/read-only/resource limits and explicit promotion evidence.
@@ -115,12 +132,11 @@ Candidate source execution is intended to happen with network disabled, a read-o
 ## What Project Seed deliberately does not claim
 
 - Gate 0 completion does not mean a frontier model has become smarter.
-- It does not demonstrate recursive amplification.
-- It does not demonstrate AGI or ASI.
-- It does not permit candidates to rewrite the evaluator/control plane.
-- It does not autonomously deploy descendants.
-
-Those boundaries are intentional. Gate 0 gives the later experiments an instrument we can trust enough to start measuring them.
+- The current Gate-1 experiments do not meet the preregistered empirical promotion threshold.
+- A positive task-level capability delta is not evidence of recursive amplification.
+- The project does not demonstrate AGI or ASI.
+- Candidates do not get to rewrite their evaluator/control plane.
+- Descendants are not autonomously deployed.
 
 ## Repository principles
 
@@ -131,6 +147,8 @@ Those boundaries are intentional. Gate 0 gives the later experiments an instrume
 5. **Explicit resources.** Model calls, tools, tokens, cost, compute and human intervention are measured.
 6. **Rollback by construction.** Descendants are separate lineage nodes.
 7. **Secrets stay outside source control.** Private evals and signing keys remain control-plane inputs.
-8. **Claims track evidence.** Documentation separates infrastructure qualification from empirical capability results.
+8. **Claims track evidence.** Documentation separates infrastructure qualification, development calibration and empirical certification.
+9. **Preregistration before holdout inference.** Candidate identity, model artifact, task/key hashes and thresholds are frozen before a certification attempt.
+10. **Failed gates remain failed.** Positive sub-results are retained as evidence without weakening frozen promotion criteria after the fact.
 
-For the full research thesis, see [`docs/PRIMARY_IDEA.md`](docs/PRIMARY_IDEA.md). For gate definitions and current implementation state, see [`docs/GATES.md`](docs/GATES.md) and [`docs/STATUS.md`](docs/STATUS.md).
+For the full research thesis, see [`docs/PRIMARY_IDEA.md`](docs/PRIMARY_IDEA.md). For gate definitions and current implementation state, see [`docs/GATES.md`](docs/GATES.md), [`docs/STATUS.md`](docs/STATUS.md), and [`docs/ROADMAP.md`](docs/ROADMAP.md).
