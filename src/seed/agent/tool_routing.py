@@ -17,7 +17,10 @@ def select_tools(goal: str, available: tuple[str, ...]) -> tuple[str, ...]:
     add("python_compute")
     add("calculator")
 
-    if any(token in text for token in ("shortest path", "minimum-cost path", "directed path", "edges with weights")):
+    graph_terms = ("path", "route", "network", "edge", "edges", "arc", "arcs")
+    shortest_terms = ("shortest", "minimum-cost", "minimum cost", "least-cost", "least cost", "lowest-cost", "lowest cost")
+    weighted_terms = ("weighted", "weight", "cost", "=", "->")
+    if (any(term in text for term in shortest_terms) and any(term in text for term in graph_terms) and any(term in text for term in weighted_terms)) or "edges with weights" in text:
         add("shortest_path")
     if any(token in text for token in ("critical path", "project completion", "prerequisite", "prerequisites", "unlimited parallel")):
         add("dag_longest_path")

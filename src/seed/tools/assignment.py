@@ -19,7 +19,34 @@ def _atom(text: str) -> Any:
     return value
 
 
-def _normalize_constraint(raw: Any, entities: set[str]) -> list[dict[str, Any]]:
+def _entities_in_source(source: str, entities: set[str]) -> list[str]:
+    hits: list[tuple[int, str]] = []
+    for entity in entities:
+        match = re.search(r"(?<!\w)" + re.escape(entity) + r"(?!\w)", source, flags=re.IGNORECASE)
+        if match:
+            hits.append((match.start(), entity))
+    return [entity for _, entity in sorted(hits)]
+
+
+def _bind_source_entities(data: dict[str, Any], source: str | None, entities: set[str]) -> dict[str, Any]:
+    if not source:
+        return data
+    found = _entities_in_source(source, entities)
+    op = str(data.get("op", ""))
+    binary = {"before", "after", "immediately_before", "immediately_after", "same_position", "not_same", "distance", "positions_between"}
+    unary = {"position_eq", "position_ne", "not_in_positions"}
+    if op in binary:
+        if len(found) != 2:
+            raise ValueError(f"source clue for {op} must contain exactly two known entities")
+        data["left"], data["right"] = found
+    elif op in unary:
+        if len(found) != 1:
+            raise ValueError(f"source clue for {op} must contain exactly one known entity")
+        data["entity"] = found[0]
+    return data
+
+
+def _normalize_constraint(raw: Any, entities: set[str], source: str | None = None) -> list[dict[str, Any]]:
     """Accept documented objects plus compact function-call strings."""
     if isinstance(raw, dict):
         data = dict(raw)
@@ -48,19 +75,32 @@ def _normalize_constraint(raw: Any, entities: set[str]) -> list[dict[str, Any]]:
                 data = {"op": "same_position", "left": str(args[0]), "right": str(args[1])}
             else:
                 data = {"op": op, "entity": str(args[0]), "position": args[1]}
-        elif op == "not_in_positions" and len(args) >= 2:
+        elif op in {"not_in_positions"} and len(args) >= 2:
             data = {"op": op, "entity": str(args[0]), "positions": list(args[1:])}
+        elif op == "position_ne" and len(args) == 2:
+            data = {"op": op, "entity": str(args[0]), "position": args[1]}
+        elif op == "positions_between" and len(args) == 3:
+            data = {"op": op, "left": str(args[0]), "right": str(args[1]), "count": args[2]}
         elif op == "distance" and len(args) == 3:
             data = {"op": op, "left": str(args[0]), "right": str(args[1]), "value": args[2]}
         elif op in {"before", "after", "immediately_before", "immediately_after", "same_position", "not_same"} and len(args) == 2:
-            data = {"op": op, "left": str(args[0]), "right": str(args[1])}
+            left, right = str(args[0]), str(args[1])
+            if op == "not_same" and left in entities and right not in entities:
+                data = {"op": "position_ne", "entity": left, "position": args[1]}
+            else:
+                data = {"op": op, "left": left, "right": right}
         else:
             raise ValueError(f"invalid compact assignment constraint: {raw}")
     else:
         raise ValueError("constraints must be objects or compact function-call strings")
 
+    data = _bind_source_entities(data, source, entities)
     if data.get("op") == "position_eq" and str(data.get("position")) in entities:
         data = {"op": "same_position", "left": str(data.get("entity", "")), "right": str(data["position"])}
+    if data.get("op") == "not_same":
+        left, right = str(data.get("left", "")), data.get("right")
+        if left in entities and str(right) not in entities:
+            data = {"op": "position_ne", "entity": left, "position": right}
     return [data]
 
 
@@ -77,6 +117,11 @@ def _translate_constraint(raw: dict[str, Any], entities: set[str]) -> dict[str, 
         if entity not in entities or not isinstance(values, list):
             raise ValueError("not_in_positions requires known entity and positions")
         return {"op": "not_in", "var": entity, "values": values}
+    if op == "position_ne":
+        entity = str(raw.get("entity", ""))
+        if entity not in entities:
+            raise ValueError("position_ne entity must be known")
+        return {"op": "ne", "left": entity, "value": raw.get("position")}
 
     left, right = str(raw.get("left", "")), str(raw.get("right", ""))
     if left not in entities or right not in entities:
@@ -95,6 +140,11 @@ def _translate_constraint(raw: dict[str, Any], entities: set[str]) -> dict[str, 
         return {"op": "offset_eq", "left": left, "right": right, "value": 1}
     if op == "distance":
         return {"op": "abs_diff", "left": left, "right": right, "value": raw.get("value")}
+    if op == "positions_between":
+        count = raw.get("count")
+        if type(count) is not int or count < 0:
+            raise ValueError("positions_between count must be a nonnegative integer")
+        return {"op": "abs_diff", "left": left, "right": right, "value": count + 1}
     raise ValueError(f"unsupported assignment constraint op: {op}")
 
 
@@ -103,6 +153,7 @@ def assignment_csp_tool(payload: dict[str, Any]) -> ToolResult:
         groups = payload.get("groups")
         positions = payload.get("positions")
         constraints = payload.get("constraints", [])
+        source_clues = payload.get("source_clues")
         render_groups = payload.get("render_groups")
         labels = payload.get("labels", {})
         template = str(payload.get("answer_template", "FINAL: {assignment}"))
@@ -110,6 +161,9 @@ def assignment_csp_tool(payload: dict[str, Any]) -> ToolResult:
             raise ValueError("groups and positions are required")
         if not isinstance(constraints, list) or not isinstance(render_groups, list) or not isinstance(labels, dict):
             raise ValueError("constraints/render_groups/labels have invalid types")
+        if source_clues is not None:
+            if not isinstance(source_clues, list) or len(source_clues) != len(constraints) or any(not isinstance(x, str) or not x.strip() for x in source_clues):
+                raise ValueError("source_clues must be a non-empty string array aligned one-to-one with constraints")
         if len(template) > 512:
             raise ValueError("answer_template too long")
 
@@ -128,8 +182,9 @@ def assignment_csp_tool(payload: dict[str, Any]) -> ToolResult:
         domains = {entity: list(positions) for entity in entities}
         all_different = list(clean_groups.values())
         normalized_constraints: list[dict[str, Any]] = []
-        for raw in constraints:
-            normalized_constraints.extend(_normalize_constraint(raw, entities))
+        for index, raw in enumerate(constraints):
+            source = source_clues[index] if source_clues is not None else None
+            normalized_constraints.extend(_normalize_constraint(raw, entities, source))
         low_constraints = [_translate_constraint(raw, entities) for raw in normalized_constraints]
         solved = solve_finite_csp(domains, all_different, low_constraints)
         solution = solved["solution"]

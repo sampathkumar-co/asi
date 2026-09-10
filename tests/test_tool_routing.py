@@ -26,6 +26,15 @@ class ToolRoutingTests(unittest.TestCase):
         self.assertIn("python_compute", tools)
         self.assertNotIn("crt", tools)
 
+    def test_shortest_route_paraphrases_route_exact_graph_tool(self):
+        cases = (
+            "Find the unique minimum-cost directed route from S to T. Weighted arcs: S->A 6, A->T 2.",
+            "A one-way network has edges P->Q=5, Q->Z=3. Determine the unique shortest P-to-Z path.",
+        )
+        for prompt in cases:
+            with self.subTest(prompt=prompt):
+                self.assertIn("shortest_path", select_tools(prompt, AVAILABLE))
+
     def test_project_schedule_routes_dag_tool(self):
         tools = select_tools("Find the critical path and project completion time with prerequisites.", AVAILABLE)
         self.assertIn("dag_longest_path", tools)

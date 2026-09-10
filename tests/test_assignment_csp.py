@@ -87,6 +87,54 @@ class AssignmentCSPTests(unittest.TestCase):
         self.assertTrue(result.ok)
         self.assertEqual(result.output["answer"], "FINAL: Bea-Dev-Alex-Chen | DB-AI-OS-Networks")
 
+    def test_positions_between_and_numeric_position_exclusion(self):
+        result = default_registry().call(
+            "assignment_csp",
+            {
+                "groups": {"packages": ["G", "H", "I", "J", "K", "L"]},
+                "positions": [1, 2, 3, 4, 5, 6],
+                "constraints": [
+                    "position_eq(J,2)", "immediately_after(K,H)", "before(G,H)",
+                    "after(L,K)", "positions_between(I,G,1)", "before(G,I)", "not_same(I,6)",
+                ],
+                "labels": {},
+                "render_groups": [{"name": "packages", "group": "packages"}],
+                "answer_template": "FINAL: {packages}",
+            },
+        )
+        self.assertTrue(result.ok)
+        self.assertEqual(result.output["answer"], "FINAL: GJIHKL")
+        self.assertTrue(all(result.output["checks"].values()))
+
+    def test_source_clues_rebind_mis_copied_entity_pairs(self):
+        result = default_registry().call(
+            "assignment_csp",
+            {
+                "groups": {"people": ["Lina", "Omar", "Priya", "Ravi"], "topics": ["Cloud", "AI", "DB", "OS"]},
+                "positions": [1, 2, 3, 4],
+                "source_clues": [
+                    "Omar speaks Tuesday.", "DB is Thursday.", "Priya speaks later than Lina.",
+                    "Lina speaks before Ravi.", "AI is immediately before Priya.",
+                    "Ravi is not Cloud.", "Lina is not OS.", "Omar is not AI.",
+                ],
+                "constraints": [
+                    {"op": "position_eq", "entity": "Omar", "position": 2},
+                    {"op": "position_eq", "entity": "DB", "position": 4},
+                    {"op": "after", "left": "Lina", "right": "Ravi"},
+                    {"op": "before", "left": "Ravi", "right": "Priya"},
+                    {"op": "immediately_before", "left": "AI", "right": "Priya"},
+                    {"op": "not_same", "left": "Ravi", "right": "Cloud"},
+                    {"op": "not_same", "left": "Lina", "right": "OS"},
+                    {"op": "not_same", "left": "Omar", "right": "AI"},
+                ],
+                "labels": {},
+                "render_groups": [{"name": "people", "group": "people"}, {"name": "topics", "group": "topics"}],
+                "answer_template": "FINAL: {people} | {topics}",
+            },
+        )
+        self.assertTrue(result.ok)
+        self.assertEqual(result.output["answer"], "FINAL: Lina-Omar-Ravi-Priya | Cloud-OS-AI-DB")
+
     def test_nonunique_assignment_rejected(self):
         result = default_registry().call(
             "assignment_csp",

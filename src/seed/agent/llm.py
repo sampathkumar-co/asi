@@ -19,11 +19,12 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
         },
     },
     "assignment_csp": {
-        "required": ["groups", "positions", "constraints", "labels", "render_groups", "answer_template"],
+        "required": ["groups", "positions", "source_clues", "constraints", "labels", "render_groups", "answer_template"],
         "properties": {
             "groups": "object group-name->array of entity names, exactly one entity per position; use exact requested output tokens as entity names when practical",
             "positions": "ordered array of positions/day indexes such as [1,2,3,4]",
-            "constraints": "prefer JSON objects: position_eq {op,entity,position}; before/after/immediately_before/immediately_after/same_position/not_same {op,left,right}; distance adds value; not_in_positions uses entity,positions; not_same_any uses entity plus others. Compact strings are accepted",
+            "source_clues": "REQUIRED array of exact clue sentences copied verbatim from the goal, one-to-one and in the same order as constraints; exclude setup/return-format sentences",
+            "constraints": "encode ONLY explicit clues, once each, aligned by index with source_clues. Prefer JSON objects: position_eq/position_ne {op,entity,position}; before/after/immediately_before/immediately_after/same_position/not_same {op,left,right}; positions_between {op,left,right,count} where count is the number of slots strictly between; distance is raw absolute difference; not_in_positions uses entity,positions; not_same_any uses entity plus others. Compact strings are accepted",
             "labels": "REQUIRED object internal-entity->exact requested output token for aliases/abbreviations; use {} when no aliases are needed",
             "render_groups": "array of {name,group,optional separator}; group should be the group NAME string, e.g. {'name':'people','group':'people'}",
             "answer_template": "string using render placeholders such as FINAL: {people} | {topics}",
@@ -214,9 +215,10 @@ class JSONPlanner:
             "Use shortest_path for nonnegative weighted directed shortest paths, dag_longest_path for project critical paths, crt for congruences, "
             "transaction_ledger for ledgers/reconciliation/credits/debits/sales/refunds/fees, python_trace for exact supplied Python tracing, "
             "subset_optimize for capacity-constrained subset maximization, aggregate_records for generic filtered grouped sums, and assignment_csp for logic grids or ordering puzzles. "
-            "For assignment_csp, do NOT invent "
-            "slot variables such as Mon-person. Put actual entities into groups and positions separately. Relation direction is literal: if the clue says "
-            "'Alex later than Dev', emit after(Alex,Dev), NEVER after(Dev,Alex); 'AI immediately before Alex' means immediately_before(AI,Alex). "
+            "For assignment_csp, source_clues is REQUIRED: copy each explicit clue sentence verbatim, one clue per constraint, in matching order. Do not include the setup sentence or requested-output sentence. The exact tool uses source_clues as provenance to bind entity identities, so never paraphrase or merge clues. Encode ONLY constraints literally stated in the goal; never add a deduced position/order as a new constraint, because a mistaken deduction can make a wrong translation look uniquely verified. Do NOT invent "
+            "slot variables such as Mon-person. Put actual entities into groups and positions separately. Preserve the exact entity names from each clue; do not substitute an entity from another clue. Relation direction is subject-first and literal: "
+            "'Alex later than Dev' => after(Alex,Dev); 'Lina before Ravi' => before(Lina,Ravi); 'E immediately after B' => immediately_after(E,B); 'AI immediately before Alex' => immediately_before(AI,Alex). "
+            "If a clue says exactly N positions lie between X and Y, use positions_between(X,Y,N); do NOT use distance(X,Y,N), because raw absolute distance is N+1. For 'X is not last/position 6', use position_ne(X,6) or not_in_positions(X,6), never not_same(X,6). "
             "Cross-group exclusions are NOT position exclusions: if an entity X is not category Y, emit not_same(X,Y), not not_in_positions; if X is "
             "neither Y nor Z, emit not_same(X,Y) and not_same(X,Z), or not_same_any(X,[Y,Z]). Use not_in_positions only when the clue explicitly "
             "forbids numbered positions/days. Use same_position(X,Y) when two entities occur on the same day/position; position_eq(X,4) only when "
