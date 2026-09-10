@@ -1,89 +1,117 @@
 # Implementation Status
 
-Updated: 2026-09-09
+Updated: 2026-09-10
 
-Current clean validation: **67/67 tests passing** on Sampath's Windows 11 / Python 3.13.15 and in GitHub Actions. CI is green on Ubuntu Python 3.11/3.12/3.13 plus a dedicated Windows Python 3.13 Gate-0/1 lane.
+Current local validation on Sampath's Windows 11 / Python 3.13.15: **121/121 tests passing**. The repository includes permanent Ubuntu and Windows CI coverage for the Gate-0/1 foundations.
 
 ## Meaning of status labels
 
 - **Implemented**: code exists in this repository.
-- **Infrastructure-qualified**: the gate's fail-closed deterministic qualification passes in CI.
-- **Experiment-ready**: the real-model protocol, evidence schema, frozen envelope and analysis path are implemented; external paired model runs can begin.
-- **Empirically certified**: a real model/research campaign has passed the gate's hidden/OOD scientific criteria.
+- **Infrastructure-qualified**: deterministic fail-closed qualification passes.
+- **Experiment-ready**: real-model protocol, evidence schema, frozen envelope and scoring path are implemented.
+- **Empirically tested**: at least one real hidden/OOD campaign has completed under a frozen candidate/model/evaluator identity.
+- **Empirically certified**: a real hidden/OOD campaign has passed the gate's preregistered scientific promotion criteria.
 
 ## Gate 0 — COMPLETE / infrastructure-qualified
 
-Gate-0 evaluation infrastructure is complete and CI-qualified.
+Gate-0 evaluation infrastructure is complete and qualified.
 
-Done:
-- evaluation suites and bounded scoring;
+Implemented:
 - external private/OOD holdout loader;
 - repeated evaluation and confidence summaries;
 - paired bootstrap comparison;
 - explicit resource accounting;
-- content-hashed receipts;
-- trusted receipt signing/verification;
+- content-hashed and signed receipts;
+- evaluator-tree integrity snapshots;
 - tamper rejection;
-- evaluator-tree integrity snapshot;
 - known-good / known-bad fail-closed canaries;
-- machine-readable Gate-0 certificate artifact;
-- Windows-safe SQLite/EventStore lifecycle with explicit context-manager cleanup.
+- machine-readable certificate output;
+- Windows-safe SQLite/EventStore lifecycle.
 
-The Gate-0 certificate qualifies the measurement/control instrument. It does not claim AGI, ASI, or recursive amplification.
+Gate 0 qualifies the measurement/control instrument. It does not claim AGI, ASI or recursive amplification.
 
-## Gate 1 — EXPERIMENT-READY / infrastructure-qualified
+## Gate 1 — EMPIRICALLY TESTED / NOT CERTIFIED
 
-Done:
+The Gate-1 infrastructure is implemented and has now been exercised in multiple real-model campaigns. The current empirical verdict is **not promoted**.
+
+### Implemented foundation
+
 - bounded planner/executor/critic loop;
 - persistent memory and event provenance;
-- strict JSON planner/critic;
-- explicit tool allowlist;
+- strict JSON planner/critic contracts;
+- evidence-only critic and verified-answer gate;
+- explicit tool allowlists;
 - hard step/model/tool/token/cost budgets;
-- budget-metered model provider wrapper;
-- model-call transcript hashes;
+- budget-metered provider wrapper and transcript hashes;
 - raw-model comparison arm;
-- identical-envelope raw-vs-Seed comparison evidence;
-- fail-closed malformed output / denied tool / budget exhaustion handling;
-- `seed gate1-certify` deterministic multi-step qualification;
-- real ChatGPT transcript/evidence schema;
-- paired real-chat validator with model/provider/surface/envelope checks;
-- evidence levels (`manual_chat`, `platform_export`, `api_attested`);
-- explicit separation between pilot evidence and certification-ready evidence;
-- transcript/pair SHA-256 hashing for tamper detection;
-- campaign-level paired bootstrap statistics;
-- minimum-pair / mean-gain / win-rate / CI certification criteria;
-- rejection of mixed models, mixed envelopes and duplicate task IDs;
-- frozen ChatGPT pilot envelope in `configs/gate1/chatgpt_pilot.toml`;
-- frozen raw-vs-Seed prompts in `docs/GATE1_CHATGPT_PROMPTS.md`;
-- full real-chat protocol in `docs/GATE1_REAL_CHAT_PROTOCOL.md`.
+- local Ollama provider with exact model digest attestation;
+- same-model/same-envelope pair evidence;
+- deterministic goal-based relevant-tool routing;
+- exact tools for shortest paths, DAG critical paths, CRT, record aggregation, finite CSP and assignment CSP;
+- sandboxed `python_compute` fallback;
+- per-task checkpoint/resume and progress telemetry;
+- Seed implementation digest attestation;
+- external answer-key scoring and paired bootstrap;
+- rejection of mixed model/envelope/implementation evidence;
+- real ChatGPT pilot protocol retained as a separate pilot path.
 
-Not yet empirically certified:
-- execute independent fresh-chat raw and Seed runs using the same visible ChatGPT model/mode;
-- score those frozen outputs on private multi-domain Gate-0 tasks;
-- attach attested model/usage metadata where the platform exposes it;
-- run the final multi-pair confidence/efficiency analysis.
+### Development/calibration campaign
 
-A normal manually copied ChatGPT transcript is accepted as pilot evidence but cannot silently upgrade itself into full scientific certification.
+The first 8-task Qwen3-8B calibration campaign produced:
+- Raw: **2/8 = 25%**;
+- Seed: **4/8 = 50%**;
+- observed gain: **+25 percentage points**;
+- strict Seed win rate: **50%**;
+- 95% paired-bootstrap CI crossed zero.
+
+That suite was then treated only as development data. It was not reused as certification evidence after architecture changes.
+
+### Preregistered unseen holdout v2
+
+Candidate source commit: `8c18f91ad72c31007243e4bf2b8388b1421efd00`.
+
+Preregistration commit: `8f38b01604964b1e6aabbef10d842051c52fb25c`.
+
+Model: local `qwen3:8b`, digest `500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41`.
+
+The 16-task private holdout was independently audited before model inference; all exact-answer tasks and relevant optimum/path/assignment solutions were reproduced and uniqueness-checked. Task and answer-key contents remain outside source control.
+
+Final corrected score:
+- Raw: **1/16 = 6.25%**;
+- Seed: **5/16 = 31.25%**;
+- observed mean gain: **+25 percentage points**;
+- strict Seed win rate: **31.25%**;
+- 95% paired-bootstrap CI: **[0.00, 0.50]**.
+
+Frozen promotion thresholds required >=16 valid pairs, >=5 percentage-point gain, >=60% strict Seed win rate and CI lower bound >0. Pair count and mean gain passed. Win rate and CI did not. **Gate 1 therefore remains NOT EMPIRICALLY CERTIFIED.**
+
+Full result: [`GATE1_LOCAL_HOLDOUT_V2_RESULT.md`](GATE1_LOCAL_HOLDOUT_V2_RESULT.md). Public score-only artifact: [`../artifacts/gate1-local-holdout-v2-score.json`](../artifacts/gate1-local-holdout-v2-score.json).
+
+### Scoring correction
+
+After the 16-pair run had fully completed, the first score attempt exposed two evaluator-side parsing bugs: single-string answer keys were iterated character-by-character, and `FINAL:` prefixes in keys were not normalized like model outputs. The frozen task/key/evidence artifacts and Seed/model run were not changed. Both bugs were fixed with regression tests, after which the repository passed **121/121 tests** and the same sealed evidence/key hashes produced the result above.
 
 ## Gate 2 — scientific-method workflow
 
 **Implemented + tested protocol; not empirically certified.**
 
-Done:
+Implemented:
 - hypotheses and falsifiers;
 - experiment plans, predictions, metrics and controls;
 - reproducibility flag;
 - independent + adversarial verification;
 - dual-verifier acceptance rule.
 
+Gate-2 empirical work should not begin as a promotion claim until Gate 1 has a qualifying baseline result.
+
 ## Gate 3 — architecture search
 
 **Implemented + tested bounded search; not empirically certified.**
 
-Done:
+Implemented:
 - declarative architecture genome;
 - seeded bounded mutations;
-- archive;
+- archive/deduplication;
 - capability/cost fitness;
 - multi-generation search.
 
@@ -91,11 +119,11 @@ Done:
 
 **Implemented + tested control foundation; not empirically certified.**
 
-Done:
+Implemented:
 - structured source mutation proposal;
 - mutation allow/deny paths;
 - byte/file budgets;
-- stale-write hash check;
+- stale-write hash checks;
 - copy-on-write descendants;
 - Docker no-network/read-only command;
 - promotion evidence gate;
@@ -105,21 +133,16 @@ Done:
 
 - canonical Project Seed state stays in `sampathkumar-co/asi` on GitHub;
 - Sampath's laptop is the active local validation machine at `C:\Users\SAMPATH\OneDrive\Desktop\asi`;
-- the local clone must track GitHub `main` and should remain clean except ignored runtime artifacts/virtual environments;
+- the local clone tracks GitHub `main` and should remain clean except ignored runtime artifacts;
+- private holdout tasks, answer keys and raw evidence stay under the external control-plane directory and are not committed;
+- GitHub contains only code, documentation, hashes and sanitized score artifacts;
 - GitHub Actions remains the independent clean CI environment;
-- Yaswanth's machine is no longer used while Sampath is online, and no Gate-1 project files were stored there.
+- Yaswanth's machine is not used for active Seed state while Sampath is online.
 
-## Windows validation record
+## Current Gate-1 next step
 
-Sampath's first Windows run exposed an SQLite file-handle cleanup bug that Ubuntu CI did not catch. The `EventStore` now has an explicit context-manager lifecycle, tests close connections deterministically, and a permanent `windows-gate01` CI job prevents regression.
-
-At commit `05a2d31c85d13b735059e831d0c1e7cfb3399a13`:
-- Sampath local Windows run: **67/67 tests passed**;
-- local Gate-0 qualification: **PASS**;
-- local Gate-1 qualification: **PASS**;
-- GitHub `windows-gate01`: **PASS**;
-- GitHub Ubuntu Python 3.11/3.12/3.13 lanes: **PASS**.
+H01-H16 are now development evidence and must not be reused as certification data. The next Seed candidate should address the observed unseen weaknesses—especially scheduling revision stability, record translation, code tracing, constraint/output formatting and budget-efficient recovery—without changing the frozen v2 result. Then a **new** private holdout must be generated, audited and preregistered before another empirical promotion attempt.
 
 ## Overall
 
-Gate 0 is complete. Gate 1 is **experiment-ready and cross-platform qualified**. The remaining Gate-1 work is the real independent same-model ChatGPT raw-vs-Seed campaign itself. Until that external evidence exists, Project Seed will not claim that Seed improves GPT in the real product.
+Gate 0 is complete. Gate 1 is **infrastructure-qualified, experiment-ready and empirically tested, but not empirically certified**. Project Seed has measured a positive unseen-task capability delta for the scaffold on a small local model, but it has not yet met the project's own threshold for a reliable promotion claim. Gates 2-4 remain foundations awaiting later empirical qualification.
