@@ -36,11 +36,11 @@ def weighted_shortest_path(edges: list[list[Any] | tuple[Any, Any, Any]], source
         raise ValueError("source and target must appear in edges")
 
     inf = float("inf")
-    dist = {node: inf for node in nodes}
+    dist: dict[str, int | float] = {node: inf for node in nodes}
     count = {node: 0 for node in nodes}
     parent: dict[str, str | None] = {node: None for node in nodes}
     dist[source], count[source] = 0, 1
-    heap: list[tuple[float, str]] = [(0.0, source)]
+    heap: list[tuple[int | float, str]] = [(0, source)]
     while heap:
         d, u = heapq.heappop(heap)
         if d != dist[u]:
@@ -51,7 +51,7 @@ def weighted_shortest_path(edges: list[list[Any] | tuple[Any, Any, Any]], source
                 dist[v] = nd
                 count[v] = count[u]
                 parent[v] = u
-                heapq.heappush(heap, (float(nd), v))
+                heapq.heappush(heap, (nd, v))
             elif nd == dist[v]:
                 count[v] += count[u]
                 if parent[v] is None or str(u) < str(parent[v]):
