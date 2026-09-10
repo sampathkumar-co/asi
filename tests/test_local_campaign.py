@@ -7,6 +7,7 @@ from unittest.mock import patch
 from seed.gate1.local_campaign import (
     LocalArmEvidence,
     LocalPairEvidence,
+    _atomic_write,
     load_local_tasks,
     run_local_pair,
     run_ollama_suite,
@@ -33,6 +34,23 @@ class LocalCampaignTests(unittest.TestCase):
         self.assertEqual(pair.seed.answer, "FINAL: 4")
         self.assertEqual(len(pair.content_hash), 64)
         Path(task_file.name).unlink(missing_ok=True)
+
+    def test_atomic_write_retries_transient_permission_error(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "evidence.json"
+            real_replace = Path.replace
+            calls = {"n": 0}
+
+            def flaky_replace(self, target):
+                calls["n"] += 1
+                if calls["n"] == 1:
+                    raise PermissionError("transient reader lock")
+                return real_replace(self, target)
+
+            with patch.object(Path, "replace", flaky_replace), patch("seed.gate1.local_campaign.time.sleep"):
+                _atomic_write(path, {"x": 1})
+            self.assertEqual(calls["n"], 2)
+            self.assertEqual(json.loads(path.read_text(encoding="utf-8")), {"x": 1})
 
     def test_checkpoint_resumes_without_rerunning_completed_pairs(self):
         with tempfile.TemporaryDirectory() as td:
