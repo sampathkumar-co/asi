@@ -17,6 +17,10 @@ class LocalScoringTests(unittest.TestCase):
         self.assertEqual(score_answer("FINAL: 9 | S-B-A-D-E-T", "9 | S-B-A-D-E-T"), 1.0)
         self.assertEqual(score_answer("FINAL: wrong", "9 | S-B-A-D-E-T"), 0.0)
 
+    def test_final_prefixed_key_is_normalized(self):
+        self.assertEqual(score_answer("FINAL: 662", "FINAL: 662"), 1.0)
+        self.assertEqual(score_answer("FINAL: A = 83.00", ["FINAL: A=83.00"]), 1.0)
+
     def test_campaign_scores_with_external_key(self):
         with tempfile.TemporaryDirectory() as td:
             evidence = Path(td) / "evidence.json"
@@ -26,7 +30,7 @@ class LocalScoringTests(unittest.TestCase):
                     {"raw":{"task_id":"T1","answer":"FINAL: no"},"seed":{"task_id":"T1","answer":"FINAL: yes"}},
                     {"raw":{"task_id":"T2","answer":"FINAL: ok"},"seed":{"task_id":"T2","answer":"FINAL: ok"}}
                 ]}), encoding="utf-8")
-            answers.write_text(json.dumps({"suite_id":"s","answers":{"T1":"yes","T2":"ok"}}), encoding="utf-8")
+            answers.write_text(json.dumps({"suite_id":"s","answers":{"T1":"FINAL: yes","T2":"FINAL: ok"}}), encoding="utf-8")
             report = score_local_campaign(evidence, answers)
             self.assertEqual(report["raw_mean"], 0.5)
             self.assertEqual(report["seed_mean"], 1.0)
