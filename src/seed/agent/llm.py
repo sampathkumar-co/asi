@@ -123,7 +123,7 @@ class JSONPlanner:
                 "required_assignment": "the final assignment in python_compute must be result={'answer': answer, 'checks': checks, 'evidence': optional_evidence}",
             },
             "safe_compute_helpers": {
-                "dag_longest_path": "dag_longest_path(weights, predecessors, target=None) where predecessors[node] lists prerequisite nodes; returns weight, path, scores, topological_order, and boolean checks"
+                "dag_longest_path": "returns a DICT. Call g=dag_longest_path(weights, predecessors, target=None), then access ONLY g['weight'], g['path'], g['checks'], g['scores'], g['topological_order']; never g[0]/g[1]/numeric indexes. predecessors[node] lists prerequisite nodes"
             },
             "schema": {
                 "description": "concise string, <=160 chars",
@@ -138,7 +138,7 @@ class JSONPlanner:
             "expression. Use echo only for already-computed scratch evidence, not as a substitute for computation. "
             "For precedence DAGs or project scheduling, prefer the built-in dag_longest_path(weights, predecessors, target) helper instead of "
             "reimplementing topological dynamic programming. predecessors[node] MUST mean the prerequisite nodes that must finish before node. "
-            "The helper returns verified weight/path/checks; wrap those checks into the final result object and format the requested FINAL answer. "
+            "The helper returns a DICT: use g['weight'], g['path'], and g['checks']; NEVER use numeric indexes like g[0]. Copy g['checks'] into the final result checks and format the requested FINAL answer. "
             "For python_compute: use ordinary Python blocks or parentheses and NEVER use backslash line continuations. Derive the candidate from "
             "the task data; do not hard-code an unchecked guess. Compute meaningful boolean checks against the selected candidate itself. The code "
             "MUST finish by assigning exactly one evidence object to result, shaped like "
