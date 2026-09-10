@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+from collections.abc import Sequence
 
 from seed.eval.statistics import paired_bootstrap
 
@@ -24,12 +25,15 @@ def extract_final(output: str | None) -> str | None:
     return matches[-1].strip() if matches else None
 
 
-def score_answer(output: str | None, accepted: list[str] | tuple[str, ...]) -> float:
+def score_answer(output: str | None, accepted: str | Sequence[str]) -> float:
     final = extract_final(output)
     if final is None:
         return 0.0
+    candidates = (accepted,) if isinstance(accepted, str) else tuple(accepted)
+    if not candidates or any(not isinstance(x, str) for x in candidates):
+        raise ValueError("accepted answers must be a string or non-empty sequence of strings")
     actual = _canonical(final)
-    return 1.0 if any(actual == _canonical(x) for x in accepted) else 0.0
+    return 1.0 if any(actual == _canonical(x) for x in candidates) else 0.0
 
 
 def score_local_campaign(evidence_path: str | Path, answer_path: str | Path) -> dict:
