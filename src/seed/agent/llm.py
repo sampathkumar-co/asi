@@ -9,24 +9,50 @@ from .interfaces import Critique
 
 
 _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
+    "aggregate_records": {
+        "required": ["records", "include_statuses", "answer_template"],
+        "properties": {
+            "records": "array of {group,status,sign:add|subtract, amount OR factors:[...], optional discount_percent}",
+            "include_statuses": "array of statuses that count",
+            "decimal_places": "optional integer 0..8, default 2",
+            "answer_template": "string containing {TOTAL} and any group placeholders such as {A}",
+        },
+    },
     "calculator": {
         "required": ["expression"],
         "properties": {"expression": "string arithmetic expression, maximum 200 characters"},
     },
+    "crt": {
+        "required": ["congruences", "answer_template"],
+        "properties": {
+            "congruences": "array of [remainder, positive_modulus] pairs",
+            "answer_template": "string containing {solution}, e.g. FINAL: {solution}",
+        },
+    },
     "dag_longest_path": {
         "required": ["weights", "predecessors", "answer_template"],
         "properties": {
-            "weights": "object mapping node names to numeric node weights/durations",
-            "predecessors": "object mapping each node to an array of prerequisite node names; omitted nodes mean no prerequisites",
-            "target": "optional target node; omit to choose the maximum-weight terminal result",
-            "answer_template": "string <=256 chars containing both {weight} and {path}, e.g. FINAL: {weight} | {path}",
-            "path_separator": "optional separator for path labels, default '-'",
+            "weights": "object node->numeric weight/duration",
+            "predecessors": "object node->array of prerequisite nodes",
+            "target": "optional target node",
+            "answer_template": "string containing {weight} and {path}",
+            "path_separator": "optional separator, default '-'",
+        },
+    },
+    "shortest_path": {
+        "required": ["edges", "source", "target", "answer_template"],
+        "properties": {
+            "edges": "array of [from,to,nonnegative_weight] directed edges",
+            "source": "source node",
+            "target": "target node",
+            "answer_template": "string containing {cost} and {path}",
+            "path_separator": "optional separator, default '-'",
         },
     },
     "python_compute": {
         "required": ["code"],
         "properties": {
-            "code": "compact safe Python code, preferably <=1600 chars; avoid backslash line continuations; safe helper dag_longest_path(weights, predecessors, target=None) returns weight/path/checks/scores; end by assigning one verified evidence object to result"
+            "code": "compact safe Python code, preferably <=1600 chars; avoid backslash line continuations; end with result={'answer':'FINAL: ...','checks':{...},'evidence':optional}"
         },
     },
     "echo": {
@@ -37,7 +63,6 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
 
 
 def _observation_view(obs: Observation) -> dict[str, object]:
-    """Remove volatile IDs/timestamps so temperature-0 model prompts are reproducible."""
     return {"ok": obs.ok, "output": obs.output, "error": obs.error}
 
 
@@ -48,11 +73,7 @@ def _recent_action_view(state: AgentState) -> list[dict[str, object]]:
     tasks = state.tasks[-count:]
     observations = state.observations[-count:]
     return [
-        {
-            "description": task.description,
-            "tool_name": task.tool_name,
-            "outcome": _observation_view(obs),
-        }
+        {"description": task.description, "tool_name": task.tool_name, "outcome": _observation_view(obs)}
         for task, obs in zip(tasks, observations)
     ]
 
@@ -82,7 +103,6 @@ def _normalize_tool_name(tool: object, allowed_tools: tuple[str, ...]) -> str:
 
 
 def _normalize_tool_input(tool: str, payload: dict) -> dict:
-    """Canonicalize semantically equivalent small-model call shapes."""
     normalized = dict(payload)
     nested_tool = normalized.get("tool_name")
     nested_input = normalized.get("tool_input")
@@ -98,8 +118,6 @@ def _normalize_tool_input(tool: str, payload: dict) -> dict:
 
 
 class JSONPlanner:
-    """Provider-neutral planner requiring a strict compact JSON action schema."""
-
     def __init__(
         self,
         provider: ModelProvider,
@@ -128,37 +146,26 @@ class JSONPlanner:
             "tool_input_schemas": self.tool_schemas,
             "verified_compute_contract": {
                 "answer": "exact requested FINAL: ... string",
-                "checks": "non-empty object of meaningful boolean validations; every value must be true",
+                "checks": "non-empty object of meaningful booleans, all true",
                 "evidence": "optional compact supporting data",
-                "required_assignment": "the final assignment in python_compute must be result={'answer': answer, 'checks': checks, 'evidence': optional_evidence}",
-            },
-            "safe_compute_helpers": {
-                "dag_longest_path": "returns a DICT. Call g=dag_longest_path(weights, predecessors, target=None), then access ONLY g['weight'], g['path'], g['checks'], g['scores'], g['topological_order']; never g[0]/g[1]/numeric indexes. predecessors[node] lists prerequisite nodes"
             },
             "schema": {
-                "description": "concise string, <=160 chars",
+                "description": "concise string <=160 chars",
                 "tool_name": "exactly one allowed tool",
-                "tool_input": "object matching the selected tool_input_schema exactly",
+                "tool_input": "object matching selected tool schema exactly",
             },
         }
         system = (
-            "Return exactly one compact JSON object matching the supplied schema. Do not emit markdown or analysis outside JSON. "
-            "Choose the smallest action that creates checkable evidence. For precedence DAGs or project scheduling, ALWAYS prefer the direct "
-            "dag_longest_path tool when it is allowed: pass weights, predecessors, target when known, answer_template, and optional path_separator. "
-            "predecessors[node] MUST list prerequisite nodes that must finish before node. The tool itself computes and verifies the optimum path "
-            "and returns an exact answer plus boolean checks, so do NOT write Python code for a DAG when this direct tool is available. "
-            "Prefer python_compute for other arithmetic, graph/search, constraint enumeration, simulation, code tracing, or optimization tasks. "
-            "Use calculator only for one simple arithmetic expression. Use echo only for already-computed scratch evidence, not as a substitute "
-            "for computation. For python_compute: use ordinary Python blocks or parentheses and NEVER use backslash line continuations. Derive "
-            "the candidate from the task data; do not hard-code an unchecked guess. Compute meaningful boolean checks against the selected candidate "
-            "itself. The code MUST finish by assigning exactly one evidence object to result, shaped like "
-            "result={'answer': 'FINAL: ...', 'checks': {'check_name': True, ...}, 'evidence': optional_data}. "
-            "Do not assign result to a bare string/list/number and do not leave checks in a separate variable without putting them in result. "
-            "Every checks value must literally be True or False, never a number/string. Checks must verify the important constraints, path/ordering "
-            "validity, arithmetic, or optimality as applicable. When enumerating candidates, verify the chosen candidate, not the final loop variable. "
-            "Pay close attention to relation direction/orientation. Use recent_critic_notes as feedback. If recent actions produced failed, incomplete, "
-            "or repeated evidence, materially change the algorithm instead of repeating it. Keep code preferably under 1600 characters. tool_input "
-            "MUST use the exact required keys shown for the selected tool."
+            "Return exactly one compact JSON object matching the supplied schema; no markdown or outside analysis. "
+            "Choose the smallest action that creates checkable evidence. When a specialized exact tool is allowed, prefer it over writing Python: "
+            "shortest_path for nonnegative weighted directed shortest paths; dag_longest_path for precedence/project critical paths; crt for systems "
+            "of congruences; aggregate_records for filtered grouped sums/ledger-style arithmetic. Translate task data faithfully into the tool schema "
+            "and preserve the exact requested FINAL formatting via answer_template. Use python_compute as the general fallback for constraint enumeration, "
+            "simulation, code tracing, combinatorial optimization, or computations not covered by an exact tool. Use calculator only for one simple "
+            "expression. For python_compute, derive the candidate from task data, avoid backslash line continuations, and finish with one result object "
+            "containing exact FINAL answer plus non-empty meaningful boolean checks all computed against the selected candidate. Never hard-code an "
+            "unchecked guess. Pay attention to relation direction, filtering/status rules, signs, percentages, required abbreviations, and output format. "
+            "Use recent critic feedback and materially change failed/repeated approaches. tool_input MUST use the exact required keys."
         )
         response = self.provider.complete(
             [Message("system", system), Message("user", json.dumps(prompt, default=str))],
@@ -185,8 +192,6 @@ class JSONPlanner:
 
 
 class JSONCritic:
-    """Evidence-only critic with an optional deterministic verified-answer gate."""
-
     def __init__(
         self,
         provider: ModelProvider,
@@ -208,16 +213,15 @@ class JSONCritic:
             "schema": {
                 "done": "boolean",
                 "confidence": "number 0..1",
-                "reason": "concise string, <=240 chars",
+                "reason": "concise string <=240 chars",
                 "final_answer": "string|null",
             },
         }
         system = (
-            "Return exactly one compact JSON object and no markdown. Judge ONLY the supplied observations; do not solve the goal from scratch. "
-            "Treat failed tool observations as no evidence. If verified_candidate_answers is present, set done=true only by copying one of those "
-            "answers exactly; never construct, repair, or invent a different final answer. Otherwise set done=true only when successful observations "
-            "contain complete checkable evidence. If evidence is incomplete or internally inconsistent, set done=false, confidence<=0.5, "
-            "final_answer=null. Keep reason under 240 chars."
+            "Return exactly one compact JSON object and no markdown. Judge ONLY supplied observations; do not solve from scratch. Treat failed tool "
+            "observations as no evidence. If verified_candidate_answers is present, set done=true only by copying one exactly; never construct or "
+            "repair a different final answer. Otherwise set done=true only when successful observations contain complete checkable evidence. If "
+            "evidence is incomplete or inconsistent, set done=false, confidence<=0.5, final_answer=null."
         )
         response = self.provider.complete(
             [Message("system", system), Message("user", json.dumps(prompt, default=str))],
@@ -235,7 +239,6 @@ class JSONCritic:
         done = bool(data.get("done", False)) and confidence >= self.finish_threshold
         reason = str(data.get("reason", ""))[:240]
         final_answer = data.get("final_answer") if done else None
-
         if self.require_verified_answer and done:
             candidate = None if final_answer is None else str(final_answer).strip()
             if candidate not in verified:
@@ -243,5 +246,4 @@ class JSONCritic:
                 final_answer = None
                 confidence = min(confidence, 0.5)
                 reason = "no verified evidence answer: checks must be non-empty booleans all true"
-
         return Critique(done, confidence, reason, None if final_answer is None else str(final_answer).strip())
