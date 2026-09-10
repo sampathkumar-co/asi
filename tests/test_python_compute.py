@@ -26,6 +26,12 @@ class PythonComputeTests(unittest.TestCase):
         self.assertTrue(result.ok)
         self.assertEqual(result.output, "A-B-C")
 
+    def test_duplicate_line_continuation_is_canonicalized(self):
+        code = "x=True and " + ("\\" * 2) + "\n True\nresult=x"
+        result = python_compute({"code": code})
+        self.assertTrue(result.ok)
+        self.assertIs(result.output, True)
+
     def test_import_and_attribute_access_are_blocked(self):
         self.assertFalse(python_compute({"code": "import os\nresult=1"}).ok)
         self.assertFalse(python_compute({"code": "result=(1).__class__"}).ok)
