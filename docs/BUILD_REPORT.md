@@ -2,6 +2,8 @@
 
 Date: 2026-09-09
 
+> **Historical snapshot.** This file records the initial Gates 0-4 foundation build exactly as it stood on 2026-09-09. It is intentionally not rewritten to match later test counts or empirical results. For current status, use [`STATUS.md`](STATUS.md), [`GATES.md`](GATES.md), and [`GATE1_LOCAL_HOLDOUT_V2_RESULT.md`](GATE1_LOCAL_HOLDOUT_V2_RESULT.md).
+
 ## Result
 
 Project Seed Gates 0-4 engineering foundation is implemented and validated locally, and is being published to the canonical repository `sampathkumar-co/asi`.
@@ -65,7 +67,7 @@ Project Seed Gates 0-4 engineering foundation is implemented and validated local
 
 ## Important boundary
 
-This report certifies the **engineering foundation and deterministic tests**, not the scientific hypothesis of recursive amplification. Gates must still be empirically certified using frontier models, private/OOD suites, repeated stochastic runs and externally accounted resources.
+This report certifies the **engineering foundation and deterministic tests**, not the scientific hypothesis of recursive amplification. Later empirical campaigns are tracked in the current status/result documents linked above.
 
 ## Canonical repository
 
