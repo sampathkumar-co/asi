@@ -1,9 +1,53 @@
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from .csp import solve_finite_csp
 from .registry import ToolResult
+
+_CALL_RE = re.compile(r"^\s*([a-z_]+)\s*\((.*)\)\s*$")
+
+
+def _atom(text: str) -> Any:
+    value = text.strip().strip('"\'')
+    if re.fullmatch(r"-?\d+", value):
+        return int(value)
+    if re.fullmatch(r"-?\d+(?:\.\d+)", value):
+        return float(value)
+    return value
+
+
+def _normalize_constraint(raw: Any, entities: set[str]) -> dict[str, Any]:
+    """Accept the documented object form and a compact function-call string form."""
+    if isinstance(raw, dict):
+        data = dict(raw)
+    elif isinstance(raw, str):
+        match = _CALL_RE.fullmatch(raw)
+        if not match:
+            raise ValueError("constraint string must look like op(arg, ...)")
+        op = match.group(1)
+        args = [_atom(part) for part in match.group(2).split(",") if part.strip()]
+        if op == "position_eq" and len(args) == 2:
+            if str(args[1]) in entities:
+                data = {"op": "same_position", "left": str(args[0]), "right": str(args[1])}
+            else:
+                data = {"op": op, "entity": str(args[0]), "position": args[1]}
+        elif op == "not_in_positions" and len(args) >= 2:
+            data = {"op": op, "entity": str(args[0]), "positions": list(args[1:])}
+        elif op == "distance" and len(args) == 3:
+            data = {"op": op, "left": str(args[0]), "right": str(args[1]), "value": args[2]}
+        elif op in {"before", "after", "immediately_before", "immediately_after", "same_position", "not_same"} and len(args) == 2:
+            data = {"op": op, "left": str(args[0]), "right": str(args[1])}
+        else:
+            raise ValueError(f"invalid compact assignment constraint: {raw}")
+    else:
+        raise ValueError("constraints must be objects or compact function-call strings")
+
+    # A common compact serialization uses position_eq(A,B) to mean equal positions.
+    if data.get("op") == "position_eq" and str(data.get("position")) in entities:
+        data = {"op": "same_position", "left": str(data.get("entity", "")), "right": str(data["position"])}
+    return data
 
 
 def _translate_constraint(raw: dict[str, Any], entities: set[str]) -> dict[str, Any]:
@@ -69,11 +113,8 @@ def assignment_csp_tool(payload: dict[str, Any]) -> ToolResult:
 
         domains = {entity: list(positions) for entity in entities}
         all_different = list(clean_groups.values())
-        low_constraints = []
-        for raw in constraints:
-            if not isinstance(raw, dict):
-                raise ValueError("constraints must be objects")
-            low_constraints.append(_translate_constraint(raw, entities))
+        normalized_constraints = [_normalize_constraint(raw, entities) for raw in constraints]
+        low_constraints = [_translate_constraint(raw, entities) for raw in normalized_constraints]
         solved = solve_finite_csp(domains, all_different, low_constraints)
         solution = solved["solution"]
         if solution is None:
@@ -85,7 +126,12 @@ def assignment_csp_tool(payload: dict[str, Any]) -> ToolResult:
         for spec in render_groups:
             if not isinstance(spec, dict):
                 raise ValueError("render_groups entries must be objects")
-            name, group = str(spec.get("name", "")), str(spec.get("group", ""))
+            name = str(spec.get("name", ""))
+            raw_group = spec.get("group", "")
+            if isinstance(raw_group, list) and name in clean_groups:
+                group = name
+            else:
+                group = str(raw_group)
             if not name or group not in clean_groups:
                 raise ValueError("render group name/group invalid")
             separator = str(spec.get("separator", "-"))
@@ -100,7 +146,7 @@ def assignment_csp_tool(payload: dict[str, Any]) -> ToolResult:
         checks = {
             "solution_found": True,
             "unique_solution": solved["unique"],
-            "all_constraints_hold": True,
+            "all_constraints_hold": all(c is not None for c in low_constraints),
             "all_groups_rendered": len(rendered) == len(render_groups),
         }
         return ToolResult(True, output={"answer": answer, "checks": checks, "evidence": {"solution": solution, "search_nodes": solved["search_nodes"], "rendered": rendered}})
