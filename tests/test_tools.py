@@ -79,6 +79,48 @@ class ToolTests(unittest.TestCase):
         self.assertEqual(result.output["answer"], "FINAL: A=90.00,B=-5.50,TOTAL=84.50")
         self.assertTrue(all(result.output["checks"].values()))
 
+    def test_finite_csp_solves_unique_logic_grid(self):
+        positions = [1, 2, 3, 4]
+        result = default_registry().call(
+            "finite_csp",
+            {
+                "domains": {name: positions for name in ["Alex", "Bea", "Chen", "Dev", "DB", "AI", "OS", "Networks"]},
+                "all_different": [["Alex", "Bea", "Chen", "Dev"], ["DB", "AI", "OS", "Networks"]],
+                "constraints": [
+                    {"op": "eq", "left": "Chen", "value": 4},
+                    {"op": "eq", "left": "DB", "value": 1},
+                    {"op": "gt", "left": "Alex", "right": "Dev"},
+                    {"op": "offset_eq", "left": "Alex", "right": "AI", "value": 1},
+                    {"op": "ne", "left": "Bea", "right": "AI"},
+                    {"op": "ne", "left": "Bea", "right": "OS"},
+                    {"op": "ne", "left": "Dev", "right": "Networks"},
+                    {"op": "eq", "left": "Chen", "right": "Networks"},
+                ],
+                "sequences": [
+                    {"name": "people", "variables": ["Alex", "Bea", "Chen", "Dev"], "order": positions},
+                    {"name": "topics", "variables": ["DB", "AI", "OS", "Networks"], "order": positions},
+                ],
+                "answer_template": "FINAL: {people} | {topics}",
+            },
+        )
+        self.assertTrue(result.ok)
+        self.assertEqual(result.output["answer"], "FINAL: Bea-Dev-Alex-Chen | DB-AI-OS-Networks")
+        self.assertTrue(all(result.output["checks"].values()))
+
+    def test_finite_csp_rejects_nonunique_problem(self):
+        result = default_registry().call(
+            "finite_csp",
+            {
+                "domains": {"A": [1, 2], "B": [1, 2]},
+                "all_different": [["A", "B"]],
+                "constraints": [],
+                "sequences": [{"name": "order", "variables": ["A", "B"], "order": [1, 2]}],
+                "answer_template": "FINAL: {order}",
+            },
+        )
+        self.assertFalse(result.ok)
+        self.assertIn("not unique", result.error)
+
     def test_unknown_tool_denied(self):
         result = default_registry().call("shell", {"command": "whoami"})
         self.assertFalse(result.ok)
