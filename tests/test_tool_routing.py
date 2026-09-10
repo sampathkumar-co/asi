@@ -5,6 +5,7 @@ from seed.agent.tool_routing import select_tools
 
 AVAILABLE = (
     "aggregate_records",
+    "assignment_csp",
     "calculator",
     "crt",
     "dag_longest_path",
@@ -37,15 +38,15 @@ class ToolRoutingTests(unittest.TestCase):
         self.assertIn("aggregate_records", tools)
         self.assertNotIn("dag_longest_path", tools)
 
-    def test_logic_grid_routes_finite_csp(self):
+    def test_logic_grid_routes_assignment_csp(self):
         tools = select_tools("Four researchers present once each Monday through Thursday, each a different topic. Determine the unique day order.", AVAILABLE)
-        self.assertIn("finite_csp", tools)
+        self.assertIn("assignment_csp", tools)
         self.assertIn("python_compute", tools)
-        self.assertNotIn("shortest_path", tools)
+        self.assertNotIn("finite_csp", tools)
 
-    def test_position_order_routes_finite_csp(self):
+    def test_position_order_routes_assignment_csp(self):
         tools = select_tools("Seven jobs must be arranged in positions 1-7. Exactly two positions lie between G and C.", AVAILABLE)
-        self.assertIn("finite_csp", tools)
+        self.assertIn("assignment_csp", tools)
 
     def test_generic_constraint_task_keeps_small_fallback_set(self):
         tools = select_tools("Choose a feasible subset maximizing total value under several logical constraints.", AVAILABLE)
