@@ -138,7 +138,9 @@ Holdouts v2, v3 and v4 are retired development evidence and may not be reused as
 
 v4 independently reproduces a large and statistically positive scaffold effect, but Gate 1 intentionally also requires broad paired reliability. Its 8/16 strict Seed wins remain below the frozen 60% threshold, even though pair count, mean gain, confidence interval, identity/integrity and resource criteria passed.
 
-The next candidate may use v4 only to diagnose generic remaining failure and budget-exhaustion classes. It must then be frozen before a new private holdout v5 is generated, independently audited and preregistered. Gate 1 remains failed until a campaign satisfies every frozen criterion; the 50.00% v4 win rate is not rounded up or treated as equivalent to 60%.
+The post-v4 v5 candidate is frozen at `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation digest `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`, and passes **140/140** local tests plus **10/10** deterministic Gate-1 checks. Retired-v4 diagnostics close all five both-wrong failure classes through generic reliability changes; see [`GATE1_V5_DEVELOPMENT.md`](GATE1_V5_DEVELOPMENT.md).
+
+The next valid promotion attempt must use a new private holdout v5 generated after this freeze, independently audited and preregistered. Gate 1 remains failed until one campaign satisfies every frozen criterion; the 50.00% v4 win rate is not rounded up or treated as equivalent to 60%.
 
 ## Storage policy
 

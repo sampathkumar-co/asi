@@ -37,9 +37,11 @@ The vNext candidate at `83ec193d6300b0658af8d4d3c45109880b28363f` substantially 
 
 The post-v3 reliability candidate at `b4242af758b1222f8ecea0bf7306e917a36ed9d8` passed **134/134** local tests and **10/10** deterministic qualification checks. Holdout v4 was independently audited 16/16 and preregistered before inference. It reproduced Seed 11/16 vs Raw 3/16 and a +50 pp gain with CI fully above zero, but strict Seed wins were only 8/16. Full result: [`GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](GATE1_LOCAL_HOLDOUT_V4_RESULT.md).
 
-### Milestone A4 — next Gate-1 candidate
+### Milestone A4 - Gate-1 v5 candidate
 
-Use v4 only as retired development evidence. Diagnose generic remaining failures and budget exhaustion without task-answer leakage. Freeze the revised candidate before generating a **new** private holdout v5, independently audit it, preregister all identities/criteria, run unchanged, and publish the score even if it fails.
+**Status: candidate frozen; holdout-v5 preparation next.**
+
+v5 source `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation digest `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`, passes **140/140** local tests and **10/10** deterministic qualification checks. All five v4 both-wrong failure classes close on retired development probes. Next: generate a new private holdout v5, independently audit it, preregister identities/criteria, run unchanged, and publish the score. See [`GATE1_V5_DEVELOPMENT.md`](GATE1_V5_DEVELOPMENT.md).
 
 ## Milestone B — Gate 2 research benchmark
 

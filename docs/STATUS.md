@@ -113,7 +113,11 @@ The private v4 holdout was generated after candidate freeze, independently audit
 
 Pair count, gain, CI, identity/integrity and resource criteria passed. The frozen >=60% strict-win criterion failed, so **Gate 1 remains NOT EMPIRICALLY CERTIFIED**. Full audit: [`GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](GATE1_LOCAL_HOLDOUT_V4_RESULT.md).
 
-The candidate remains green at **134/134** local tests and **10/10** deterministic Gate-1 checks after the run.
+The evaluated v4 candidate remains green at **134/134** local tests and **10/10** deterministic Gate-1 checks after the run.
+
+### Gate-1 v5 development candidate
+
+v5 is frozen at source commit `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation digest `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`. It passes **140/140** local tests and **10/10** deterministic Gate-1 checks. Retired-v4 probes close W401/W403/W404/W412/W413 through generic routing, exact-tool preference, duration-label normalization, exact Python tracing and output canonicalization. See [`GATE1_V5_DEVELOPMENT.md`](GATE1_V5_DEVELOPMENT.md).
 
 ## Gate 2 — scientific-method workflow
 
@@ -165,8 +169,8 @@ Implemented:
 
 ## Current Gate-1 next step
 
-Holdouts v2, v3 and v4 are retired development evidence and may not be reused for certification. v4 independently reproduced a large statistically positive aggregate Seed effect but failed broad paired reliability at 8/16 strict wins. The next candidate must diagnose generic v4 failure/budget-exhaustion classes without answer leakage, then face a **new independently audited and preregistered holdout v5** under frozen criteria.
+Holdouts v2, v3 and v4 are retired development evidence and may not be reused for certification. The v5 candidate is now frozen and locally qualified. The next action is to generate, independently audit and preregister a **new private holdout v5** against that frozen identity, then run the same-model Raw-vs-Seed campaign without architecture changes.
 
 ## Overall
 
-Gate 0 is complete. Gate 1 is **infrastructure-qualified, experiment-ready and repeatedly empirically tested, but not empirically certified**. The latest unseen v4 holdout again shows Seed 68.75% vs Raw 18.75% (+50 pp) with a confidence interval fully above zero, but strict paired reliability remains below the project's 60% promotion standard (50.00%). Gates 2-4 remain foundations awaiting later empirical qualification.
+Gate 0 is complete. Gate 1 is **infrastructure-qualified, repeatedly empirically tested, and now at a frozen v5 candidate awaiting a fresh holdout, but not empirically certified**. v3/v4 both showed Seed 68.75% vs Raw 18.75% (+50 pp) with CIs above zero, while strict paired reliability remained below 60%. Gates 2-4 remain foundations awaiting later empirical qualification.

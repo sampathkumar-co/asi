@@ -58,6 +58,10 @@ See [`docs/GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](docs/GATE1_LOCAL_HOLDOUT_V4_RESULT
 
 The evaluated v4 candidate is source commit `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`. It passes **134/134** local tests and **10/10** deterministic Gate-1 checks. See [`docs/GATE1_V4_DEVELOPMENT.md`](docs/GATE1_V4_DEVELOPMENT.md).
 
+### Current v5 candidate
+
+v5 is frozen at source commit `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation digest `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`. It passes **140/140** local tests and **10/10** deterministic Gate-1 checks. All five v4 both-wrong failure classes close on retired development probes. A new independently audited/preregistered private holdout v5 is required before any promotion claim. See [`docs/GATE1_V5_DEVELOPMENT.md`](docs/GATE1_V5_DEVELOPMENT.md).
+
 ## Gate-0 measurement layer
 
 Gate 0 provides:

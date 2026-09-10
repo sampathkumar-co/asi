@@ -34,6 +34,8 @@ See [`GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](GATE1_LOCAL_HOLDOUT_V4_RESULT.md).
 
 The evaluated v4 candidate is frozen at `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`, and remains green at **134/134** local tests and **10/10** deterministic Gate-1 checks.
 
+The current v5 candidate is frozen at `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation digest `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`, with **140/140** local tests and **10/10** deterministic checks passing. This is development readiness, not promotion evidence; a new holdout v5 is required.
+
 ### Implemented
 - raw-model control arm;
 - planner/executor/critic Seed arm;
