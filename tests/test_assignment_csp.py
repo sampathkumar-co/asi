@@ -35,6 +35,36 @@ class AssignmentCSPTests(unittest.TestCase):
         self.assertEqual(result.output["answer"], "FINAL: Bea-Dev-Alex-Chen | DB-AI-OS-Networks")
         self.assertTrue(all(result.output["checks"].values()))
 
+    def test_compact_strings_and_render_lists_are_normalized(self):
+        result = default_registry().call(
+            "assignment_csp",
+            {
+                "groups": {
+                    "people": ["Alex", "Bea", "Chen", "Dev"],
+                    "topics": ["AI", "Databases", "Operating Systems", "Networks"],
+                },
+                "positions": [1, 2, 3, 4],
+                "constraints": [
+                    "position_eq(Chen,4)",
+                    "position_eq(Databases,1)",
+                    "after(Alex,Dev)",
+                    "immediately_before(AI,Alex)",
+                    "not_same(Bea,AI)",
+                    "not_same(Bea,Operating Systems)",
+                    "not_same(Dev,Networks)",
+                    "position_eq(Chen,Networks)",
+                ],
+                "labels": {"Databases": "DB", "Operating Systems": "OS"},
+                "render_groups": [
+                    {"name": "people", "group": ["Mon-person", "Tue-person", "Wed-person", "Thu-person"]},
+                    {"name": "topics", "group": ["Mon-topic", "Tue-topic", "Wed-topic", "Thu-topic"]},
+                ],
+                "answer_template": "FINAL: {people} | {topics}",
+            },
+        )
+        self.assertTrue(result.ok)
+        self.assertEqual(result.output["answer"], "FINAL: Bea-Dev-Alex-Chen | DB-AI-OS-Networks")
+
     def test_nonunique_assignment_rejected(self):
         result = default_registry().call(
             "assignment_csp",
