@@ -2,7 +2,7 @@
 
 Updated: 2026-09-10
 
-Current local validation on Sampath's Windows 11 / Python 3.13.15: **121/121 tests passing**. The repository includes permanent Ubuntu and Windows CI coverage for the Gate-0/1 foundations.
+Current local validation on Sampath's Windows 11 / Python 3.13.15: **131/131 tests passing**. The repository includes permanent Ubuntu and Windows CI coverage for the Gate-0/1 foundations.
 
 ## Meaning of status labels
 
@@ -47,7 +47,7 @@ The Gate-1 infrastructure is implemented and has now been exercised in multiple 
 - local Ollama provider with exact model digest attestation;
 - same-model/same-envelope pair evidence;
 - deterministic goal-based relevant-tool routing;
-- exact tools for shortest paths, DAG critical paths, CRT, record aggregation, finite CSP and assignment CSP;
+- exact tools for shortest paths, DAG critical paths, CRT, semantic transactions/reconciliation, generic aggregation, finite/assignment CSP, exact Python tracing and constrained subset optimization;
 - sandboxed `python_compute` fallback;
 - per-task checkpoint/resume and progress telemetry;
 - Seed implementation digest attestation;
@@ -90,6 +90,12 @@ Full result: [`GATE1_LOCAL_HOLDOUT_V2_RESULT.md`](GATE1_LOCAL_HOLDOUT_V2_RESULT.
 ### Scoring correction
 
 After the 16-pair run had fully completed, the first score attempt exposed two evaluator-side parsing bugs: single-string answer keys were iterated character-by-character, and `FINAL:` prefixes in keys were not normalized like model outputs. The frozen task/key/evidence artifacts and Seed/model run were not changed. Both bugs were fixed with regression tests, after which the repository passed **121/121 tests** and the same sealed evidence/key hashes produced the result above.
+
+### Gate-1 vNext development candidate
+
+Post-v2 development is frozen at source commit `83ec193d6300b0658af8d4d3c45109880b28363f`, implementation digest `a82be2b8cd2a60e4fa4021a0d6bfa0434c73032afbf0ec29771626385dccd708`. The candidate passes **131/131** local tests and **10/10** deterministic Gate-1 infrastructure canaries.
+
+Retired-holdout development probes verify the intended generic fixes for critical-path finalization, transaction/reconciliation semantics, ordering-format fidelity, exact Python tracing and structured subset optimization. These probes are development evidence only. See [`GATE1_VNEXT_DEVELOPMENT.md`](GATE1_VNEXT_DEVELOPMENT.md).
 
 ## Gate 2 — scientific-method workflow
 
@@ -141,7 +147,7 @@ Implemented:
 
 ## Current Gate-1 next step
 
-H01-H16 are now development evidence and must not be reused as certification data. The next Seed candidate should address the observed unseen weaknesses—especially scheduling revision stability, record translation, code tracing, constraint/output formatting and budget-efficient recovery—without changing the frozen v2 result. Then a **new** private holdout must be generated, audited and preregistered before another empirical promotion attempt.
+The vNext candidate is frozen and locally qualified. H01-H16 remain retired development evidence and may not be reused as certification data. The next action is to generate, independently audit and preregister a **new private holdout v3** against the frozen vNext candidate, then run the same-model Raw-vs-Seed promotion campaign without architecture changes.
 
 ## Overall
 

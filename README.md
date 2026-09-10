@@ -53,6 +53,10 @@ Result:
 
 This is positive unseen-task evidence for some scaffold/tooling effects, but it is not enough for empirical Gate-1 certification. See [`docs/GATE1_LOCAL_HOLDOUT_V2_RESULT.md`](docs/GATE1_LOCAL_HOLDOUT_V2_RESULT.md) for the full audit trail and [`artifacts/gate1-local-holdout-v2-score.json`](artifacts/gate1-local-holdout-v2-score.json) for the public score-only artifact.
 
+### Current Gate-1 vNext candidate
+
+Post-v2 development is frozen at source commit `83ec193d6300b0658af8d4d3c45109880b28363f` with implementation digest `a82be2b8cd2a60e4fa4021a0d6bfa0434c73032afbf0ec29771626385dccd708`. It passes **131/131** local tests and **10/10** deterministic Gate-1 canaries. The v2 holdout is retired to development use; the next empirical promotion attempt must use a newly generated, independently audited and preregistered holdout v3. See [`docs/GATE1_VNEXT_DEVELOPMENT.md`](docs/GATE1_VNEXT_DEVELOPMENT.md).
+
 ## Gate-0 measurement layer
 
 Gate 0 provides:
@@ -120,7 +124,7 @@ No external LLM API is required for Gate-0 infrastructure qualification. Gate-1 
 
 ## Gates 1-4 foundation
 
-- **Gate 1:** provider-neutral model interface; local Ollama adapter; goal/state models; planner/executor/critic loop; deterministic relevant-tool routing; persistent provenance; implementation/model attestation; strict evidence-only critic; exact reusable tools for graphs, scheduling, CRT, aggregation and assignment/CSP; sandboxed computation fallback; hard budgets and checkpointed paired campaigns.
+- **Gate 1:** provider-neutral model interface; local Ollama adapter; goal/state models; planner/executor/critic loop; deterministic relevant-tool routing; persistent provenance; implementation/model attestation; strict evidence-only critic; exact reusable tools for graphs, scheduling, CRT, semantic transactions/reconciliation, aggregation, assignment/CSP, exact Python tracing and constrained subset optimization; sandboxed computation fallback; hard budgets and checkpointed paired campaigns.
 - **Gate 2:** falsifiable hypotheses, experiment plans, controls, predictions, reproducibility and independent/adversarial verification.
 - **Gate 3:** declarative `AgentGenome`, bounded seeded mutation, archive and capability/cost fitness search.
 - **Gate 4:** copy-on-write descendants, mutation allow/deny policy, stale-hash protection, lineage, no in-place parent mutation, Docker no-network/read-only/resource limits and explicit promotion evidence.

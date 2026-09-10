@@ -43,7 +43,7 @@ Gate 1 now also includes:
 - exact local model digest attestation;
 - Raw single-call bounded-analysis protocol;
 - deterministic relevant-tool routing for Seed;
-- exact shortest-path, DAG critical-path, CRT, record-aggregation, finite-CSP and assignment-CSP tools;
+- exact shortest-path, DAG critical-path, CRT, semantic transaction/reconciliation, record-aggregation, finite/assignment-CSP, exact Python-trace and constrained subset-optimization tools;
 - sandboxed `python_compute` fallback;
 - evidence-only critic requiring verified candidate answers;
 - per-purpose output caps inside a common hard total budget;
@@ -112,6 +112,14 @@ After the 16-pair model run had fully completed and sealed, the first scoring pa
 The frozen candidate/model run, tasks, answer key and evidence were not altered. The scoring implementation was corrected with regression tests, and the same sealed hashes were rescored. Local repository validation then passed **121/121 tests**.
 
 This incident is retained as part of the audit trail rather than hidden because evaluator correctness is part of Gate 0/1 trustworthiness.
+
+## Current vNext candidate
+
+After holdout v2 was retired to development use, the observed failure classes were addressed generically. The resulting candidate is frozen at source commit `83ec193d6300b0658af8d4d3c45109880b28363f` with Seed implementation digest `a82be2b8cd2a60e4fa4021a0d6bfa0434c73032afbf0ec29771626385dccd708`.
+
+The candidate passes **131/131** local regression tests and **10/10** deterministic Gate-1 infrastructure canaries. Development-only probes on retired H01-H16 cases verify the new transaction/reconciliation, exact Python-trace, subset-optimization and output-finalization paths. This is not promotion evidence. See [`GATE1_VNEXT_DEVELOPMENT.md`](GATE1_VNEXT_DEVELOPMENT.md).
+
+The next certification attempt must use a new private holdout v3 generated and preregistered after this candidate identity was frozen.
 
 ## Failure semantics
 

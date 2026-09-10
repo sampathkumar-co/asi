@@ -14,7 +14,7 @@ Completed:
 - implementation/model/evidence hashing and checkpointing;
 - public score-only result artifacts;
 - one full calibration campaign and one independent preregistered unseen holdout;
-- exact reusable tools for shortest paths, project critical paths, CRT, aggregation and assignment/CSP;
+- exact reusable tools for shortest paths, project critical paths, CRT, semantic transactions/reconciliation, aggregation, assignment/CSP, exact Python tracing and constrained subset optimization;
 - deterministic relevant-tool routing and sandboxed computation fallback.
 
 Latest unseen holdout result:
@@ -25,24 +25,18 @@ Latest unseen holdout result:
 - 95% paired-bootstrap CI [0.00, 0.50];
 - **promotion FAIL** under the frozen >=60% win-rate and CI-low >0 rule.
 
-### Milestone A2 — next Gate-1 candidate
+### Milestone A2 — Gate-1 vNext candidate
 
-Use H01-H16 only as development evidence. Do not reuse it as fresh certification data.
+**Status: implementation frozen; new-holdout preparation next.**
 
-Priorities:
-- improve critical-path translation/revision without task-specific hints;
-- strengthen ledger/reconciliation mapping of status/sign/discount semantics;
-- add a generic exact code-trace/state-transition capability rather than repeated free-form Python reasoning;
-- make constrained optimization more direct and budget-efficient;
-- improve assignment/output-format fidelity without leaking benchmark answers;
-- add generic stagnation detection so repeated identical plans terminate/re-route earlier;
-- preserve strict evidence-only finalization and fail-closed behavior;
-- measure capability gain and resource efficiency together.
+Candidate source: `83ec193d6300b0658af8d4d3c45109880b28363f`. Implementation digest: `a82be2b8cd2a60e4fa4021a0d6bfa0434c73032afbf0ec29771626385dccd708`. Local validation is **131/131 tests passing** and **10/10 deterministic Gate-1 canaries passing**.
+
+H01-H16 were used only as retired development evidence. Generic fixes now cover critical-path finalization, transaction/reconciliation semantics, exact Python tracing, constrained subset optimization, ordering-format fidelity and stable capability routing. Details: [`GATE1_VNEXT_DEVELOPMENT.md`](GATE1_VNEXT_DEVELOPMENT.md).
 
 Before the next promotion attempt:
-1. freeze the new candidate source + implementation digest;
+1. keep the vNext candidate frozen;
 2. generate a **new** private holdout with materially different instances;
-3. independently audit answer correctness and uniqueness;
+3. independently audit answer correctness and uniqueness/optimality;
 4. preregister task/key hashes, model digest, envelope and unchanged thresholds;
 5. run all paired tasks without architecture changes;
 6. score once and publish the result even if it fails.
