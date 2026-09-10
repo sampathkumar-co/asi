@@ -14,7 +14,6 @@ def select_tools(goal: str, available: tuple[str, ...]) -> tuple[str, ...]:
         if name in available:
             chosen.add(name)
 
-    # General fallbacks remain available for tasks without a specialized primitive.
     add("python_compute")
     add("calculator")
 
@@ -30,7 +29,7 @@ def select_tools(goal: str, available: tuple[str, ...]) -> tuple[str, ...]:
         "logic grid", "logic-grid", "arranged in positions", "unique order", "unique day order",
         "each a different topic", "presents once each", "exactly two positions", "immediately before",
     )):
-        add("finite_csp")
+        add("assignment_csp")
     if any(token in text for token in ("echo", "scratch evidence")):
         add("echo")
 
