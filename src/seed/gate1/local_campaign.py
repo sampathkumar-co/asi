@@ -144,20 +144,20 @@ def _hash_body(body: dict) -> str:
 
 
 def _atomic_write(path: Path, body: dict) -> None:
-    """Atomically replace a checkpoint, tolerating brief Windows reader locks."""
+    """Atomically replace a checkpoint, tolerating transient Windows reader locks."""
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(body, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     last_error: PermissionError | None = None
-    for attempt in range(8):
+    for attempt in range(30):
         try:
             tmp.replace(path)
             return
         except PermissionError as exc:
             last_error = exc
-            if attempt == 7:
+            if attempt == 29:
                 break
-            time.sleep(min(0.05 * (2 ** attempt), 0.5))
+            time.sleep(min(0.05 * (2 ** min(attempt, 4)), 0.5))
     assert last_error is not None
     raise last_error
 
@@ -205,7 +205,7 @@ def run_ollama_suite(
     provider_id = f"ollama:{model}"
     purpose_caps = {
         "raw_eval": int(num_predict),
-        "plan": min(640, int(num_predict)),
+        "plan": int(num_predict),
         "critic": min(128, int(num_predict)),
     }
     probe = OllamaProvider(
