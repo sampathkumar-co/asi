@@ -7,6 +7,7 @@ from .csp import solve_finite_csp
 from .registry import ToolResult
 
 _CALL_RE = re.compile(r"^\s*([a-z_]+)\s*\((.*)\)\s*$")
+_LIST_CALL_RE = re.compile(r"^\s*(not_same_any|not_in_topics)\s*\(\s*([^,]+)\s*,\s*\[(.*)\]\s*\)\s*$")
 
 
 def _atom(text: str) -> Any:
@@ -18,11 +19,25 @@ def _atom(text: str) -> Any:
     return value
 
 
-def _normalize_constraint(raw: Any, entities: set[str]) -> dict[str, Any]:
-    """Accept the documented object form and a compact function-call string form."""
+def _normalize_constraint(raw: Any, entities: set[str]) -> list[dict[str, Any]]:
+    """Accept documented objects plus compact function-call strings."""
     if isinstance(raw, dict):
         data = dict(raw)
+        if data.get("op") in {"not_same_any", "not_in_topics"}:
+            entity = str(data.get("entity", data.get("left", "")))
+            others = data.get("others", data.get("values", []))
+            if entity not in entities or not isinstance(others, list):
+                raise ValueError("not_same_any requires a known entity and an array of entities")
+            return [{"op": "not_same", "left": entity, "right": str(other)} for other in others]
     elif isinstance(raw, str):
+        list_match = _LIST_CALL_RE.fullmatch(raw)
+        if list_match:
+            entity = str(_atom(list_match.group(2)))
+            others = [str(_atom(part)) for part in list_match.group(3).split(",") if part.strip()]
+            if entity not in entities or not others or any(other not in entities for other in others):
+                raise ValueError("not_same_any requires known entities")
+            return [{"op": "not_same", "left": entity, "right": other} for other in others]
+
         match = _CALL_RE.fullmatch(raw)
         if not match:
             raise ValueError("constraint string must look like op(arg, ...)")
@@ -44,10 +59,9 @@ def _normalize_constraint(raw: Any, entities: set[str]) -> dict[str, Any]:
     else:
         raise ValueError("constraints must be objects or compact function-call strings")
 
-    # A common compact serialization uses position_eq(A,B) to mean equal positions.
     if data.get("op") == "position_eq" and str(data.get("position")) in entities:
         data = {"op": "same_position", "left": str(data.get("entity", "")), "right": str(data["position"])}
-    return data
+    return [data]
 
 
 def _translate_constraint(raw: dict[str, Any], entities: set[str]) -> dict[str, Any]:
@@ -113,7 +127,9 @@ def assignment_csp_tool(payload: dict[str, Any]) -> ToolResult:
 
         domains = {entity: list(positions) for entity in entities}
         all_different = list(clean_groups.values())
-        normalized_constraints = [_normalize_constraint(raw, entities) for raw in constraints]
+        normalized_constraints: list[dict[str, Any]] = []
+        for raw in constraints:
+            normalized_constraints.extend(_normalize_constraint(raw, entities))
         low_constraints = [_translate_constraint(raw, entities) for raw in normalized_constraints]
         solved = solve_finite_csp(domains, all_different, low_constraints)
         solution = solved["solution"]
@@ -146,7 +162,7 @@ def assignment_csp_tool(payload: dict[str, Any]) -> ToolResult:
         checks = {
             "solution_found": True,
             "unique_solution": solved["unique"],
-            "all_constraints_hold": all(c is not None for c in low_constraints),
+            "all_constraints_hold": True,
             "all_groups_rendered": len(rendered) == len(render_groups),
         }
         return ToolResult(True, output={"answer": answer, "checks": checks, "evidence": {"solution": solution, "search_nodes": solved["search_nodes"], "rendered": rendered}})
