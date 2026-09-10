@@ -23,7 +23,7 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
         "properties": {
             "groups": "object group-name->array of entity names, exactly one entity per position; use exact requested output tokens as entity names when practical",
             "positions": "ordered array of positions/day indexes such as [1,2,3,4]",
-            "constraints": "prefer JSON objects: position_eq {op,entity,position}; before/after/immediately_before/immediately_after/same_position/not_same {op,left,right}; distance adds value; not_in_positions uses entity,positions. Compact strings like after(Alex,Dev) are also accepted",
+            "constraints": "prefer JSON objects: position_eq {op,entity,position}; before/after/immediately_before/immediately_after/same_position/not_same {op,left,right}; distance adds value; not_in_positions uses entity,positions; not_same_any uses entity plus others. Compact strings are accepted",
             "labels": "REQUIRED object internal-entity->exact requested output token for aliases/abbreviations; use {} when no aliases are needed",
             "render_groups": "array of {name,group,optional separator}; group should be the group NAME string, e.g. {'name':'people','group':'people'}",
             "answer_template": "string using render placeholders such as FINAL: {people} | {topics}",
@@ -183,14 +183,16 @@ class JSONPlanner:
             "aggregate_records for filtered grouped sums, and assignment_csp for logic grids or ordering puzzles. For assignment_csp, do NOT invent "
             "slot variables such as Mon-person. Put actual entities into groups and positions separately. Relation direction is literal: if the clue says "
             "'Alex later than Dev', emit after(Alex,Dev), NEVER after(Dev,Alex); 'AI immediately before Alex' means immediately_before(AI,Alex). "
-            "Use same_position(X,Y) when two entities occur on the same day/position; position_eq(X,4) only when the second argument is an actual "
-            "position value. Prefer constraint JSON objects, though compact function strings are accepted. render_groups.group should be the exact group "
-            "name string such as 'people' or 'topics', not a list of day labels. labels is REQUIRED for assignment_csp: use {} if no aliases are needed; "
-            "if the task explicitly requests output tokens/abbreviations, map every internal entity whose requested output differs (for example a full "
-            "name to an abbreviation) to that exact token. Do not silently substitute synonyms or expanded names. Use finite_csp only when the high-level "
-            "assignment form cannot express the problem. Use python_compute only as the general fallback. Preserve exact FINAL formatting via "
-            "answer_template. Never hard-code an unchecked guess. Pay close attention to relation direction, filtering/status rules, signs, percentages, "
-            "abbreviations, and requested output format. Use recent critic feedback and materially change failed/repeated approaches. tool_input MUST use exact keys."
+            "Cross-group exclusions are NOT position exclusions: if an entity X is not category Y, emit not_same(X,Y), not not_in_positions; if X is "
+            "neither Y nor Z, emit not_same(X,Y) and not_same(X,Z), or not_same_any(X,[Y,Z]). Use not_in_positions only when the clue explicitly "
+            "forbids numbered positions/days. Use same_position(X,Y) when two entities occur on the same day/position; position_eq(X,4) only when "
+            "the second argument is an actual position value. Prefer constraint JSON objects, though compact function strings are accepted. "
+            "render_groups.group should be the exact group name string such as 'people' or 'topics', not a list of day labels. labels is REQUIRED for "
+            "assignment_csp: use {} if no aliases are needed; if the task explicitly requests output tokens/abbreviations, map every internal entity "
+            "whose requested output differs to that exact token. Do not silently substitute synonyms or expanded names. Use finite_csp only when the "
+            "high-level assignment form cannot express the problem. Use python_compute only as the general fallback. Preserve exact FINAL formatting "
+            "via answer_template. Never hard-code an unchecked guess. Pay close attention to relation direction, filtering/status rules, signs, "
+            "percentages, abbreviations, and requested output format. Use recent critic feedback and materially change failed/repeated approaches."
         )
         response = self.provider.complete(
             [Message("system", system), Message("user", json.dumps(prompt, default=str))],
