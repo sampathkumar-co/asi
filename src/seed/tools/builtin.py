@@ -5,6 +5,7 @@ import operator
 from typing import Any
 
 from .aggregate import aggregate_records
+from .csp import finite_csp_tool
 from .graph import dag_longest_path_tool, shortest_path_tool
 from .math_exact import crt_tool
 from .python_compute import python_compute
@@ -60,6 +61,7 @@ def default_registry() -> ToolRegistry:
     reg.register("calculator", calculator)
     reg.register("crt", crt_tool)
     reg.register("dag_longest_path", dag_longest_path_tool)
+    reg.register("finite_csp", finite_csp_tool)
     reg.register("shortest_path", shortest_path_tool)
     reg.register("python_compute", python_compute)
     reg.register("echo", echo)
