@@ -13,6 +13,16 @@ _DEFAULT_TOOL_SCHEMAS: dict[str, dict[str, object]] = {
         "required": ["expression"],
         "properties": {"expression": "string arithmetic expression, maximum 200 characters"},
     },
+    "dag_longest_path": {
+        "required": ["weights", "predecessors", "answer_template"],
+        "properties": {
+            "weights": "object mapping node names to numeric node weights/durations",
+            "predecessors": "object mapping each node to an array of prerequisite node names; omitted nodes mean no prerequisites",
+            "target": "optional target node; omit to choose the maximum-weight terminal result",
+            "answer_template": "string <=256 chars containing both {weight} and {path}, e.g. FINAL: {weight} | {path}",
+            "path_separator": "optional separator for path labels, default '-'",
+        },
+    },
     "python_compute": {
         "required": ["code"],
         "properties": {
@@ -133,15 +143,15 @@ class JSONPlanner:
         }
         system = (
             "Return exactly one compact JSON object matching the supplied schema. Do not emit markdown or analysis outside JSON. "
-            "Choose the smallest action that creates checkable evidence. Prefer python_compute for arithmetic, graph/search, scheduling, "
-            "constraint enumeration, simulation, code tracing, or optimization when available. Use calculator only for one simple arithmetic "
-            "expression. Use echo only for already-computed scratch evidence, not as a substitute for computation. "
-            "For precedence DAGs or project scheduling, prefer the built-in dag_longest_path(weights, predecessors, target) helper instead of "
-            "reimplementing topological dynamic programming. predecessors[node] MUST mean the prerequisite nodes that must finish before node. "
-            "The helper returns a DICT: use g['weight'], g['path'], and g['checks']; NEVER use numeric indexes like g[0]. Copy g['checks'] into the final result checks and format the requested FINAL answer. "
-            "For python_compute: use ordinary Python blocks or parentheses and NEVER use backslash line continuations. Derive the candidate from "
-            "the task data; do not hard-code an unchecked guess. Compute meaningful boolean checks against the selected candidate itself. The code "
-            "MUST finish by assigning exactly one evidence object to result, shaped like "
+            "Choose the smallest action that creates checkable evidence. For precedence DAGs or project scheduling, ALWAYS prefer the direct "
+            "dag_longest_path tool when it is allowed: pass weights, predecessors, target when known, answer_template, and optional path_separator. "
+            "predecessors[node] MUST list prerequisite nodes that must finish before node. The tool itself computes and verifies the optimum path "
+            "and returns an exact answer plus boolean checks, so do NOT write Python code for a DAG when this direct tool is available. "
+            "Prefer python_compute for other arithmetic, graph/search, constraint enumeration, simulation, code tracing, or optimization tasks. "
+            "Use calculator only for one simple arithmetic expression. Use echo only for already-computed scratch evidence, not as a substitute "
+            "for computation. For python_compute: use ordinary Python blocks or parentheses and NEVER use backslash line continuations. Derive "
+            "the candidate from the task data; do not hard-code an unchecked guess. Compute meaningful boolean checks against the selected candidate "
+            "itself. The code MUST finish by assigning exactly one evidence object to result, shaped like "
             "result={'answer': 'FINAL: ...', 'checks': {'check_name': True, ...}, 'evidence': optional_data}. "
             "Do not assign result to a bare string/list/number and do not leave checks in a separate variable without putting them in result. "
             "Every checks value must literally be True or False, never a number/string. Checks must verify the important constraints, path/ordering "
