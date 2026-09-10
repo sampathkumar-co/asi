@@ -4,7 +4,9 @@ import ast
 import operator
 from typing import Any
 
-from .graph import dag_longest_path_tool
+from .aggregate import aggregate_records
+from .graph import dag_longest_path_tool, shortest_path_tool
+from .math_exact import crt_tool
 from .python_compute import python_compute
 from .registry import ToolRegistry, ToolResult
 
@@ -54,8 +56,11 @@ def echo(payload: dict[str, Any]) -> ToolResult:
 
 def default_registry() -> ToolRegistry:
     reg = ToolRegistry()
+    reg.register("aggregate_records", aggregate_records)
     reg.register("calculator", calculator)
+    reg.register("crt", crt_tool)
     reg.register("dag_longest_path", dag_longest_path_tool)
+    reg.register("shortest_path", shortest_path_tool)
     reg.register("python_compute", python_compute)
     reg.register("echo", echo)
     return reg
