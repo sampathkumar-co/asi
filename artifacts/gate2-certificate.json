@@ -1,0 +1,63 @@
+{
+  "checks": {
+    "all_hypothesis_forecasts_precommitted_before_reveal": true,
+    "budget_exhaustion_is_terminal": true,
+    "checkpoint_hash_tamper_rejected": true,
+    "exact_resume_identity_accepts": true,
+    "forecast_audit_is_separate_and_pre_reveal": true,
+    "forecast_collision_resolution_is_hidden_safe": true,
+    "hidden_outcomes_absent_before_selection": true,
+    "implementation_change_invalidates_resume": true,
+    "invalid_control_id_rejected": true,
+    "invalid_experiment_id_rejected": true,
+    "invalid_hypothesis_id_rejected": true,
+    "invalid_isolated_forecast_rejected": true,
+    "invalid_risk_id_rejected": true,
+    "malformed_model_json_fails_closed": true,
+    "model_identity_mismatch_rejected": true,
+    "overbudget_response_is_transcript_audited": true,
+    "post_reveal_forecast_match_table_is_mechanical": true,
+    "post_reveal_revision_call_order_is_explicit": true,
+    "post_reveal_revision_receives_revealed_evidence": true,
+    "prediction_precommitted_before_reveal": true,
+    "private_answer_key_external_to_candidate_prompt": true,
+    "repeated_experiment_rejected": true,
+    "resource_envelope_mismatch_rejected": true,
+    "same_identity_pair_validates": true,
+    "schema_repair_is_explicit_and_hidden_safe": true,
+    "verifier_disagreement_blocks_acceptance": true,
+    "verifier_roles_are_distinct_calls": true,
+    "verifier_verdict_is_runner_derived": true
+  },
+  "content_hash": "b02ef57a4c1bd48cdc57f3b5905f421e7fbcb6d9f652e94ba86e46d9aba9597e",
+  "evidence": {
+    "check_count": 28,
+    "forecast_audit_call_purposes": [
+      "gate2_seed_action",
+      "gate2_seed_forecast_hypothesis",
+      "gate2_seed_forecast_hypothesis"
+    ],
+    "overbudget_record_budget_accepted": false,
+    "qualification_note": "Deterministic Gate-2 protocol canaries; not empirical Gate-2 certification.",
+    "repair_canary_call_purposes": [
+      "gate2_raw_action",
+      "gate2_repair",
+      "gate2_raw_final"
+    ],
+    "seed_disagreement_accepted": false,
+    "seed_disagreement_status": "succeeded",
+    "seed_revision_count": 1,
+    "seed_verifier_call_purposes": [
+      "gate2_seed_action",
+      "gate2_seed_forecast_hypothesis",
+      "gate2_seed_forecast_hypothesis",
+      "gate2_seed_revision",
+      "gate2_seed_final",
+      "gate2_independent",
+      "gate2_adversarial"
+    ]
+  },
+  "gate": 2,
+  "passed": true,
+  "qualification": "gate2-research-protocol-v1"
+}

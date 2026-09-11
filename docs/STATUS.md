@@ -1,8 +1,8 @@
 # Implementation Status
 
-Updated: 2026-09-10
+Updated: 2026-09-11
 
-Current local validation on Sampath's Windows 11 / Python 3.13.15: **140/140 tests passing**. The repository includes permanent Ubuntu and Windows CI coverage for the Gate-0/1 foundations.
+Current local validation on Sampath's Windows 11 / Python 3.13.15: **157/157 tests passing** with `ResourceWarning` promoted to an error. The repository includes permanent Ubuntu and Windows CI coverage.
 
 ## Meaning of status labels
 
@@ -125,16 +125,18 @@ Full audit: [`GATE1_LOCAL_HOLDOUT_V5_RESULT.md`](GATE1_LOCAL_HOLDOUT_V5_RESULT.m
 
 ## Gate 2 — scientific-method workflow
 
-**Implemented + tested protocol; not empirically certified.**
+**Development candidate frozen; public calibration complete; private/OOD certification pending.**
 
-Implemented:
-- hypotheses and falsifiers;
-- experiment plans, predictions, metrics and controls;
-- reproducibility flag;
-- independent + adversarial verification;
-- dual-verifier acceptance rule.
+Current candidate:
+- 28/28 deterministic Gate-2 protocol canaries pass;
+- 157/157 repository tests pass under `ResourceWarning`-as-error;
+- implementation digest `49c9db731136a98c0bef78627fd3952d5e2b9b1b1030eb8e6dbc7c5d4647ea7a`;
+- same local `qwen3:8b` artifact for Raw/Seed, 16 calls / 16 steps / 12,000 tokens / zero tools;
+- isolated blind per-hypothesis forecasts, optional two-way first-experiment collision audit, reveal-then-mechanical comparison, explicit revision, bounded repair, and independent/adversarial verification.
 
-Gate-2 empirical qualification is now unblocked because Gate 1 has a qualifying baseline result. The next work is to freeze and preregister the Gate-2 scientific-method benchmark before making any Gate-2 promotion claim.
+Final eight-task public development result: Raw **0.78750**, Seed **0.93125**, gain **+0.14375**, strict Seed wins **5/8 = 62.5%**, verifier acceptance **6/8 = 75%**, bootstrap CI **[-0.015625, +0.31875]**. This does **not** certify Gate 2: it has only 8 pairs, mean gain is below the frozen +0.15 threshold, and the CI lower bound is not positive.
+
+The public suite is retired as development evidence. Next: freeze the candidate in Git/CI, generate and independently audit a new >=16-pair external private/OOD holdout, preregister hashes and frozen criteria, then run inference once.
 
 ## Gate 3 — architecture search
 
@@ -173,8 +175,8 @@ Implemented:
 
 ## Current next step
 
-Gate 1 is complete. The active empirical milestone is **Gate 2**: freeze a scientific-method/verification candidate, define a preregistered benchmark that measures falsifiable hypothesis generation, experiment design, prediction, independent verification and adversarial checking, then run it under the same evidence-separation discipline used for Gate 1.
+Gate 1 is complete. The active empirical milestone is **Gate 2 private/OOD certification**: commit and CI-freeze the current candidate, create and independently audit a new external >=16-pair holdout, preregister hashes/identity/budgets/rubric/thresholds, then run the sealed paired campaign without post-inference tuning.
 
 ## Overall
 
-Gate 0 is complete and Gate 1 is **empirically certified**. Gate-1 v5 raised the same Qwen3-8B substrate from 6.25% Raw to 93.75% Seed on a new preregistered private holdout and passed every frozen promotion criterion. **Gate 2 is now active.** Gates 3-4 remain implemented foundations awaiting later empirical qualification.
+Gate 0 is complete and Gate 1 is **empirically certified**. Gate 2 has a frozen development candidate with strong but non-promoting public calibration evidence; empirical certification still depends on a new preregistered private/OOD >=16-pair campaign. Gates 3-4 remain implemented foundations awaiting later empirical qualification.

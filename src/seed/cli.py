@@ -16,6 +16,9 @@ from seed.gate1.local_campaign import run_ollama_suite
 from seed.gate1.local_scoring import score_local_campaign
 from seed.gate1.qualification import run_gate1_qualification, write_gate1_certificate
 from seed.gate1.realchat import load_pair
+from seed.gate2.local_campaign import run_ollama_research_suite
+from seed.gate2.qualification import run_gate2_qualification, write_gate2_certificate
+from seed.gate2.scoring import score_research_campaign
 from seed.search.architecture import AgentGenome, ArchitectureSearch
 from seed.tools.builtin import default_registry
 
@@ -91,6 +94,34 @@ def gate1_local_score(evidence: str, answers: str, output: str | None) -> int:
     return 0
 
 
+def gate2_certify(output: str | None) -> int:
+    certificate = run_gate2_qualification()
+    if output:
+        write_gate2_certificate(certificate, output)
+    print(json.dumps(certificate.to_dict(), indent=2, sort_keys=True))
+    return 0 if certificate.passed else 1
+
+
+def gate2_local_campaign(task_file: str, model: str, output: str | None, num_ctx: int) -> int:
+    report = run_ollama_research_suite(task_file, model, checkpoint_path=output, resume=True, num_ctx=num_ctx)
+    if output and not Path(output).exists():
+        path = Path(output)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    print(json.dumps(report, indent=2, sort_keys=True))
+    return 0
+
+
+def gate2_local_score(evidence: str, answers: str, output: str | None) -> int:
+    report = score_research_campaign(evidence, answers)
+    if output:
+        path = Path(output)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    print(json.dumps(report, indent=2, sort_keys=True))
+    return 0
+
+
 def search_demo() -> int:
     def evaluator(g: AgentGenome) -> tuple[float, float]:
         capability = min(1.0, 0.50 + 0.03 * g.verification_passes + 0.01 * min(g.max_steps, 12))
@@ -125,6 +156,17 @@ def main() -> int:
     score.add_argument("--evidence", required=True)
     score.add_argument("--answers", required=True)
     score.add_argument("--output", default=None)
+    gate2 = sub.add_parser("gate2-certify", help="Run deterministic Gate-2 research-protocol qualification canaries")
+    gate2.add_argument("--output", default=None)
+    gate2_local = sub.add_parser("gate2-local-campaign", help="Run a resumable paired Gate-2 Raw-vs-Seed research campaign")
+    gate2_local.add_argument("--tasks", default="configs/gate2_public_calibration_v1.json")
+    gate2_local.add_argument("--model", required=True)
+    gate2_local.add_argument("--output", default=None, help="Evidence/checkpoint file; completed pairs are written atomically")
+    gate2_local.add_argument("--num-ctx", type=int, default=4096)
+    gate2_score = sub.add_parser("gate2-local-score", help="Externally score Gate-2 campaign evidence")
+    gate2_score.add_argument("--evidence", required=True)
+    gate2_score.add_argument("--answers", required=True)
+    gate2_score.add_argument("--output", default=None)
     sub.add_parser("search-demo", help="Run the Gate-3 architecture-search demo")
     args = parser.parse_args()
     if args.command == "gate0-certify":
@@ -137,6 +179,12 @@ def main() -> int:
         return gate1_local_campaign(args.tasks, args.model, args.output, args.num_predict)
     if args.command == "gate1-local-score":
         return gate1_local_score(args.evidence, args.answers, args.output)
+    if args.command == "gate2-certify":
+        return gate2_certify(args.output)
+    if args.command == "gate2-local-campaign":
+        return gate2_local_campaign(args.tasks, args.model, args.output, args.num_ctx)
+    if args.command == "gate2-local-score":
+        return gate2_local_score(args.evidence, args.answers, args.output)
     return {"demo": demo, "eval-demo": eval_demo, "search-demo": search_demo}[args.command]()
 
 

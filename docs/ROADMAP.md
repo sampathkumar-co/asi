@@ -1,10 +1,10 @@
 # Roadmap after the Gates 0-4 foundation
 
-Updated: 2026-09-10
+Updated: 2026-09-11
 
 ## Milestone A — Empirical Gate 0/1 baseline
 
-**Status: active; empirical Gate-1 promotion not yet passed.**
+**Status: COMPLETE — Gate 1 promoted.**
 
 Completed:
 - provider-neutral model interface and local Ollama adapter;
@@ -48,14 +48,16 @@ Frozen v5 source `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation dige
 
 ## Milestone B — Gate 2 research benchmark
 
-**Status: ACTIVE NEXT.** Gate 1 is now complete, so Gate-2 empirical qualification is unblocked. The existing Gate-2 machinery must now be frozen into a falsifiable, independently verifiable benchmark and evaluated under preregistered promotion rules.
+**Status: CANDIDATE FROZEN FOR PRIVATE/OOD CERTIFICATION.** The final public development suite is complete and retired. The candidate passes 28/28 deterministic Gate-2 canaries and 157/157 repository tests.
 
-Planned:
-- uncertain problems that require hypothesis revision;
-- planted confounds and faulty instrumentation;
-- replication runs;
-- verifier-disagreement analysis;
-- hidden/OOD scientific-method scoring.
+Public development result: Raw **0.78750**, Seed **0.93125**, gain **+0.14375**, strict wins **62.5%**, verifier acceptance **75%**, bootstrap CI **[-0.015625, +0.31875]**. This is strong development evidence but not promotion: the suite has 8 pairs, the gain is below +0.15, and the CI lower bound is not positive.
+
+Next:
+- commit/push/CI-freeze the candidate;
+- create a new external >=16-pair private/OOD scientific-method holdout;
+- independently audit tasks and answers before inference;
+- preregister candidate/model/task/key identities, resource envelope, rubric, verifier rule, bootstrap procedure, and thresholds;
+- run the paired campaign once without post-inference tuning.
 
 ## Milestone C — Gate 3 architecture campaign
 

@@ -1,0 +1,833 @@
+{
+  "suite_id": "gate2-public-calibration-v1",
+  "tasks": [
+    {
+      "task_id": "CAL01_SELECTION",
+      "question": "A wellness program cohort shows 18% lower sick-day use than nonparticipants. Which explanation best accounts for the observed difference?",
+      "hypotheses": [
+        {
+          "id": "H1",
+          "text": "The program itself causally reduces sick-day use."
+        },
+        {
+          "id": "H2",
+          "text": "Self-selection into the program explains the apparent benefit."
+        },
+        {
+          "id": "H3",
+          "text": "The apparent difference is unstable sampling noise."
+        }
+      ],
+      "experiments": [
+        {
+          "id": "E1",
+          "description": "Randomly assign eligible employees to program invitation versus control and measure sick-day use with identical follow-up.",
+          "possible_outcomes": [
+            {
+              "id": "O1A",
+              "text": "A similar benefit persists after randomization."
+            },
+            {
+              "id": "O1B",
+              "text": "The benefit largely disappears after randomization."
+            },
+            {
+              "id": "O1C",
+              "text": "Results vary widely with no stable direction."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O1B",
+            "observation": "The benefit largely disappears after randomization."
+          }
+        },
+        {
+          "id": "E2",
+          "description": "Match participants and nonparticipants on pre-program health and attendance, then re-estimate the difference.",
+          "possible_outcomes": [
+            {
+              "id": "O2A",
+              "text": "A similar benefit persists after matching."
+            },
+            {
+              "id": "O2B",
+              "text": "The benefit largely disappears after matching."
+            },
+            {
+              "id": "O2C",
+              "text": "The estimate becomes erratic and directionally unstable."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O2B",
+            "observation": "The benefit largely disappears after matching."
+          }
+        },
+        {
+          "id": "E3",
+          "description": "Increase the observational sample without changing enrollment or adjustment procedures.",
+          "possible_outcomes": [
+            {
+              "id": "O3A",
+              "text": "The original benefit remains statistically stable."
+            },
+            {
+              "id": "O3C",
+              "text": "The estimate becomes directionally unstable."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O3A",
+            "observation": "The original benefit remains statistically stable."
+          }
+        }
+      ],
+      "controls": [
+        {
+          "id": "C1",
+          "text": "Verify baseline balance and adherence under the randomized assignment."
+        },
+        {
+          "id": "C2",
+          "text": "Use the same outcome definition and follow-up window in all groups."
+        }
+      ],
+      "risks": [
+        {
+          "id": "R1",
+          "text": "Selection bias from healthier or more motivated employees enrolling."
+        },
+        {
+          "id": "R2",
+          "text": "Outcome-coding drift between participant and comparison groups."
+        }
+      ],
+      "max_experiments": 2
+    },
+    {
+      "task_id": "CAL02_CACHE",
+      "question": "A new database engine appears 27% faster than the old engine in a benchmark where the new engine is always run second. What best explains the speedup?",
+      "hypotheses": [
+        {
+          "id": "H1",
+          "text": "The new engine has an intrinsic execution-speed advantage."
+        },
+        {
+          "id": "H2",
+          "text": "Warm operating-system and database caches from run order explain the apparent speedup."
+        },
+        {
+          "id": "H3",
+          "text": "The benchmark difference is dominated by random timing noise."
+        }
+      ],
+      "experiments": [
+        {
+          "id": "E1",
+          "description": "Randomize engine order and reset relevant caches between runs while keeping the workload identical.",
+          "possible_outcomes": [
+            {
+              "id": "O1A",
+              "text": "The new engine stays about 27% faster."
+            },
+            {
+              "id": "O1B",
+              "text": "The apparent speedup collapses after cache reset and order randomization."
+            },
+            {
+              "id": "O1C",
+              "text": "Timings remain highly unstable across repetitions."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O1B",
+            "observation": "The apparent speedup collapses after cache reset and order randomization."
+          }
+        },
+        {
+          "id": "E2",
+          "description": "Run old-new and new-old back-to-back sequences on the same inputs and compare the second-run effect.",
+          "possible_outcomes": [
+            {
+              "id": "O2A",
+              "text": "The new engine is faster regardless of position."
+            },
+            {
+              "id": "O2B",
+              "text": "Whichever engine runs second gets most of the speed advantage."
+            },
+            {
+              "id": "O2C",
+              "text": "No repeatable position effect appears."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O2B",
+            "observation": "Whichever engine runs second gets most of the speed advantage."
+          }
+        },
+        {
+          "id": "E3",
+          "description": "Repeat many trials while retaining the original old-then-new order and no cache reset.",
+          "possible_outcomes": [
+            {
+              "id": "O3A",
+              "text": "The new engine remains stably faster."
+            },
+            {
+              "id": "O3C",
+              "text": "The measured difference fluctuates around zero."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O3A",
+            "observation": "The new engine remains stably faster."
+          }
+        }
+      ],
+      "controls": [
+        {
+          "id": "C1",
+          "text": "Reset caches or explicitly measure cache state before each timed run."
+        },
+        {
+          "id": "C2",
+          "text": "Pin the workload, data snapshot, hardware, and configuration across engines."
+        }
+      ],
+      "risks": [
+        {
+          "id": "R1",
+          "text": "Cache warm-up and order effects contaminate latency measurements."
+        },
+        {
+          "id": "R2",
+          "text": "Background system load differs systematically between engine runs."
+        }
+      ],
+      "max_experiments": 2
+    },
+    {
+      "task_id": "CAL03_CONTAMINATION",
+      "question": "A classifier gains 9 accuracy points on a benchmark after training on a newly assembled web corpus. What most likely explains the gain?",
+      "hypotheses": [
+        {
+          "id": "H1",
+          "text": "The new training method genuinely improves out-of-distribution generalization."
+        },
+        {
+          "id": "H2",
+          "text": "Benchmark examples or near-duplicates leaked into the training corpus."
+        },
+        {
+          "id": "H3",
+          "text": "The apparent gain is mainly random-seed variance."
+        }
+      ],
+      "experiments": [
+        {
+          "id": "E1",
+          "description": "Evaluate both models on a newly collected test set created after training and excluded from all corpora.",
+          "possible_outcomes": [
+            {
+              "id": "O1A",
+              "text": "A similar accuracy gain persists."
+            },
+            {
+              "id": "O1B",
+              "text": "The gain mostly disappears on the fresh uncontaminated set."
+            },
+            {
+              "id": "O1C",
+              "text": "The sign and size of the gain vary sharply across reruns."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O1B",
+            "observation": "The gain mostly disappears on the fresh uncontaminated set."
+          }
+        },
+        {
+          "id": "E2",
+          "description": "Run exact and semantic deduplication between the web corpus and the benchmark, then retrain after removing overlaps.",
+          "possible_outcomes": [
+            {
+              "id": "O2A",
+              "text": "The gain persists after deduplication."
+            },
+            {
+              "id": "O2B",
+              "text": "The gain collapses after overlapping items are removed."
+            },
+            {
+              "id": "O2C",
+              "text": "Results remain inconsistent across seeds."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O2B",
+            "observation": "The gain collapses after overlapping items are removed."
+          }
+        },
+        {
+          "id": "E3",
+          "description": "Repeat training over many seeds but continue evaluating on the same original benchmark.",
+          "possible_outcomes": [
+            {
+              "id": "O3A",
+              "text": "The gain remains stable."
+            },
+            {
+              "id": "O3C",
+              "text": "The average gain shrinks toward zero with high variance."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O3A",
+            "observation": "The gain remains stable."
+          }
+        }
+      ],
+      "controls": [
+        {
+          "id": "C1",
+          "text": "Maintain auditable train/test provenance and deduplicate before training."
+        },
+        {
+          "id": "C2",
+          "text": "Use identical model capacity, optimization budget, and evaluation code."
+        }
+      ],
+      "risks": [
+        {
+          "id": "R1",
+          "text": "Train/test contamination or near-duplicate leakage inflates benchmark accuracy."
+        },
+        {
+          "id": "R2",
+          "text": "Hyperparameter tuning indirectly overfits the public benchmark."
+        }
+      ],
+      "max_experiments": 2
+    },
+    {
+      "task_id": "CAL04_SENSOR",
+      "question": "After a factory ventilation change, one installed temperature sensor reports a persistent 2.5 C drop. What explanation best fits the effect?",
+      "hypotheses": [
+        {
+          "id": "H1",
+          "text": "The ventilation change truly lowered local air temperature by about 2.5 C."
+        },
+        {
+          "id": "H2",
+          "text": "The installed sensor drifted out of calibration around the intervention time."
+        },
+        {
+          "id": "H3",
+          "text": "Ordinary environmental variation produced the apparent drop."
+        }
+      ],
+      "experiments": [
+        {
+          "id": "E1",
+          "description": "Place a recently calibrated reference sensor beside the installed sensor before and after repeating the intervention.",
+          "possible_outcomes": [
+            {
+              "id": "O1A",
+              "text": "Both sensors show the same intervention-linked drop."
+            },
+            {
+              "id": "O1B",
+              "text": "Only the installed sensor shows the drop while the reference stays stable."
+            },
+            {
+              "id": "O1C",
+              "text": "Both sensors fluctuate inconsistently without a repeatable pattern."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O1B",
+            "observation": "Only the installed sensor shows the drop while the reference stays stable."
+          }
+        },
+        {
+          "id": "E2",
+          "description": "Swap the installed sensor with a calibrated unit while holding location and ventilation settings fixed.",
+          "possible_outcomes": [
+            {
+              "id": "O2A",
+              "text": "The measured drop stays tied to the location/intervention."
+            },
+            {
+              "id": "O2B",
+              "text": "The anomalous offset follows the original sensor rather than the location."
+            },
+            {
+              "id": "O2C",
+              "text": "Neither unit shows a stable pattern."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O2B",
+            "observation": "The anomalous offset follows the original sensor rather than the location."
+          }
+        },
+        {
+          "id": "E3",
+          "description": "Repeat the intervention several times using only the original installed sensor.",
+          "possible_outcomes": [
+            {
+              "id": "O3A",
+              "text": "The same drop repeats."
+            },
+            {
+              "id": "O3C",
+              "text": "The reported effect varies substantially across repetitions."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O3A",
+            "observation": "The same drop repeats."
+          }
+        }
+      ],
+      "controls": [
+        {
+          "id": "C1",
+          "text": "Use a traceably calibrated reference instrument at the same location and sampling times."
+        },
+        {
+          "id": "C2",
+          "text": "Hold sensor placement, logging interval, and ventilation schedule constant."
+        }
+      ],
+      "risks": [
+        {
+          "id": "R1",
+          "text": "Calibration drift can masquerade as a physical intervention effect."
+        },
+        {
+          "id": "R2",
+          "text": "Spatial temperature gradients can confound comparisons across locations."
+        }
+      ],
+      "max_experiments": 2
+    },
+    {
+      "task_id": "CAL05_SUBGROUP",
+      "question": "A treatment study reports a 12-point overall response advantage, but the treatment arm contains many more low-risk patients. What best explains the overall advantage?",
+      "hypotheses": [
+        {
+          "id": "H1",
+          "text": "The treatment improves response broadly across patient subgroups."
+        },
+        {
+          "id": "H2",
+          "text": "Subgroup imbalance creates the apparent overall benefit."
+        },
+        {
+          "id": "H3",
+          "text": "A time trend unrelated to treatment creates the apparent benefit."
+        }
+      ],
+      "experiments": [
+        {
+          "id": "E1",
+          "description": "Estimate treatment effects within risk strata and reweight both arms to the same subgroup distribution.",
+          "possible_outcomes": [
+            {
+              "id": "O1A",
+              "text": "A similar benefit remains within strata and after reweighting."
+            },
+            {
+              "id": "O1B",
+              "text": "The overall benefit disappears after stratification and reweighting."
+            },
+            {
+              "id": "O1C",
+              "text": "Effects change unpredictably across strata and time."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O1B",
+            "observation": "The overall benefit disappears after stratification and reweighting."
+          }
+        },
+        {
+          "id": "E2",
+          "description": "Run a new randomized replication with blocked assignment by baseline risk.",
+          "possible_outcomes": [
+            {
+              "id": "O2A",
+              "text": "A similar treatment advantage remains."
+            },
+            {
+              "id": "O2B",
+              "text": "The treatment and control outcomes become similar when subgroup balance is enforced."
+            },
+            {
+              "id": "O2C",
+              "text": "Results remain directionally unstable."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O2B",
+            "observation": "The treatment and control outcomes become similar when subgroup balance is enforced."
+          }
+        },
+        {
+          "id": "E3",
+          "description": "Enroll a larger sample using the same imbalanced assignment mechanism and analyze only the aggregate response.",
+          "possible_outcomes": [
+            {
+              "id": "O3A",
+              "text": "The aggregate treatment advantage remains."
+            },
+            {
+              "id": "O3C",
+              "text": "The aggregate difference becomes unstable around zero."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O3A",
+            "observation": "The aggregate treatment advantage remains."
+          }
+        }
+      ],
+      "controls": [
+        {
+          "id": "C1",
+          "text": "Balance or stratify assignment by baseline risk before estimating the treatment effect."
+        },
+        {
+          "id": "C2",
+          "text": "Use the same endpoint timing and response definition across arms."
+        }
+      ],
+      "risks": [
+        {
+          "id": "R1",
+          "text": "Simpson's-paradox-style subgroup imbalance distorts the aggregate treatment effect."
+        },
+        {
+          "id": "R2",
+          "text": "Differential dropout can alter subgroup composition after assignment."
+        }
+      ],
+      "max_experiments": 2
+    },
+    {
+      "task_id": "CAL06_WORKLOAD",
+      "question": "A software optimization is reported to cut request latency by 35%, but the post-change benchmark processed fewer and simpler requests. What best explains the result?",
+      "hypotheses": [
+        {
+          "id": "H1",
+          "text": "The code optimization intrinsically reduces latency for the same work."
+        },
+        {
+          "id": "H2",
+          "text": "The benchmark workload changed, creating an apparent performance gain."
+        },
+        {
+          "id": "H3",
+          "text": "Compiler or runtime noise explains the measured difference."
+        }
+      ],
+      "experiments": [
+        {
+          "id": "E1",
+          "description": "Benchmark old and new binaries on the exact same pinned request trace, data snapshot, and machine.",
+          "possible_outcomes": [
+            {
+              "id": "O1A",
+              "text": "The new binary keeps a similar latency advantage."
+            },
+            {
+              "id": "O1B",
+              "text": "The latency advantage largely disappears on the identical workload."
+            },
+            {
+              "id": "O1C",
+              "text": "Results fluctuate strongly between repetitions."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O1B",
+            "observation": "The latency advantage largely disappears on the identical workload."
+          }
+        },
+        {
+          "id": "E2",
+          "description": "Compare pre- and post-change workload traces for request count, query mix, payload size, and cacheability.",
+          "possible_outcomes": [
+            {
+              "id": "O2A",
+              "text": "Workload characteristics are effectively identical."
+            },
+            {
+              "id": "O2B",
+              "text": "The post-change trace is materially lighter and explains most of the timing difference."
+            },
+            {
+              "id": "O2C",
+              "text": "Trace differences are small and inconsistent."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O2B",
+            "observation": "The post-change trace is materially lighter and explains most of the timing difference."
+          }
+        },
+        {
+          "id": "E3",
+          "description": "Repeat the benchmark using the current lighter workload for both several times.",
+          "possible_outcomes": [
+            {
+              "id": "O3A",
+              "text": "The new binary remains faster."
+            },
+            {
+              "id": "O3C",
+              "text": "The measured difference oscillates around zero."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O3A",
+            "observation": "The new binary remains faster."
+          }
+        }
+      ],
+      "controls": [
+        {
+          "id": "C1",
+          "text": "Replay the identical pinned workload and data snapshot for both binaries."
+        },
+        {
+          "id": "C2",
+          "text": "Pin compiler/runtime settings and machine resource limits."
+        }
+      ],
+      "risks": [
+        {
+          "id": "R1",
+          "text": "Workload drift makes before/after latency incomparable."
+        },
+        {
+          "id": "R2",
+          "text": "Thermal or frequency scaling can bias sequential performance measurements."
+        }
+      ],
+      "max_experiments": 2
+    },
+    {
+      "task_id": "CAL07_RETRIEVAL",
+      "question": "A retrieval system jumps 14 points on a QA benchmark after indexing a new corpus. What best explains the improvement?",
+      "hypotheses": [
+        {
+          "id": "H1",
+          "text": "The retriever learned or exposes genuinely better semantic retrieval."
+        },
+        {
+          "id": "H2",
+          "text": "The new corpus contains benchmark-answer leakage or near-verbatim answer material."
+        },
+        {
+          "id": "H3",
+          "text": "Reranker stochasticity produced the apparent improvement."
+        }
+      ],
+      "experiments": [
+        {
+          "id": "E1",
+          "description": "Evaluate on a fresh QA set whose questions and answers were created after the corpus snapshot and are absent from it.",
+          "possible_outcomes": [
+            {
+              "id": "O1A",
+              "text": "A similar retrieval gain persists."
+            },
+            {
+              "id": "O1B",
+              "text": "The gain largely disappears on the fresh leakage-resistant set."
+            },
+            {
+              "id": "O1C",
+              "text": "The gain varies strongly across repeated reranker runs."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O1B",
+            "observation": "The gain largely disappears on the fresh leakage-resistant set."
+          }
+        },
+        {
+          "id": "E2",
+          "description": "Search the indexed corpus for exact and semantic matches to benchmark questions and reference answers.",
+          "possible_outcomes": [
+            {
+              "id": "O2A",
+              "text": "No meaningful benchmark overlap is found."
+            },
+            {
+              "id": "O2B",
+              "text": "Many benchmark questions or answer-bearing passages are found in the indexed corpus."
+            },
+            {
+              "id": "O2C",
+              "text": "Overlap findings are inconsistent across repeated searches."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O2B",
+            "observation": "Many benchmark questions or answer-bearing passages are found in the indexed corpus."
+          }
+        },
+        {
+          "id": "E3",
+          "description": "Repeat evaluation many times on the same benchmark and indexed corpus.",
+          "possible_outcomes": [
+            {
+              "id": "O3A",
+              "text": "The gain remains stable."
+            },
+            {
+              "id": "O3C",
+              "text": "The average gain collapses with high run-to-run variance."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O3A",
+            "observation": "The gain remains stable."
+          }
+        }
+      ],
+      "controls": [
+        {
+          "id": "C1",
+          "text": "Audit corpus provenance and exclude benchmark-derived or answer-bearing material before indexing."
+        },
+        {
+          "id": "C2",
+          "text": "Use the same retriever/reranker configuration and evaluation pipeline across corpora."
+        }
+      ],
+      "risks": [
+        {
+          "id": "R1",
+          "text": "Answer leakage makes retrieval quality look better without improved generalization."
+        },
+        {
+          "id": "R2",
+          "text": "Evaluation-query caching can contaminate repeated measurements."
+        }
+      ],
+      "max_experiments": 2
+    },
+    {
+      "task_id": "CAL08_SEEDS",
+      "question": "A new learning algorithm beats a baseline by 4 points in one training run. Both methods are stochastic. What best explains the apparent improvement?",
+      "hypotheses": [
+        {
+          "id": "H1",
+          "text": "The new algorithm has a genuine average performance advantage."
+        },
+        {
+          "id": "H2",
+          "text": "The single-run difference is random-seed variance."
+        },
+        {
+          "id": "H3",
+          "text": "Unequal hyperparameter-search budget explains the apparent advantage."
+        }
+      ],
+      "experiments": [
+        {
+          "id": "E1",
+          "description": "Run paired evaluations across many shared random seeds with equal training and tuning budgets, then compare the mean difference and interval.",
+          "possible_outcomes": [
+            {
+              "id": "O1A",
+              "text": "The new algorithm retains a positive mean gain with a clearly positive interval."
+            },
+            {
+              "id": "O1B",
+              "text": "The mean difference shrinks near zero and the interval includes zero."
+            },
+            {
+              "id": "O1C",
+              "text": "The new algorithm wins only when allowed a larger tuning search."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O1B",
+            "observation": "The mean difference shrinks near zero and the interval includes zero."
+          }
+        },
+        {
+          "id": "E2",
+          "description": "Repeat the original comparison over many seeds without changing either method's existing hyperparameter choices.",
+          "possible_outcomes": [
+            {
+              "id": "O2A",
+              "text": "The new algorithm wins consistently."
+            },
+            {
+              "id": "O2B",
+              "text": "The average advantage disappears as seed coverage grows."
+            },
+            {
+              "id": "O2C",
+              "text": "The gap persists but is traceable to systematically better-tuned settings."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O2B",
+            "observation": "The average advantage disappears as seed coverage grows."
+          }
+        },
+        {
+          "id": "E3",
+          "description": "Run one additional seed while keeping the original tuning process unchanged.",
+          "possible_outcomes": [
+            {
+              "id": "O3A",
+              "text": "The new algorithm wins again."
+            },
+            {
+              "id": "O3B",
+              "text": "Either method may win; one extra seed is not decisive."
+            },
+            {
+              "id": "O3C",
+              "text": "The result strongly tracks tuning-budget differences."
+            }
+          ],
+          "observed": {
+            "outcome_id": "O3B",
+            "observation": "Either method may win; one extra seed is not decisive."
+          }
+        }
+      ],
+      "controls": [
+        {
+          "id": "C1",
+          "text": "Use paired/shared seed sets and report the distribution or confidence interval, not one run."
+        },
+        {
+          "id": "C2",
+          "text": "Equalize hyperparameter-search budget and stopping rules across algorithms."
+        }
+      ],
+      "risks": [
+        {
+          "id": "R1",
+          "text": "Random-seed variance is mistaken for a stable algorithmic improvement."
+        },
+        {
+          "id": "R2",
+          "text": "Researcher selection of favorable seeds or runs biases the reported result."
+        }
+      ],
+      "max_experiments": 2
+    }
+  ]
+}

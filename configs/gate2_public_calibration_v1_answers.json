@@ -1,0 +1,456 @@
+{
+  "suite_id": "gate2-public-calibration-v1",
+  "development_only": true,
+  "promotion_criteria": {
+    "min_valid_pairs": 16,
+    "min_seed_mean": 0.75,
+    "min_mean_gain": 0.15,
+    "min_win_rate": 0.6,
+    "min_ci_low_exclusive": 0.0,
+    "min_seed_verifier_acceptance": 0.75
+  },
+  "answers": {
+    "CAL01_SELECTION": {
+      "final_hypothesis_id": "H2",
+      "discriminating_experiment_ids": [
+        "E1"
+      ],
+      "informative_experiment_ids": [
+        "E1",
+        "E2"
+      ],
+      "prediction_map": {
+        "H1": {
+          "E1": [
+            "O1A"
+          ],
+          "E2": [
+            "O2A"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H2": {
+          "E1": [
+            "O1B"
+          ],
+          "E2": [
+            "O2B"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H3": {
+          "E1": [
+            "O1C"
+          ],
+          "E2": [
+            "O2C"
+          ],
+          "E3": [
+            "O3C"
+          ]
+        }
+      },
+      "required_control_ids": [
+        "C1"
+      ],
+      "reject_hypothesis_ids": [
+        "H1",
+        "H3"
+      ],
+      "critical_risk_ids": [
+        "R1"
+      ]
+    },
+    "CAL02_CACHE": {
+      "final_hypothesis_id": "H2",
+      "discriminating_experiment_ids": [
+        "E1"
+      ],
+      "informative_experiment_ids": [
+        "E1",
+        "E2"
+      ],
+      "prediction_map": {
+        "H1": {
+          "E1": [
+            "O1A"
+          ],
+          "E2": [
+            "O2A"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H2": {
+          "E1": [
+            "O1B"
+          ],
+          "E2": [
+            "O2B"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H3": {
+          "E1": [
+            "O1C"
+          ],
+          "E2": [
+            "O2C"
+          ],
+          "E3": [
+            "O3C"
+          ]
+        }
+      },
+      "required_control_ids": [
+        "C1",
+        "C2"
+      ],
+      "reject_hypothesis_ids": [
+        "H1",
+        "H3"
+      ],
+      "critical_risk_ids": [
+        "R1"
+      ]
+    },
+    "CAL03_CONTAMINATION": {
+      "final_hypothesis_id": "H2",
+      "discriminating_experiment_ids": [
+        "E1"
+      ],
+      "informative_experiment_ids": [
+        "E1",
+        "E2"
+      ],
+      "prediction_map": {
+        "H1": {
+          "E1": [
+            "O1A"
+          ],
+          "E2": [
+            "O2A"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H2": {
+          "E1": [
+            "O1B"
+          ],
+          "E2": [
+            "O2B"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H3": {
+          "E1": [
+            "O1C"
+          ],
+          "E2": [
+            "O2C"
+          ],
+          "E3": [
+            "O3C"
+          ]
+        }
+      },
+      "required_control_ids": [
+        "C1"
+      ],
+      "reject_hypothesis_ids": [
+        "H1",
+        "H3"
+      ],
+      "critical_risk_ids": [
+        "R1"
+      ]
+    },
+    "CAL04_SENSOR": {
+      "final_hypothesis_id": "H2",
+      "discriminating_experiment_ids": [
+        "E1"
+      ],
+      "informative_experiment_ids": [
+        "E1",
+        "E2"
+      ],
+      "prediction_map": {
+        "H1": {
+          "E1": [
+            "O1A"
+          ],
+          "E2": [
+            "O2A"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H2": {
+          "E1": [
+            "O1B"
+          ],
+          "E2": [
+            "O2B"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H3": {
+          "E1": [
+            "O1C"
+          ],
+          "E2": [
+            "O2C"
+          ],
+          "E3": [
+            "O3C"
+          ]
+        }
+      },
+      "required_control_ids": [
+        "C1"
+      ],
+      "reject_hypothesis_ids": [
+        "H1",
+        "H3"
+      ],
+      "critical_risk_ids": [
+        "R1"
+      ]
+    },
+    "CAL05_SUBGROUP": {
+      "final_hypothesis_id": "H2",
+      "discriminating_experiment_ids": [
+        "E1"
+      ],
+      "informative_experiment_ids": [
+        "E1",
+        "E2"
+      ],
+      "prediction_map": {
+        "H1": {
+          "E1": [
+            "O1A"
+          ],
+          "E2": [
+            "O2A"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H2": {
+          "E1": [
+            "O1B"
+          ],
+          "E2": [
+            "O2B"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H3": {
+          "E1": [
+            "O1C"
+          ],
+          "E2": [
+            "O2C"
+          ],
+          "E3": [
+            "O3C"
+          ]
+        }
+      },
+      "required_control_ids": [
+        "C1"
+      ],
+      "reject_hypothesis_ids": [
+        "H1",
+        "H3"
+      ],
+      "critical_risk_ids": [
+        "R1"
+      ]
+    },
+    "CAL06_WORKLOAD": {
+      "final_hypothesis_id": "H2",
+      "discriminating_experiment_ids": [
+        "E1"
+      ],
+      "informative_experiment_ids": [
+        "E1",
+        "E2"
+      ],
+      "prediction_map": {
+        "H1": {
+          "E1": [
+            "O1A"
+          ],
+          "E2": [
+            "O2A"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H2": {
+          "E1": [
+            "O1B"
+          ],
+          "E2": [
+            "O2B"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H3": {
+          "E1": [
+            "O1C"
+          ],
+          "E2": [
+            "O2C"
+          ],
+          "E3": [
+            "O3C"
+          ]
+        }
+      },
+      "required_control_ids": [
+        "C1"
+      ],
+      "reject_hypothesis_ids": [
+        "H1",
+        "H3"
+      ],
+      "critical_risk_ids": [
+        "R1"
+      ]
+    },
+    "CAL07_RETRIEVAL": {
+      "final_hypothesis_id": "H2",
+      "discriminating_experiment_ids": [
+        "E1"
+      ],
+      "informative_experiment_ids": [
+        "E1",
+        "E2"
+      ],
+      "prediction_map": {
+        "H1": {
+          "E1": [
+            "O1A"
+          ],
+          "E2": [
+            "O2A"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H2": {
+          "E1": [
+            "O1B"
+          ],
+          "E2": [
+            "O2B"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H3": {
+          "E1": [
+            "O1C"
+          ],
+          "E2": [
+            "O2C"
+          ],
+          "E3": [
+            "O3C"
+          ]
+        }
+      },
+      "required_control_ids": [
+        "C1"
+      ],
+      "reject_hypothesis_ids": [
+        "H1",
+        "H3"
+      ],
+      "critical_risk_ids": [
+        "R1"
+      ]
+    },
+    "CAL08_SEEDS": {
+      "final_hypothesis_id": "H2",
+      "discriminating_experiment_ids": [
+        "E1"
+      ],
+      "informative_experiment_ids": [
+        "E1",
+        "E2"
+      ],
+      "prediction_map": {
+        "H1": {
+          "E1": [
+            "O1A"
+          ],
+          "E2": [
+            "O2A"
+          ],
+          "E3": [
+            "O3A"
+          ]
+        },
+        "H2": {
+          "E1": [
+            "O1B"
+          ],
+          "E2": [
+            "O2B"
+          ],
+          "E3": [
+            "O3B"
+          ]
+        },
+        "H3": {
+          "E1": [
+            "O1C"
+          ],
+          "E2": [
+            "O2C"
+          ],
+          "E3": [
+            "O3C"
+          ]
+        }
+      },
+      "required_control_ids": [
+        "C1",
+        "C2"
+      ],
+      "reject_hypothesis_ids": [
+        "H1",
+        "H3"
+      ],
+      "critical_risk_ids": [
+        "R1"
+      ]
+    }
+  }
+}

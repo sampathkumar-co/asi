@@ -22,6 +22,17 @@ class Gate1BudgetTests(unittest.TestCase):
             p.complete([Message("user", "x")], purpose="one")
         self.assertEqual(b.model_calls, 0)
 
+    def test_rejected_overbudget_response_is_transcript_audited(self):
+        b = Budget(max_model_calls=2, max_tokens=1, max_cost_usd=1)
+        p = BudgetedProvider(ScriptedProvider(["two words"]), b, provider_id="same-model")
+        before = p.transcript_hash
+        with self.assertRaises(BudgetExceeded):
+            p.complete([Message("user", "x")], purpose="one")
+        self.assertEqual(len(p.records), 1)
+        self.assertFalse(p.records[0].budget_accepted)
+        self.assertNotEqual(before, p.transcript_hash)
+        self.assertEqual(b.model_calls, 0)
+
     def test_transcript_hash_changes_with_calls(self):
         b = Budget(max_model_calls=2, max_tokens=100)
         p = BudgetedProvider(ScriptedProvider(["a"]), b, provider_id="m")

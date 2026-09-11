@@ -30,11 +30,11 @@ The core engineering rule is that **the system being optimized is less privilege
 |---|---|---|
 | **0** | Measurement before optimization | **COMPLETE — infrastructure-qualified** |
 | **1** | Strong bounded baseline agent | **COMPLETE — empirically certified** |
-| **2** | Scientific-method / verification | **ACTIVE NEXT — foundation implemented; empirical campaign next** |
+| **2** | Scientific-method / verification | **CANDIDATE FROZEN FOR PRIVATE/OOD CERTIFICATION** |
 | 3 | Automatic architecture search | Foundation implemented; empirical campaign pending |
 | 4 | Controlled self-modification | Foundation implemented; empirical campaign pending |
 
-Gate 0 remains the trusted measurement/control instrument. Gate 1 is now complete: the preregistered v5 local-model campaign satisfied every frozen promotion criterion without post-run threshold changes.
+Gate 0 remains the trusted measurement/control instrument. Gate 1 is complete and empirically certified. Gate 2 now has a frozen development candidate and completed public calibration; private/OOD certification remains pending.
 
 ## Latest Gate-1 empirical result
 
@@ -45,6 +45,14 @@ Preregistered holdout v5 result: Raw **1/16 = 6.25%**, Seed **15/16 = 93.75%**, 
 See [`docs/GATE1_LOCAL_HOLDOUT_V5_RESULT.md`](docs/GATE1_LOCAL_HOLDOUT_V5_RESULT.md), [`docs/GATE1_LOCAL_HOLDOUT_V5_PREREGISTRATION.md`](docs/GATE1_LOCAL_HOLDOUT_V5_PREREGISTRATION.md), and [`artifacts/gate1-local-holdout-v5-score.json`](artifacts/gate1-local-holdout-v5-score.json).
 
 Historical v2/v3/v4 campaigns remain published as failed promotion attempts. They are retired evidence and are not rewritten or reused as fresh certification data.
+
+## Gate-2 public development calibration
+
+The frozen Gate-2 development candidate uses local `qwen3:8b` with a common 16-call / 12,000-token envelope. Deterministic protocol qualification passes **28/28** canaries and the repository passes **157/157** tests with `ResourceWarning` treated as an error.
+
+On the eight-task public calibration suite, Raw scored **0.78750** mean and Seed **0.93125**, a **+0.14375** mean gain. Strict Seed wins were **5/8 = 62.5%**, verifier acceptance **6/8 = 75%**, and the paired-bootstrap CI was **[-0.015625, +0.31875]**. This public run does **not** promote Gate 2: it has only 8 pairs, misses the frozen +0.15 mean-gain threshold by 0.00625, and its CI lower bound is not above zero.
+
+The public suite is now retired as development evidence. See [`docs/GATE2_PROTOCOL.md`](docs/GATE2_PROTOCOL.md), [`docs/GATE2_DEVELOPMENT.md`](docs/GATE2_DEVELOPMENT.md), and [`docs/GATE2_CERTIFICATION.md`](docs/GATE2_CERTIFICATION.md).
 
 ## Gate-0 measurement layer
 
@@ -114,7 +122,7 @@ No external LLM API is required for Gate-0 infrastructure qualification. Gate-1 
 ## Gates 1-4 foundation
 
 - **Gate 1:** provider-neutral model interface; local Ollama adapter; goal/state models; planner/executor/critic loop; deterministic relevant-tool routing; persistent provenance; implementation/model attestation; strict evidence-only critic; exact reusable tools for graphs, scheduling, CRT, semantic transactions/reconciliation, aggregation, assignment/CSP, exact Python tracing and constrained subset optimization; sandboxed computation fallback; hard budgets and checkpointed paired campaigns.
-- **Gate 2:** falsifiable hypotheses, experiment plans, controls, predictions, reproducibility and independent/adversarial verification.
+- **Gate 2:** falsifiable action selection; isolated blind per-hypothesis forecasts; optional two-way forecast-collision audit; reveal-then-mechanical comparison; explicit evidence-driven revision; bounded repair; independent/adversarial verification; runner-derived verdicts; attested paired campaigns.
 - **Gate 3:** declarative `AgentGenome`, bounded seeded mutation, archive and capability/cost fitness search.
 - **Gate 4:** copy-on-write descendants, mutation allow/deny policy, stale-hash protection, lineage, no in-place parent mutation, Docker no-network/read-only/resource limits and explicit promotion evidence.
 
@@ -125,7 +133,7 @@ Candidate source execution is intended to happen with network disabled, a read-o
 ## What Project Seed deliberately does not claim
 
 - Gate 0 completion does not mean a frontier model has become smarter.
-- The current Gate-1 experiments do not meet the preregistered empirical promotion threshold.
+- Gate 1 is empirically certified; Gate 2 is **not** yet empirically certified and its eight-task public calibration is development evidence only.
 - A positive task-level capability delta is not evidence of recursive amplification.
 - The project does not demonstrate AGI or ASI.
 - Candidates do not get to rewrite their evaluator/control plane.

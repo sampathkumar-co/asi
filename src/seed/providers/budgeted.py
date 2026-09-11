@@ -21,6 +21,7 @@ class ModelCallRecord:
     output_tokens: int
     cost_usd: float
     wall_time_s: float
+    budget_accepted: bool = True
 
 
 class BudgetedProvider:
@@ -52,21 +53,24 @@ class BudgetedProvider:
         started = time.perf_counter()
         response = self.inner.complete(messages, purpose=purpose)
         wall_time_s = time.perf_counter() - started
-        self.budget.charge_model(response.total_tokens, response.cost_usd)
-        record = ModelCallRecord(
-            index=len(self.records),
-            provider_id=self.provider_id,
-            purpose=purpose,
-            request_hash=request_hash,
-            response_hash=self._hash(response.text),
-            input_tokens=response.input_tokens,
-            output_tokens=response.output_tokens,
-            cost_usd=response.cost_usd,
-            wall_time_s=wall_time_s,
-        )
-        self.records.append(record)
-        if self.on_record is not None:
-            self.on_record(record)
+        def record_call(*, budget_accepted: bool) -> ModelCallRecord:
+            record = ModelCallRecord(
+                index=len(self.records), provider_id=self.provider_id, purpose=purpose,
+                request_hash=request_hash, response_hash=self._hash(response.text),
+                input_tokens=response.input_tokens, output_tokens=response.output_tokens,
+                cost_usd=response.cost_usd, wall_time_s=wall_time_s,
+                budget_accepted=budget_accepted,
+            )
+            self.records.append(record)
+            if self.on_record is not None:
+                self.on_record(record)
+            return record
+        try:
+            self.budget.charge_model(response.total_tokens, response.cost_usd)
+        except BudgetExceeded:
+            record_call(budget_accepted=False)
+            raise
+        record_call(budget_accepted=True)
         return response
 
     @property
