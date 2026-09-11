@@ -1,5 +1,7 @@
 # Gate 1 v4 Candidate Development
 
+> **Historical snapshot:** This document records pre-v5 Gate-1 development. Gate 1 later passed holdout v5; see `GATE1_LOCAL_HOLDOUT_V5_RESULT.md`.
+
 Updated: 2026-09-10
 
 Status: **HISTORICAL DEVELOPMENT/FREEZE RECORD; v4 HOLDOUT COMPLETED — PROMOTION FAIL**
@@ -53,4 +55,4 @@ The next valid evidence must come from a new private holdout v4 created only aft
 5. run Raw and Seed without architecture changes;
 6. score once and publish the result whether it passes or fails.
 
-Gate 1 remains active until every preregistered promotion criterion is satisfied.
+At this historical stage, Gate 1 remained active until every preregistered promotion criterion was satisfied.

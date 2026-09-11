@@ -2,7 +2,7 @@
 
 Updated: 2026-09-10
 
-Current local validation on Sampath's Windows 11 / Python 3.13.15: **131/131 tests passing**. The repository includes permanent Ubuntu and Windows CI coverage for the Gate-0/1 foundations.
+Current local validation on Sampath's Windows 11 / Python 3.13.15: **140/140 tests passing**. The repository includes permanent Ubuntu and Windows CI coverage for the Gate-0/1 foundations.
 
 ## Meaning of status labels
 
@@ -30,9 +30,9 @@ Implemented:
 
 Gate 0 qualifies the measurement/control instrument. It does not claim AGI, ASI or recursive amplification.
 
-## Gate 1 — EMPIRICALLY TESTED / NOT CERTIFIED
+## Gate 1 — COMPLETE / EMPIRICALLY CERTIFIED
 
-The Gate-1 infrastructure is implemented and has now been exercised in multiple real-model campaigns. The current empirical verdict is **not promoted**.
+The Gate-1 infrastructure is implemented and empirically certified. Holdout v5 is the first preregistered campaign to satisfy every frozen promotion criterion.
 
 ### Implemented foundation
 
@@ -83,7 +83,7 @@ Final corrected score:
 - strict Seed win rate: **31.25%**;
 - 95% paired-bootstrap CI: **[0.00, 0.50]**.
 
-Frozen promotion thresholds required >=16 valid pairs, >=5 percentage-point gain, >=60% strict Seed win rate and CI lower bound >0. Pair count and mean gain passed. Win rate and CI did not. **Gate 1 therefore remains NOT EMPIRICALLY CERTIFIED.**
+Frozen promotion thresholds required >=16 valid pairs, >=5 percentage-point gain, >=60% strict Seed win rate and CI lower bound >0. Pair count and mean gain passed. Win rate and CI did not. **At that point Gate 1 remained NOT EMPIRICALLY CERTIFIED.**
 
 Full result: [`GATE1_LOCAL_HOLDOUT_V2_RESULT.md`](GATE1_LOCAL_HOLDOUT_V2_RESULT.md). Public score-only artifact: [`../artifacts/gate1-local-holdout-v2-score.json`](../artifacts/gate1-local-holdout-v2-score.json).
 
@@ -101,7 +101,7 @@ Retired-holdout development probes verify the intended generic fixes for critica
 
 Frozen vNext source: `83ec193d6300b0658af8d4d3c45109880b28363f`; implementation digest: `a82be2b8cd2a60e4fa4021a0d6bfa0434c73032afbf0ec29771626385dccd708`; preregistration commit: `f10457f41d167551657e7e0e2b7741f79ed25b7b`.
 
-Final score: Raw **3/16 = 18.75%**, Seed **11/16 = 68.75%**, mean gain **+50 pp**, strict Seed win rate **56.25%**, 95% paired-bootstrap CI **[+18.75 pp, +81.25 pp]**. Pair count, gain, CI, identity/integrity, and resource criteria passed. The frozen >=60% strict-win criterion failed, so **Gate 1 remains NOT EMPIRICALLY CERTIFIED**.
+Final score: Raw **3/16 = 18.75%**, Seed **11/16 = 68.75%**, mean gain **+50 pp**, strict Seed win rate **56.25%**, 95% paired-bootstrap CI **[+18.75 pp, +81.25 pp]**. Pair count, gain, CI, identity/integrity, and resource criteria passed. The frozen >=60% strict-win criterion failed, so **at that point Gate 1 remained NOT EMPIRICALLY CERTIFIED**.
 
 Full audit: [`GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](GATE1_LOCAL_HOLDOUT_V3_RESULT.md).
 
@@ -111,13 +111,17 @@ Frozen source: `b4242af758b1222f8ecea0bf7306e917a36ed9d8`; implementation digest
 
 The private v4 holdout was generated after candidate freeze, independently audited **16/16**, and scored only after all 16 pairs sealed. Final score: Raw **3/16 = 18.75%**, Seed **11/16 = 68.75%**, mean gain **+50 pp**, strict Seed win rate **8/16 = 50.00%**, 95% paired-bootstrap CI **[+25.00 pp, +75.00 pp]**.
 
-Pair count, gain, CI, identity/integrity and resource criteria passed. The frozen >=60% strict-win criterion failed, so **Gate 1 remains NOT EMPIRICALLY CERTIFIED**. Full audit: [`GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](GATE1_LOCAL_HOLDOUT_V4_RESULT.md).
+Pair count, gain, CI, identity/integrity and resource criteria passed. The frozen >=60% strict-win criterion failed, so **at that point Gate 1 remained NOT EMPIRICALLY CERTIFIED**. Full audit: [`GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](GATE1_LOCAL_HOLDOUT_V4_RESULT.md).
 
 The evaluated v4 candidate remains green at **134/134** local tests and **10/10** deterministic Gate-1 checks after the run.
 
-### Gate-1 v5 development candidate
+### Gate-1 v5 promotion campaign — PASS
 
-v5 is frozen at source commit `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation digest `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`. It passes **140/140** local tests and **10/10** deterministic Gate-1 checks. Retired-v4 probes close W401/W403/W404/W412/W413 through generic routing, exact-tool preference, duration-label normalization, exact Python tracing and output canonicalization. See [`GATE1_V5_DEVELOPMENT.md`](GATE1_V5_DEVELOPMENT.md).
+Frozen source: `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`; implementation digest: `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`; preregistration: `857aa0f4cac7437deb86646e6f72d682b16d806a`.
+
+The new private holdout was independently audited **16/16** before inference. Final score: Raw **1/16 = 6.25%**, Seed **15/16 = 93.75%**, mean gain **+87.50 pp**, strict Seed win rate **14/16 = 87.50%**, 95% paired-bootstrap CI **[+68.75 pp, +100.00 pp]**. Identity/integrity and resource-envelope audits passed. **Gate 1 promotes.**
+
+Full audit: [`GATE1_LOCAL_HOLDOUT_V5_RESULT.md`](GATE1_LOCAL_HOLDOUT_V5_RESULT.md). Public score-only artifact: [`../artifacts/gate1-local-holdout-v5-score.json`](../artifacts/gate1-local-holdout-v5-score.json).
 
 ## Gate 2 — scientific-method workflow
 
@@ -130,7 +134,7 @@ Implemented:
 - independent + adversarial verification;
 - dual-verifier acceptance rule.
 
-Gate-2 empirical work should not begin as a promotion claim until Gate 1 has a qualifying baseline result.
+Gate-2 empirical qualification is now unblocked because Gate 1 has a qualifying baseline result. The next work is to freeze and preregister the Gate-2 scientific-method benchmark before making any Gate-2 promotion claim.
 
 ## Gate 3 — architecture search
 
@@ -167,10 +171,10 @@ Implemented:
 - GitHub Actions remains the independent clean CI environment;
 - Yaswanth's machine is not used for active Seed state while Sampath is online.
 
-## Current Gate-1 next step
+## Current next step
 
-Holdouts v2, v3 and v4 are retired development evidence and may not be reused for certification. The v5 candidate is now frozen and locally qualified. The next action is to generate, independently audit and preregister a **new private holdout v5** against that frozen identity, then run the same-model Raw-vs-Seed campaign without architecture changes.
+Gate 1 is complete. The active empirical milestone is **Gate 2**: freeze a scientific-method/verification candidate, define a preregistered benchmark that measures falsifiable hypothesis generation, experiment design, prediction, independent verification and adversarial checking, then run it under the same evidence-separation discipline used for Gate 1.
 
 ## Overall
 
-Gate 0 is complete. Gate 1 is **infrastructure-qualified, repeatedly empirically tested, and now at a frozen v5 candidate awaiting a fresh holdout, but not empirically certified**. v3/v4 both showed Seed 68.75% vs Raw 18.75% (+50 pp) with CIs above zero, while strict paired reliability remained below 60%. Gates 2-4 remain foundations awaiting later empirical qualification.
+Gate 0 is complete and Gate 1 is **empirically certified**. Gate-1 v5 raised the same Qwen3-8B substrate from 6.25% Raw to 93.75% Seed on a new preregistered private holdout and passed every frozen promotion criterion. **Gate 2 is now active.** Gates 3-4 remain implemented foundations awaiting later empirical qualification.

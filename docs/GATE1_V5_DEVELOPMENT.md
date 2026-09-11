@@ -2,7 +2,7 @@
 
 Updated: 2026-09-10
 
-Status: **FROZEN DEVELOPMENT CANDIDATE — NEW HOLDOUT REQUIRED**
+Status: **FROZEN CANDIDATE — PROMOTION VALIDATED BY HOLDOUT v5**
 
 ## Why v5 exists
 
@@ -18,6 +18,7 @@ W401-W416 are therefore retired development evidence. They may be used to diagno
 - Local regression: **140/140 PASS** with `ResourceWarning` promoted to error
 - Deterministic Gate-1 qualification: **10/10 PASS**
 - Qualification content hash: `357b3beac3bbcfb04ccf09b6e00a74dd7fdd95b2ef9ae72f7dd15fc9cff16799`
+
 ## Generic reliability changes
 
 v5 targets the generic failure modes observed after v4 without embedding any private answer text into the candidate:
@@ -40,15 +41,10 @@ After v4 was sealed and scored, the five both-wrong cases were rerun only as dev
 - W413: exact subset optimization returned the unique optimum with canonical single-letter formatting in one Seed step.
 These probes confirm closure of the targeted failure classes on retired data. They do **not** change the official v4 score and do **not** certify Gate 1.
 
-## Next promotion attempt
+## Certification outcome
 
-The next valid promotion evidence must come from a new private holdout v5 created only after the v5 candidate was frozen. Before any inference:
+The required fresh holdout was subsequently generated outside source control, independently audited **16/16**, and preregistered before inference at commit `857aa0f4cac7437deb86646e6f72d682b16d806a`.
 
-1. generate materially new task instances;
-2. independently audit correctness, uniqueness and optimality;
-3. standardize the answer-key container to the repository scorer schema;
-4. preregister task/key hashes, candidate/model identities, resource envelope and unchanged thresholds;
-5. run every Raw/Seed pair without architecture changes;
-6. score once and publish the result whether it passes or fails.
+The unchanged v5 candidate then produced Raw **1/16 = 6.25%** vs Seed **15/16 = 93.75%**, mean gain **+87.50 pp**, strict Seed win rate **14/16 = 87.50%**, and 95% paired-bootstrap CI **[+68.75 pp, +100.00 pp]**. Identity/integrity and resource-envelope audits passed.
 
-Gate 1 remains active until one preregistered campaign satisfies every frozen promotion criterion.
+Therefore **Gate 1 promotes and is complete**. See [`GATE1_LOCAL_HOLDOUT_V5_PREREGISTRATION.md`](GATE1_LOCAL_HOLDOUT_V5_PREREGISTRATION.md) and [`GATE1_LOCAL_HOLDOUT_V5_RESULT.md`](GATE1_LOCAL_HOLDOUT_V5_RESULT.md). The active empirical milestone is Gate 2.

@@ -101,7 +101,7 @@ Frozen empirical promotion requirements were:
 - CI lower bound >0;
 - no integrity or resource-envelope violation.
 
-Pair count and mean gain passed. Win rate and CI did not. **Gate 1 is therefore NOT empirically certified.**
+Pair count and mean gain passed. Win rate and CI did not. **At that point Gate 1 remained NOT empirically certified.**
 
 The complete result/audit record is [`GATE1_LOCAL_HOLDOUT_V2_RESULT.md`](GATE1_LOCAL_HOLDOUT_V2_RESULT.md).
 
@@ -113,15 +113,17 @@ The frozen candidate/model run, tasks, answer key and evidence were not altered.
 
 This incident is retained as part of the audit trail rather than hidden because evaluator correctness is part of Gate 0/1 trustworthiness.
 
-## Current empirical history through holdout v4
+## Current empirical history through holdout v5
 
-Holdout v3 used candidate `83ec193d6300b0658af8d4d3c45109880b28363f` and produced Raw **3/16** vs Seed **11/16**, +50 pp gain, CI **[+18.75 pp, +81.25 pp]**, but only **9/16 = 56.25%** strict Seed wins. It failed promotion and is retired development evidence.
+Holdout v3 used candidate `83ec193d6300b0658af8d4d3c45109880b28363f` and produced Raw **3/16** vs Seed **11/16**, +50 pp gain, CI **[+18.75 pp, +81.25 pp]**, but **9/16 = 56.25%** strict Seed wins. It failed promotion and is retired evidence.
 
-Post-v3 reliability development produced candidate `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`, with **134/134** local tests and **10/10** deterministic Gate-1 checks.
+Holdout v4 used candidate `b4242af758b1222f8ecea0bf7306e917a36ed9d8` and produced Raw **3/16** vs Seed **11/16**, +50 pp gain, CI **[+25.00 pp, +75.00 pp]**, but **8/16 = 50.00%** strict Seed wins. It failed promotion and is retired evidence.
 
-Holdout v4 was generated after that freeze, independently audited 16/16, and preregistered at `e346ffabb2f77bded32d29e58e8009dc2731fd20`. The sealed campaign produced Raw **3/16 (18.75%)** vs Seed **11/16 (68.75%)**, +50 pp gain, 95% CI **[+25.00 pp, +75.00 pp]**, and **8/16 = 50.00%** strict Seed wins. All criteria except the >=60% strict-win threshold passed, so Gate 1 remains **NOT empirically certified**.
+Post-v4 reliability work froze v5 at source `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation digest `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`, with **140/140** local tests and **10/10** deterministic Gate-1 checks.
 
-Full audits: [`GATE1_LOCAL_HOLDOUT_V3_RESULT.md`](GATE1_LOCAL_HOLDOUT_V3_RESULT.md) and [`GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](GATE1_LOCAL_HOLDOUT_V4_RESULT.md).
+Holdout v5 was independently audited 16/16 before inference and preregistered at `857aa0f4cac7437deb86646e6f72d682b16d806a`. The sealed campaign produced Raw **1/16 = 6.25%** vs Seed **15/16 = 93.75%**, **+87.50 pp** gain, **14/16 = 87.50%** strict Seed wins, and 95% paired-bootstrap CI **[+68.75 pp, +100.00 pp]**. Identity/integrity and resource-envelope audits passed. **Every frozen promotion criterion passed; Gate 1 is empirically certified.**
+
+Full audit: [`GATE1_LOCAL_HOLDOUT_V5_RESULT.md`](GATE1_LOCAL_HOLDOUT_V5_RESULT.md).
 
 ## Failure semantics
 
@@ -132,15 +134,13 @@ The bounded agent converts failures into explicit states:
 
 A failed planner/critic/tool path cannot silently become a successful answer.
 
-## What remains for Gate-1 empirical certification
+## Gate-1 certification decision and Gate-2 handoff
 
-Holdouts v2, v3 and v4 are retired development evidence and may not be reused as fresh certification sets.
+**Gate 1 is complete.** No additional Gate-1 campaign is required for promotion under the frozen protocol. Holdouts v2-v5 are now historical/retired evidence and must not be reused as fresh certification sets.
 
-v4 independently reproduces a large and statistically positive scaffold effect, but Gate 1 intentionally also requires broad paired reliability. Its 8/16 strict Seed wins remain below the frozen 60% threshold, even though pair count, mean gain, confidence interval, identity/integrity and resource criteria passed.
+Additional cross-model Gate-1 replications remain scientifically useful but are replication studies, not blockers for Gate 2. Recommended replications are the unchanged v5 scaffold on the existing local Qwen3-4B model and later on a different model family.
 
-The post-v4 v5 candidate is frozen at `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation digest `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`, and passes **140/140** local tests plus **10/10** deterministic Gate-1 checks. Retired-v4 diagnostics close all five both-wrong failure classes through generic reliability changes; see [`GATE1_V5_DEVELOPMENT.md`](GATE1_V5_DEVELOPMENT.md).
-
-The next valid promotion attempt must use a new private holdout v5 generated after this freeze, independently audited and preregistered. Gate 1 remains failed until one campaign satisfies every frozen criterion; the 50.00% v4 win rate is not rounded up or treated as equivalent to 60%.
+The active milestone is Gate 2: evaluate whether the system can formulate falsifiable hypotheses, design informative experiments with controls and predictions, use independent/adversarial verification, revise hypotheses from evidence, and improve research quality under normalized resources.
 
 ## Storage policy
 

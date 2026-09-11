@@ -1,0 +1,95 @@
+{
+  "answer_key_sha256": "b86e19c1447f7556ecb2192e01889abdcf8dcc7704d2cd97c8bac1ae34784ad1",
+  "ci_high": 1.0,
+  "ci_low": 0.6875,
+  "content_hash": "0a18148a326503edf14e3cf4fbbce159ee6429aee641a33bdb19a2a4ef0fc9c1",
+  "evidence_hash": "7c3781d19220bcf0d2701e670c586c2a681e9d7b0624c1b0c5c24aa32db6c419",
+  "mean_gain": 0.875,
+  "pair_count": 16,
+  "per_task": [
+    {
+      "raw_score": 1.0,
+      "seed_score": 1.0,
+      "task_id": "X501"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X502"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X503"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X504"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X505"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X506"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X507"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X508"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X509"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 0.0,
+      "task_id": "X510"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X511"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X512"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X513"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X514"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X515"
+    },
+    {
+      "raw_score": 0.0,
+      "seed_score": 1.0,
+      "task_id": "X516"
+    }
+  ],
+  "raw_mean": 0.0625,
+  "seed_mean": 0.9375,
+  "suite_id": "gate1-local-holdout-v5",
+  "win_rate": 0.875
+}

@@ -26,15 +26,13 @@ Gate 0 is the measurement instrument used to judge every later capability claim.
 Determine whether a scaffold improves a fixed model under a controlled resource envelope.
 
 ### Status
-**Infrastructure-qualified and empirically tested; NOT empirically certified.**
+**COMPLETE / EMPIRICALLY CERTIFIED.**
 
-The latest preregistered unseen 16-pair local Qwen3-8B holdout v4 completed on 2026-09-10. Raw scored 3/16 and Seed scored 11/16, a +50 percentage-point mean gain. The 95% paired-bootstrap CI for gain was [+25.00 pp, +75.00 pp], clearing zero. However strict Seed win rate was 8/16 = 50.00%, below the frozen >=60% requirement. Gate 1 therefore does not promote.
+The preregistered 16-pair local Qwen3-8B holdout v5 completed on 2026-09-10. Raw scored **1/16 = 6.25%** and Seed scored **15/16 = 93.75%**, a **+87.50 pp** mean gain. Strict Seed win rate was **14/16 = 87.50%** and the 95% paired-bootstrap CI was **[+68.75 pp, +100.00 pp]**. Identity/integrity and resource-envelope audits passed, so every frozen promotion criterion passed.
 
-See [`GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](GATE1_LOCAL_HOLDOUT_V4_RESULT.md).
+Frozen v5 source: `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`; implementation digest: `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`; preregistration: `857aa0f4cac7437deb86646e6f72d682b16d806a`.
 
-The evaluated v4 candidate is frozen at `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`, and remains green at **134/134** local tests and **10/10** deterministic Gate-1 checks.
-
-The current v5 candidate is frozen at `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation digest `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`, with **140/140** local tests and **10/10** deterministic checks passing. This is development readiness, not promotion evidence; a new holdout v5 is required.
+See [`GATE1_LOCAL_HOLDOUT_V5_RESULT.md`](GATE1_LOCAL_HOLDOUT_V5_RESULT.md). Earlier failed holdouts remain published as retired historical evidence.
 
 ### Implemented
 - raw-model control arm;
@@ -76,7 +74,7 @@ A failed holdout becomes development evidence. Its tasks cannot be reused as fre
 Make the system reason in terms of falsifiable hypotheses and independent evidence.
 
 ### Status
-**Foundation implemented; not empirically certified.**
+**ACTIVE NEXT — foundation implemented; empirical qualification pending.**
 
 ### Implemented
 - hypotheses + falsifiers;

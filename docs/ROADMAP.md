@@ -17,13 +17,16 @@ Completed:
 - exact reusable tools for shortest paths, project critical paths, CRT, semantic transactions/reconciliation, aggregation, assignment/CSP, exact Python tracing and constrained subset optimization;
 - deterministic relevant-tool routing and sandboxed computation fallback.
 
-Latest unseen holdout result (v4):
-- Raw 3/16 (18.75%);
-- Seed 11/16 (68.75%);
-- +50 percentage-point observed gain;
-- 8/16 = 50.00% strict Seed win rate;
-- 95% paired-bootstrap CI [+25.00 pp, +75.00 pp];
-- **promotion FAIL** because the frozen >=60% strict-win criterion was not met.
+Latest unseen holdout result (v5):
+- Raw **1/16 = 6.25%**;
+- Seed **15/16 = 93.75%**;
+- **+87.50 percentage-point** observed gain;
+- **14/16 = 87.50%** strict Seed win rate;
+- 95% paired-bootstrap CI **[+68.75 pp, +100.00 pp]**;
+- all identity/integrity/resource criteria passed;
+- **Gate 1 COMPLETE / PROMOTED**.
+
+v2-v4 remain historical failed promotion attempts and retired evidence.
 
 ### Milestone A2 — vNext / holdout-v3 cycle
 
@@ -37,15 +40,15 @@ The vNext candidate at `83ec193d6300b0658af8d4d3c45109880b28363f` substantially 
 
 The post-v3 reliability candidate at `b4242af758b1222f8ecea0bf7306e917a36ed9d8` passed **134/134** local tests and **10/10** deterministic qualification checks. Holdout v4 was independently audited 16/16 and preregistered before inference. It reproduced Seed 11/16 vs Raw 3/16 and a +50 pp gain with CI fully above zero, but strict Seed wins were only 8/16. Full result: [`GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](GATE1_LOCAL_HOLDOUT_V4_RESULT.md).
 
-### Milestone A4 - Gate-1 v5 candidate
+### Milestone A4 - Gate-1 v5 promotion
 
-**Status: candidate frozen; holdout-v5 preparation next.**
+**Status: COMPLETE — Gate 1 promoted.**
 
-v5 source `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation digest `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`, passes **140/140** local tests and **10/10** deterministic qualification checks. All five v4 both-wrong failure classes close on retired development probes. Next: generate a new private holdout v5, independently audit it, preregister identities/criteria, run unchanged, and publish the score. See [`GATE1_V5_DEVELOPMENT.md`](GATE1_V5_DEVELOPMENT.md).
+Frozen v5 source `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation digest `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`, passed **140/140** local tests and **10/10** deterministic qualification checks. Holdout v5 was independently audited before inference, preregistered at `857aa0f4cac7437deb86646e6f72d682b16d806a`, and passed every frozen empirical criterion. See [`GATE1_LOCAL_HOLDOUT_V5_RESULT.md`](GATE1_LOCAL_HOLDOUT_V5_RESULT.md).
 
 ## Milestone B — Gate 2 research benchmark
 
-Gate-2 machinery exists, but its promotion campaign remains blocked behind a reliable Gate-1 baseline.
+**Status: ACTIVE NEXT.** Gate 1 is now complete, so Gate-2 empirical qualification is unblocked. The existing Gate-2 machinery must now be frozen into a falsifiable, independently verifiable benchmark and evaluated under preregistered promotion rules.
 
 Planned:
 - uncertain problems that require hypothesis revision;

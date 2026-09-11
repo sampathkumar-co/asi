@@ -29,38 +29,22 @@ The core engineering rule is that **the system being optimized is less privilege
 | Gate | Purpose | Status |
 |---|---|---|
 | **0** | Measurement before optimization | **COMPLETE — infrastructure-qualified** |
-| **1** | Strong bounded baseline agent | **Empirically tested; promotion NOT passed** |
-| 2 | Scientific-method / verification | Foundation implemented; empirical campaign pending |
+| **1** | Strong bounded baseline agent | **COMPLETE — empirically certified** |
+| **2** | Scientific-method / verification | **ACTIVE NEXT — foundation implemented; empirical campaign next** |
 | 3 | Automatic architecture search | Foundation implemented; empirical campaign pending |
 | 4 | Controlled self-modification | Foundation implemented; empirical campaign pending |
 
-Gate 0 passed its fail-closed qualification and remains the measurement/control instrument for later gates. Gate 1 has now been tested on a preregistered unseen local-model holdout, but the frozen promotion rule was not satisfied.
+Gate 0 remains the trusted measurement/control instrument. Gate 1 is now complete: the preregistered v5 local-model campaign satisfied every frozen promotion criterion without post-run threshold changes.
 
 ## Latest Gate-1 empirical result
 
-On 2026-09-10, the frozen v4 Seed candidate at source commit `b4242af758b1222f8ecea0bf7306e917a36ed9d8` was evaluated on a new 16-pair private holdout v4 against the exact same local `qwen3:8b` Raw control under the hard 8,000-token arm envelope.
+Frozen v5 candidate: source `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation digest `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`, local `qwen3:8b` digest `500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41`.
 
-The private v4 suite was independently audited 16/16 before inference and preregistered at commit `e346ffabb2f77bded32d29e58e8009dc2731fd20`.
+Preregistered holdout v5 result: Raw **1/16 = 6.25%**, Seed **15/16 = 93.75%**, mean gain **+87.50 pp**, strict Seed win rate **14/16 = 87.50%**, 95% paired-bootstrap CI **[+68.75 pp, +100.00 pp]**. Identity/integrity and resource-envelope audits passed. **Gate 1 promotes.**
 
-Result:
-- Raw: **3/16 = 18.75%**
-- Seed: **11/16 = 68.75%**
-- observed mean gain: **+50 percentage points**
-- strict Seed win rate: **8/16 = 50.00%**
-- 95% paired-bootstrap CI: **[+25.00 pp, +75.00 pp]**
-- Gate-1 promotion: **FAIL** because the frozen strict-win threshold is >=60%
+See [`docs/GATE1_LOCAL_HOLDOUT_V5_RESULT.md`](docs/GATE1_LOCAL_HOLDOUT_V5_RESULT.md), [`docs/GATE1_LOCAL_HOLDOUT_V5_PREREGISTRATION.md`](docs/GATE1_LOCAL_HOLDOUT_V5_PREREGISTRATION.md), and [`artifacts/gate1-local-holdout-v5-score.json`](artifacts/gate1-local-holdout-v5-score.json).
 
-Pair count, mean gain, CI, identity/integrity and resource-envelope criteria all passed. With 16 pairs, promotion requires at least 10 strict Seed wins; v4 produced 8. The threshold is not weakened after observing the result.
-
-See [`docs/GATE1_LOCAL_HOLDOUT_V4_RESULT.md`](docs/GATE1_LOCAL_HOLDOUT_V4_RESULT.md) and [`artifacts/gate1-local-holdout-v4-score.json`](artifacts/gate1-local-holdout-v4-score.json). Gate 1 remains empirically tested but **not certified**.
-
-### Frozen v4 candidate
-
-The evaluated v4 candidate is source commit `b4242af758b1222f8ecea0bf7306e917a36ed9d8`, implementation digest `f9d882e185b235d0a8345640ee1577edb518be96dbf8af0f6b50ec204f5a1358`. It passes **134/134** local tests and **10/10** deterministic Gate-1 checks. See [`docs/GATE1_V4_DEVELOPMENT.md`](docs/GATE1_V4_DEVELOPMENT.md).
-
-### Current v5 candidate
-
-v5 is frozen at source commit `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation digest `011881547d85a31cccc3bd66a174e7ae9b3e8506014a6c918d248e78708e286c`. It passes **140/140** local tests and **10/10** deterministic Gate-1 checks. All five v4 both-wrong failure classes close on retired development probes. A new independently audited/preregistered private holdout v5 is required before any promotion claim. See [`docs/GATE1_V5_DEVELOPMENT.md`](docs/GATE1_V5_DEVELOPMENT.md).
+Historical v2/v3/v4 campaigns remain published as failed promotion attempts. They are retired evidence and are not rewritten or reused as fresh certification data.
 
 ## Gate-0 measurement layer
 
