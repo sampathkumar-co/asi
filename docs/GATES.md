@@ -74,22 +74,21 @@ A failed holdout becomes development evidence. Its tasks cannot be reused as fre
 Make the system reason in terms of falsifiable hypotheses and independent evidence.
 
 ### Status
-**Empirically tested on preregistered private/OOD holdout v1; NOT empirically certified.**
+**Empirically tested; private v1 failed verifier acceptance; v2 development candidate passes public calibration; NOT empirically certified.**
 
 ### Implemented
-- falsifiable hypothesis/action selection;
-- experiment + control selection under a common resource envelope;
-- one blind pre-reveal forecast per hypothesis;
-- optional two-way first-experiment forecast-collision audit;
-- mechanical frozen-forecast comparison after reveal;
+- falsifiable hypothesis/action and experiment/control selection;
+- one isolated blind probability distribution per hypothesis before each reveal;
+- strict probability validation with harmless omitted-zero normalization only;
+- runner-derived categorical argmax for the unchanged scoring rubric;
+- trusted cumulative frozen-likelihood support across observed experiments;
 - explicit post-reveal hypothesis revision and rejection;
 - bounded fail-closed schema repair with transcript evidence;
-- independent and adversarial verifier calls with runner-derived verdicts;
+- independent and adversarial support-set verifier calls;
+- trusted verdicts that reject mechanical ties, lower-support finals, or concrete direct evidence defects;
 - external-key scoring and deterministic paired bootstrap.
 
-Public development calibration produced Raw **0.78750** vs Seed **0.93125**, gain **+0.14375**, strict wins **62.5%**, verifier acceptance **75%**, CI **[-0.015625, +0.31875]**. The public suite is retired development evidence.
-
-Private holdout v1 used 18 balanced H1/H2/H3 tasks. It produced Raw **0.70556** vs Seed **0.94167**, gain **+0.23611**, strict wins **66.67%**, CI **[+0.11944, +0.37222]**, and **18** valid pairs. Seed verifier acceptance was only **50% (9/18)** versus the frozen **75%** criterion. Gate 2 therefore remains not certified and private v1 is retired.
+Private holdout v1 remains retired after failing only verifier acceptance (50% vs 75%). The v2 public-development run produced Raw **0.75625** vs Seed **0.94375**, gain **+0.18750**, strict wins **75%**, CI **[+0.025, +0.35]**, and verifier acceptance **100%** on 8/8 pairs. It is development evidence only.
 
 ### Empirical criterion
 Any future Gate-2 certification attempt must use a newly created preregistered private/OOD campaign and retain the frozen requirements: >=16 valid pairs, Seed mean >=0.75, mean gain >=0.15, strict Seed wins >=60%, paired-bootstrap lower bound >0, verifier acceptance >=75%, and no identity/integrity/resource/protocol mismatch.

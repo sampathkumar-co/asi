@@ -48,11 +48,13 @@ Historical v2/v3/v4 campaigns remain published as failed promotion attempts. The
 
 ## Gate-2 public development calibration
 
-The frozen Gate-2 development candidate uses local `qwen3:8b` with a common 16-call / 12,000-token envelope. Deterministic protocol qualification passes **28/28** canaries and the repository passes **157/157** tests with `ResourceWarning` treated as an error.
+The current Gate-2 v2 development candidate uses local `qwen3:8b` with a common **16-call / 15,000-token** envelope. Deterministic protocol qualification passes **36/36** canaries and the repository passes **157/157** tests with `ResourceWarning` treated as an error.
 
-On the eight-task public calibration suite, Raw scored **0.78750** mean and Seed **0.93125**, a **+0.14375** mean gain. Strict Seed wins were **5/8 = 62.5%**, verifier acceptance **6/8 = 75%**, and the paired-bootstrap CI was **[-0.015625, +0.31875]**. This public run does **not** promote Gate 2: it has only 8 pairs, misses the frozen +0.15 mean-gain threshold by 0.00625, and its CI lower bound is not above zero.
+V2 replaces brittle categorical collision rescue with blind per-hypothesis **probability distributions** over declared outcomes. The trusted runner accumulates frozen observed-outcome likelihood across experiments and requires the final hypothesis to be the unique mechanical best before either verifier can pass it.
 
-The public suite is now retired as development evidence. See [`docs/GATE2_PROTOCOL.md`](docs/GATE2_PROTOCOL.md), [`docs/GATE2_DEVELOPMENT.md`](docs/GATE2_DEVELOPMENT.md), and [`docs/GATE2_CERTIFICATION.md`](docs/GATE2_CERTIFICATION.md).
+On a fresh eight-task public-development run, Raw scored **0.75625** and Seed **0.94375**, a **+0.18750** mean gain. Strict Seed wins were **6/8 = 75%**, Seed verifier acceptance **8/8 = 100%**, and the paired-bootstrap CI was **[+0.025, +0.35]**. All eight Seed arms succeeded, selected H2, had unique mechanical H2 support, and used zero repairs.
+
+This still does **not** promote Gate 2 because the public suite contains only 8 pairs versus the frozen requirement of >=16. It is development-only evidence and is retired for certification. See [`docs/GATE2_V2_PUBLIC_RESULT.md`](docs/GATE2_V2_PUBLIC_RESULT.md), [`docs/GATE2_PROTOCOL.md`](docs/GATE2_PROTOCOL.md), and [`docs/GATE2_DEVELOPMENT.md`](docs/GATE2_DEVELOPMENT.md).
 
 ## Gate-2 private holdout v1
 
@@ -132,7 +134,7 @@ No external LLM API is required for Gate-0 infrastructure qualification. Gate-1 
 ## Gates 1-4 foundation
 
 - **Gate 1:** provider-neutral model interface; local Ollama adapter; goal/state models; planner/executor/critic loop; deterministic relevant-tool routing; persistent provenance; implementation/model attestation; strict evidence-only critic; exact reusable tools for graphs, scheduling, CRT, semantic transactions/reconciliation, aggregation, assignment/CSP, exact Python tracing and constrained subset optimization; sandboxed computation fallback; hard budgets and checkpointed paired campaigns.
-- **Gate 2:** falsifiable action selection; isolated blind per-hypothesis forecasts; optional two-way forecast-collision audit; reveal-then-mechanical comparison; explicit evidence-driven revision; bounded repair; independent/adversarial verification; runner-derived verdicts; attested paired campaigns.
+- **Gate 2:** falsifiable action selection; isolated blind per-hypothesis probability forecasts; runner-derived categorical argmax; reveal-then cumulative frozen-likelihood comparison; explicit evidence-driven revision; bounded repair; independent/adversarial support-set verification; trusted runner-derived verdicts; attested paired campaigns.
 - **Gate 3:** declarative `AgentGenome`, bounded seeded mutation, archive and capability/cost fitness search.
 - **Gate 4:** copy-on-write descendants, mutation allow/deny policy, stale-hash protection, lineage, no in-place parent mutation, Docker no-network/read-only/resource limits and explicit promotion evidence.
 

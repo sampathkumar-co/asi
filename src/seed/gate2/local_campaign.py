@@ -26,6 +26,7 @@ class ResearchStep:
     observed_outcome_id: str
     observation: str
     hypothesis_predictions: tuple[tuple[str, str], ...] = ()
+    hypothesis_probabilities: tuple[tuple[str, tuple[tuple[str, int], ...]], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -45,6 +46,10 @@ class VerificationEvidence:
     confidence: float
     risk_ids: tuple[str, ...]
     reason: str
+    supported_hypothesis_ids: tuple[str, ...] = ()
+    direct_evidence_defect: bool = False
+    defect_summary: str = ""
+    mechanical_supported_hypothesis_ids: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -96,7 +101,7 @@ class ResearchPairEvidence:
 
 
 def _budget() -> Budget:
-    return Budget(max_steps=16, max_model_calls=16, max_tool_calls=0, max_tokens=12000, max_cost_usd=0.0)
+    return Budget(max_steps=16, max_model_calls=16, max_tool_calls=0, max_tokens=15000, max_cost_usd=0.0)
 
 
 def _record_event(task_id: str, arm: str, record: ModelCallRecord) -> dict:
@@ -199,36 +204,34 @@ def _validated_action_choice(task: ResearchTask, data: dict, history: list[Resea
     return {"hypothesis_id": hypothesis_id, "experiment_id": experiment_id, "control_ids": controls, "rejected_hypothesis_ids": rejected, "risk_ids": risks}
 
 
-def _resolve_forecast_collision(provider: BudgetedProvider, budget: Budget, task: ResearchTask, experiment_id: str, hypothesis_ids: tuple[str, ...], shared_outcome_id: str) -> dict:
-    experiment = task.experiment(experiment_id); hypotheses = [asdict(x) for x in task.hypotheses if x.id in hypothesis_ids]
-    payload = {"question": task.question, "hypotheses": hypotheses, "experiment": experiment.public_dict(), "current_shared_outcome": shared_outcome_id, "schema": {"hypothesis_predictions": "map exactly the supplied hypothesis ids to declared outcome ids", "distinguishable": "boolean", "reason": "brief contrast rationale"}}
-    system = "No result has been revealed. Multiple hypotheses currently forecast the same outcome. Decide whether this experiment can actually distinguish them. If yes, independently assign each hypothesis the declared outcome that would most support it. If they genuinely make the same prediction, keep the same outcome. Never force distinct outcomes merely for uniqueness. Return JSON only."
-    return _json_call(provider, budget, [Message("system", system), Message("user", json.dumps(payload))], "gate2_seed_forecast_collision")
-
-
-def _validated_collision(task: ResearchTask, experiment_id: str, hypothesis_ids: tuple[str, ...], data: dict) -> dict[str, str]:
-    raw=data.get("hypothesis_predictions"); allowed=_ids(task.experiment(experiment_id).possible_outcomes)
-    if not isinstance(raw, dict) or set(raw) != set(hypothesis_ids): raise ValueError("collision resolver must map exactly the colliding hypotheses")
-    if not isinstance(data.get("distinguishable"), bool): raise ValueError("collision distinguishable must be boolean")
-    for hid,oid in raw.items():
-        if hid not in _ids(task.hypotheses) or not isinstance(oid,str) or oid not in allowed: raise ValueError("invalid collision forecast")
-    if data["distinguishable"] and len(set(raw.values())) < 2: raise ValueError("distinguishable collision must separate at least two forecasts")
-    return {str(k):str(v) for k,v in raw.items()}
-
-
 def _forecast_one(provider: BudgetedProvider, budget: Budget, task: ResearchTask, experiment_id: str, hypothesis_id: str) -> dict:
     experiment = task.experiment(experiment_id)
     hypothesis = next(x for x in task.hypotheses if x.id == hypothesis_id)
-    payload = {"question": task.question, "hypothesis": asdict(hypothesis), "experiment": {"id": experiment.id, "description": experiment.description, "possible_outcomes": [asdict(x) for x in experiment.possible_outcomes]}, "schema": {"outcome_id": "one declared outcome id", "reason": "brief causal rationale"}}
-    system = "No experiment result is available. You are given ONE hypothesis and one experiment with declared outcomes. Assume the hypothesis is true. Choose the ONE outcome that would be most expected and would increase rational belief in this hypothesis. Never choose an outcome that would falsify, undermine, remove the mechanism of, or count as evidence against the hypothesis. Read the outcome text literally. Return JSON only."
+    payload = {"question": task.question, "hypothesis": asdict(hypothesis), "experiment": {"id": experiment.id, "description": experiment.description, "possible_outcomes": [asdict(x) for x in experiment.possible_outcomes]}, "schema": {"outcome_probabilities": "map every declared outcome id to an integer probability 0..100 summing exactly 100", "reason": "brief causal rationale"}}
+    system = ("No experiment result is available. You are given ONE hypothesis and one experiment with declared outcomes. "
+              "Assume the hypothesis is the sole true explanation and assign a predictive probability distribution across ALL declared outcomes. "
+              "Probabilities must be integer percentages summing exactly 100. Use the outcome text literally and reserve substantial probability for instability/noise outcomes when the hypothesis itself is stochastic or unstable. Return JSON only.")
     return _json_call(provider, budget, [Message("system", system), Message("user", json.dumps(payload))], "gate2_seed_forecast_hypothesis")
 
 
-def _validated_forecast_one(task: ResearchTask, experiment_id: str, hypothesis_id: str, data: dict) -> tuple[str, str]:
+def _validated_forecast_one(task: ResearchTask, experiment_id: str, hypothesis_id: str, data: dict) -> tuple[str, str, tuple[tuple[str, int], ...]]:
     if hypothesis_id not in _ids(task.hypotheses): raise ValueError("invalid forecast hypothesis id")
-    experiment = task.experiment(experiment_id); outcome_id = data.get("outcome_id")
-    if not isinstance(outcome_id, str) or outcome_id not in _ids(experiment.possible_outcomes): raise ValueError("invalid hypothesis forecast outcome")
-    return hypothesis_id, outcome_id
+    experiment = task.experiment(experiment_id)
+    outcome_ids = [x.id for x in experiment.possible_outcomes]
+    raw = data.get("outcome_probabilities")
+    if not isinstance(raw, dict) or not set(raw).issubset(set(outcome_ids)):
+        raise ValueError("forecast probabilities may contain only declared outcome ids")
+    supplied: dict[str, int] = {}
+    for oid, value in raw.items():
+        if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 100:
+            raise ValueError("forecast probabilities must be integer percentages 0..100")
+        supplied[oid] = value
+    if sum(supplied.values()) != 100:
+        raise ValueError("forecast probabilities must sum exactly to 100 before zero-fill")
+    probs = {oid: supplied.get(oid, 0) for oid in outcome_ids}
+    categorical = max(outcome_ids, key=lambda oid: probs[oid])
+    return hypothesis_id, categorical, tuple((oid, probs[oid]) for oid in outcome_ids)
+
 
 def _validated_step(task: ResearchTask, data: dict, history: list[ResearchStep], *, require_hypothesis_predictions: bool = False) -> ResearchStep | None:
     hypothesis_id = str(data.get("hypothesis_id", ""))
@@ -248,6 +251,7 @@ def _validated_step(task: ResearchTask, data: dict, history: list[ResearchStep],
     if not isinstance(prediction, str) or prediction not in _ids(experiment.possible_outcomes):
         raise ValueError("invalid pre-evidence prediction")
     hypothesis_predictions: tuple[tuple[str, str], ...] = ()
+    hypothesis_probabilities: tuple[tuple[str, tuple[tuple[str, int], ...]], ...] = ()
     if require_hypothesis_predictions:
         raw_predictions = data.get("hypothesis_predictions")
         hypothesis_ids = [item.id for item in task.hypotheses]
@@ -291,10 +295,9 @@ def _revision(provider: BudgetedProvider, budget: Budget, task: ResearchTask, hi
         "prior_revisions": [asdict(x) for x in revisions],
         "latest_experiment_id": history[-1].experiment_id,
         "latest_precommitted_hypothesis_predictions": dict(history[-1].hypothesis_predictions),
-        "latest_forecast_evaluation": [
-            {"hypothesis_id": hid, "predicted_outcome_id": oid, "matches_observation": oid == history[-1].observed_outcome_id}
-            for hid, oid in history[-1].hypothesis_predictions
-        ],
+        "latest_precommitted_hypothesis_probabilities": {hid: dict(probs) for hid, probs in history[-1].hypothesis_probabilities},
+        "latest_observed_outcome_probabilities": {hid: dict(probs)[history[-1].observed_outcome_id] for hid, probs in history[-1].hypothesis_probabilities},
+        "cumulative_likelihood_products": _mechanical_support(task, history)[0],
         "schema": {
             "hypothesis_id": "best-supported hypothesis after the newly revealed evidence",
             "rejected_hypothesis_ids": "hypothesis ids contradicted by revealed evidence",
@@ -304,8 +307,9 @@ def _revision(provider: BudgetedProvider, budget: Budget, task: ResearchTask, hi
         },
     }
     system = (
-        "A selected experiment result has now been revealed. Return JSON only. The forecast-evaluation table was computed mechanically from the frozen pre-reveal forecasts: matches_observation=true is evidence FOR that hypothesis on this experiment, while false is evidence AGAINST it. "
-        "Use those labels in the stated direction, combine them with earlier revealed evidence, explicitly reject contradicted hypotheses, update material risks/confounds, and select the hypothesis now best supported. "
+        "A selected experiment result has now been revealed. Return JSON only. The probability distributions were frozen before reveal. "
+        "A hypothesis receives stronger evidence when it assigned higher probability to the actually observed outcome; cumulative_likelihood_products multiplies those frozen observed-outcome probabilities across experiments. "
+        "Use that direction of evidence, combine it with the revealed record, explicitly reject contradicted hypotheses, update material risks/confounds, and select the hypothesis now best supported. "
         "Do not choose another experiment in this call. Do not invent ids or use evidence that has not been revealed."
     )
     return _json_call(provider, budget, [Message("system", system), Message("user", json.dumps(payload))], "gate2_seed_revision")
@@ -376,6 +380,32 @@ def _validated_final(task: ResearchTask, data: dict) -> tuple[str, tuple[str, ..
     return hypothesis_id, rejected, risks, confidence
 
 
+def _mechanical_support(task: ResearchTask, history: list[ResearchStep]) -> tuple[dict[str, int], tuple[str, ...]]:
+    hypothesis_ids = tuple(x.id for x in task.hypotheses)
+    products = {hid: 1 for hid in hypothesis_ids}
+    if not history:
+        raise ValueError("verifier requires revealed history")
+    for step in history:
+        distributions = {hid: dict(probs) for hid, probs in step.hypothesis_probabilities}
+        if set(distributions) != set(hypothesis_ids):
+            raise ValueError("verifier requires complete frozen hypothesis probability forecasts")
+        for hid in hypothesis_ids:
+            if step.observed_outcome_id not in distributions[hid]:
+                raise ValueError("observed outcome missing from frozen probability forecast")
+            products[hid] *= int(distributions[hid][step.observed_outcome_id])
+    best_score = max(products.values())
+    best = tuple(hid for hid in hypothesis_ids if products[hid] == best_score)
+    return products, best
+
+
+def _verifier_verdict(final_id: str, model_supported: tuple[str, ...], mechanical_best: tuple[str, ...], direct_defect: bool) -> str:
+    return "pass" if (
+        mechanical_best == (final_id,)
+        and model_supported == (final_id,)
+        and not direct_defect
+    ) else "fail"
+
+
 def _verify(provider: BudgetedProvider, budget: Budget, task: ResearchTask, history: list[ResearchStep], final: dict, kind: str, revisions: list[ResearchRevision] | None = None) -> VerificationEvidence:
     payload = {
         "task": task.public_dict(),
@@ -383,29 +413,52 @@ def _verify(provider: BudgetedProvider, budget: Budget, task: ResearchTask, hist
         "revisions": [asdict(x) for x in (revisions or [])],
         "final_report": final,
     }
-    payload["schema"] = {"has_material_defect": "boolean: true iff a material unresolved defect exists", "defect_summary": "concise defect description, or 'none' when false", "confidence": "0..1 confidence in this defect assessment", "risk_ids": "list of risk ids", "reason": "concise evidence-based audit summary"}
+    payload["schema"] = {
+        "supported_hypothesis_ids": "non-empty list of declared hypothesis ids tied for strongest support; include every tie",
+        "has_direct_evidence_defect": "boolean; true only for a concrete contradiction or protocol/evidence defect grounded in the revealed record, never for generic residual uncertainty",
+        "defect_summary": "concise concrete defect description, or 'none' when false",
+        "confidence": "0..1 confidence in this support assessment",
+        "risk_ids": "list of declared risk ids that remain relevant",
+        "reason": "concise evidence-based audit summary",
+    }
+    common = (
+        "Evaluate only the declared hypotheses against the revealed evidence. "
+        "supported_hypothesis_ids must contain every declared hypothesis tied for strongest evidential support. "
+        "Residual risks or hypothetical unknown confounders belong in risk_ids/reason and MUST NOT by themselves create a defect or a tie. "
+        "Set has_direct_evidence_defect=true only for a concrete contradiction, prediction/evidence mismatch, or protocol/evidence defect visible in the record. "
+        "Return JSON only; do not emit a verdict label because the runner derives pass/fail."
+    )
     if kind == "independent":
-        system = "Independently audit whether the conclusion follows from the revealed evidence and controls. Return JSON only; do not assume the investigator is correct. Set has_material_defect=false only when no material evidential or methodological defect remains; otherwise set it true and name the defect in defect_summary. Do not emit a verdict label: the runner derives pass/fail from the boolean."
+        system = "Independently audit the conclusion. " + common
         purpose = "gate2_independent"
     else:
-        system = "Act as an adversarial scientific reviewer. Search for falsifiers, confounds, leakage, unsupported causal claims, and prediction/evidence mismatches. Return JSON only. Set has_material_defect=false only if no material unresolved defect remains; otherwise set it true and name the strongest defect in defect_summary. Do not emit a verdict label: the runner derives pass/fail from the boolean."
+        system = "Act as an adversarial scientific reviewer and actively search for falsifiers and competing declared hypotheses. " + common
         purpose = "gate2_adversarial"
     data = _json_call(provider, budget, [Message("system", system), Message("user", json.dumps(payload))], purpose)
+
     def validate(value: dict) -> VerificationEvidence:
-        has_defect = value.get("has_material_defect")
-        if not isinstance(has_defect, bool):
-            raise ValueError("verifier has_material_defect must be boolean")
+        supported = _strings(value.get("supported_hypothesis_ids", []))
+        hypothesis_ids = _ids(task.hypotheses)
+        if not supported:
+            raise ValueError("verifier supported_hypothesis_ids must be non-empty")
+        if not set(supported).issubset(hypothesis_ids):
+            raise ValueError("invalid verifier supported hypothesis id")
+        direct_defect = value.get("has_direct_evidence_defect")
+        if not isinstance(direct_defect, bool):
+            raise ValueError("verifier has_direct_evidence_defect must be boolean")
         defect_summary = value.get("defect_summary", "")
         if not isinstance(defect_summary, str):
             raise ValueError("verifier defect_summary must be string")
-        verdict = "fail" if has_defect else "pass"
+        final_id = str(final.get("final_hypothesis_id", ""))
+        _, mechanical_best = _mechanical_support(task, history)
+        verdict = _verifier_verdict(final_id, supported, mechanical_best, direct_defect)
         confidence = float(value.get("confidence", 0.0))
         if not 0.0 <= confidence <= 1.0:
             raise ValueError("verifier confidence out of range")
         risks = _strings(value.get("risk_ids", []))
         if not set(risks).issubset(_ids(task.risks)):
             raise ValueError("invalid verifier risk id")
-        return VerificationEvidence(kind, verdict, confidence, risks, str(value.get("reason", ""))[:320])
+        return VerificationEvidence(kind, verdict, confidence, risks, str(value.get("reason", ""))[:320], supported, direct_defect, defect_summary[:240], mechanical_best)
     try:
         return validate(data)
     except ValueError as exc:
@@ -451,22 +504,22 @@ def _run_arm(task: ResearchTask, provider: BudgetedProvider, budget: Budget, arm
             if arm == "seed":
                 choice = validate_or_repair("action", action, lambda value: _validated_action_choice(task, value, history))
                 if choice is None: break
-                forecasts_list = []
+                categorical: dict[str, str] = {}
+                distributions: dict[str, tuple[tuple[str, int], ...]] = {}
                 for hypothesis in task.hypotheses:
                     forecast_data = _forecast_one(provider, budget, task, choice["experiment_id"], hypothesis.id)
-                    forecast = validate_or_repair("forecast_hypothesis", forecast_data, lambda value, hid=hypothesis.id: _validated_forecast_one(task, choice["experiment_id"], hid, value))
-                    forecasts_list.append(forecast)
-                forecast_map = dict(forecasts_list)
-                if not history:
-                    selected_outcome = forecast_map[choice["hypothesis_id"]]
-                    colliding = tuple(hid for hid, oid in forecast_map.items() if oid == selected_outcome)
-                    if len(colliding) == 2:
-                        collision_data = _resolve_forecast_collision(provider, budget, task, choice["experiment_id"], colliding, selected_outcome)
-                        resolved = validate_or_repair("forecast_collision", collision_data, lambda value: _validated_collision(task, choice["experiment_id"], colliding, value))
-                        forecast_map.update(resolved)
-                forecasts = tuple((h.id, forecast_map[h.id]) for h in task.hypotheses)
-                experiment = task.experiment(choice["experiment_id"]); prediction = forecast_map[choice["hypothesis_id"]]
-                step = ResearchStep(choice["hypothesis_id"], experiment.id, prediction, choice["control_ids"], choice["rejected_hypothesis_ids"], choice["risk_ids"], experiment.observed_outcome_id, experiment.observation, forecasts)
+                    hid, outcome_id, probabilities = validate_or_repair("forecast_hypothesis", forecast_data, lambda value, hid=hypothesis.id: _validated_forecast_one(task, choice["experiment_id"], hid, value))
+                    categorical[hid] = outcome_id
+                    distributions[hid] = probabilities
+                forecasts = tuple((h.id, categorical[h.id]) for h in task.hypotheses)
+                probability_rows = tuple((h.id, distributions[h.id]) for h in task.hypotheses)
+                experiment = task.experiment(choice["experiment_id"])
+                prediction = categorical[choice["hypothesis_id"]]
+                step = ResearchStep(
+                    choice["hypothesis_id"], experiment.id, prediction, choice["control_ids"],
+                    choice["rejected_hypothesis_ids"], choice["risk_ids"], experiment.observed_outcome_id,
+                    experiment.observation, forecasts, probability_rows,
+                )
             else:
                 step = validate_or_repair("action", action, lambda value: _validated_step(task, value, history))
                 if step is None: break
@@ -564,11 +617,11 @@ def run_ollama_research_suite(task_path: str | Path, model: str, *, checkpoint_p
     suite_id, tasks = load_research_tasks(task_file)
     provider_id = f"ollama:{model}"
     json_purposes = (
-        "gate2_raw_action", "gate2_raw_final", "gate2_seed_action", "gate2_seed_forecast_hypothesis", "gate2_seed_forecast_collision", "gate2_seed_revision", "gate2_seed_final",
+        "gate2_raw_action", "gate2_raw_final", "gate2_seed_action", "gate2_seed_forecast_hypothesis", "gate2_seed_revision", "gate2_seed_final",
         "gate2_independent", "gate2_adversarial", "gate2_repair",
     )
     caps = {
-        "gate2_raw_action": 640, "gate2_seed_action": 640, "gate2_seed_forecast_hypothesis": 128, "gate2_seed_forecast_collision": 256, "gate2_seed_revision": 384,
+        "gate2_raw_action": 640, "gate2_seed_action": 640, "gate2_seed_forecast_hypothesis": 192, "gate2_seed_revision": 384,
         "gate2_raw_final": 512, "gate2_seed_final": 512,
         "gate2_independent": 384, "gate2_adversarial": 384, "gate2_repair": 256,
     }
@@ -584,7 +637,7 @@ def run_ollama_research_suite(task_path: str | Path, model: str, *, checkpoint_p
         "num_ctx": num_ctx,
         "purpose_num_predict": caps,
         "raw_protocol": "interactive direct investigation without Seed verifier scaffold",
-        "seed_protocol": "falsifiable action -> isolated blind per-hypothesis forecasts -> optional two-way first-experiment collision audit -> reveal -> mechanical forecast comparison -> revision -> independent/adversarial verification",
+        "seed_protocol": "falsifiable action -> isolated blind per-hypothesis probability forecasts -> reveal -> cumulative frozen-likelihood comparison -> revision -> trusted likelihood support gate + independent/adversarial verification",
         "resource_envelope": _budget().limits(),
         "task_file_sha256": task_file_sha256,
     }

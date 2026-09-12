@@ -4,7 +4,7 @@ Updated: 2026-09-12
 
 ## Status
 
-Gate 2 is **not empirically certified**. Private holdout v1 completed under the frozen candidate and preregistration. Strong score transfer passed every frozen criterion except Seed dual-verifier acceptance, which was 50% versus the required 75%. The v1 holdout is retired evidence.
+Gate 2 is **not empirically certified**. Private holdout v1 remains retired failed evidence because Seed dual-verifier acceptance was 50% versus the required 75%. A v2 probabilistic development candidate now passes every frozen numerical public-development check except the eight-task suite's unavoidable `valid_pairs >= 16` requirement. V2 must be frozen in Git/CI and evaluated on a completely new preregistered private/OOD holdout before any certification claim.
 
 ## Private holdout v1 outcome
 
@@ -17,6 +17,8 @@ Observed on 18 valid pairs: Raw mean **0.70556**, Seed mean **0.94167**, mean ga
 The valid-pair, Seed-mean, mean-gain, strict-win, and CI requirements passed. Verifier acceptance failed. Under the frozen all-checks rule, **promotion_pass=false** and Gate 2 remains uncertified.
 
 Private v1 is permanently retired for future certification. See [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md).
+
+Current v2 public-development result: Raw **0.75625**, Seed **0.94375**, gain **+0.18750**, strict wins **75%**, CI **[+0.025, +0.35]**, verifier acceptance **100%**, 8 valid pairs. This is development-only evidence. See [`GATE2_V2_PUBLIC_RESULT.md`](GATE2_V2_PUBLIC_RESULT.md).
 
 ## Frozen promotion rule
 

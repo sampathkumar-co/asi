@@ -1,6 +1,6 @@
 # Gate 2 Development Record
 
-Updated: 2026-09-11
+Updated: 2026-09-12
 
 ## Scope
 
@@ -110,3 +110,32 @@ Seed verifier acceptance was **9/18 = 50%**, below the preregistered **75%** thr
 This holdout is now retired. The next development cycle may study its verifier failures, but no changed candidate may claim certification on these same 18 tasks. A later certification attempt requires a completely new independently audited and preregistered private/OOD holdout.
 
 See [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md).
+
+## Gate-2 v2 verifier/research development
+
+Private v1 failed only the verifier-acceptance criterion. Diagnostic review showed that eight correct Seed conclusions were rejected largely because model verifiers converted generic residual uncertainty into hard defects. The v2 cycle therefore changed verifier semantics without weakening any promotion threshold.
+
+Several categorical forecast-rescue designs were tested and rejected during development: global planning, collision audits, anchored collision refinement, and all-tie experiment fallback. Stress tests showed that categorical collision prompts could hallucinate distinctions or mutate otherwise-correct forecasts. Those rescue paths are **not** part of v2.
+
+The v2 candidate instead records one blind **probability distribution over declared outcomes per hypothesis per experiment before reveal**. The runner derives categorical argmax predictions for the unchanged scoring rubric, while trusted verifier support is the cumulative product of the frozen probability assigned to each observed outcome. Exact ties remain failures rather than being forced apart.
+
+Verifier model outputs are also structured: they name every declared hypothesis tied for strongest support and flag only concrete direct evidence/protocol defects. The runner accepts a verifier only when the final hypothesis is the unique mechanical likelihood winner, the verifier supports only that hypothesis, and no direct defect exists.
+
+Current pre-commit v2 implementation digest:
+`d8a028f394121ca3dc6e5c890304bd3d13cd03e5566467befecb31190540b340`.
+
+Deterministic qualification: **36/36** canaries. Repository regression: **157/157** tests with `ResourceWarning` promoted to an error, plus clean `compileall` and `git diff --check`.
+
+Common Raw/Seed envelope: **16 steps / 16 model calls / 0 tools / 15,000 tokens / $0**. Model remains local `qwen3:8b` digest `500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41`.
+
+### v2 public development result
+
+Fresh eight-pair evidence content hash: `5db6f27ff34fe0138a2f499361960ac63b32faa4b9d56fa1a2bd355a97a5197a`.
+Evidence-file SHA-256: `13258ebf0a6bc405a2683cf98f4531fdb8e929f026b2319efab54562e448782f`.
+Score content hash: `15cc46330eb28a212ca91a045ba12ba86c066c80a3217ac620e567b0f742629f`.
+
+Raw mean **0.75625**; Seed mean **0.94375**; mean gain **+0.18750**; strict Seed wins **6/8 = 75%**; paired-bootstrap CI **[+0.025, +0.35]**; Seed verifier acceptance **8/8 = 100%**. Every Seed arm succeeded with final H2, unique mechanical likelihood support for H2, zero repairs, and no budget failure.
+
+This development run passes every frozen numerical criterion except `valid_pairs >= 16`, which cannot be satisfied by the eight-task public suite by construction. It is **not** certification evidence. The public suite has been repeatedly observed and remains retired for certification.
+
+The next legitimate step is to freeze v2 in Git/CI, create a completely new external private/OOD holdout, independently audit it, preregister hashes and the frozen candidate identity, and only then begin a second private certification attempt.

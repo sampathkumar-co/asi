@@ -1,6 +1,6 @@
 # Gate 2 Scientific-Method Protocol
 
-Updated: 2026-09-11
+Updated: 2026-09-12
 
 ## Purpose
 
@@ -22,20 +22,22 @@ The candidate never receives the private answer key. Hidden observations are wit
 For each permitted experiment:
 
 1. choose the currently best-supported hypothesis, an unused experiment, controls, rejected hypotheses, and material risks;
-2. before reveal, forecast the selected experiment independently once for **each hypothesis**;
-3. on the first experiment only, if the selected hypothesis has the same forecast as exactly one competing hypothesis, optionally run one blind two-way collision audit;4. reveal only that experiment's observed outcome and observation;
-5. mechanically compare every frozen forecast with the revealed outcome;
-6. revise the best-supported hypothesis, explicitly reject contradicted alternatives, and update risks;
-7. repeat until the task's experiment limit is reached, then produce a final report;
-8. run distinct independent and adversarial verifier calls.
+2. before reveal, forecast that experiment independently once for **each hypothesis** as an integer probability distribution over every declared outcome;
+3. validate that supplied probabilities use only declared outcome IDs, are integers in 0..100, and sum to exactly 100; an omitted declared outcome is normalized to zero only when the supplied declared probabilities already sum to 100;
+4. derive each hypothesis's categorical prediction mechanically from the probability argmax for rubric compatibility;
+5. reveal only that experiment's observed outcome and observation;
+6. mechanically accumulate hypothesis support by multiplying the frozen pre-reveal probability assigned to each observed outcome across experiments;
+7. revise the best-supported hypothesis, explicitly reject contradicted alternatives, and update risks;
+8. repeat until the task's experiment limit is reached, then produce a final report;
+9. run distinct independent and adversarial verifier calls.
 
-Three-way forecast collisions are deliberately **not** forced apart. Ambiguity is preserved rather than converted into fabricated discrimination.
+Probability distributions preserve graded pre-evidence commitments without forcing arbitrary categorical distinctions. Exact cumulative-likelihood ties remain ambiguity and block trusted acceptance.
 
 ## Verification contract
 
-Verifiers do not emit a trusted `pass`/`fail` label. They return a structured `has_material_defect` boolean, confidence, declared risks, and rationale. The trusted runner derives the verdict from that boolean.
+Each verifier returns the declared hypothesis IDs it judges tied for strongest support, a `has_direct_evidence_defect` boolean, confidence, declared risks, and rationale. Generic residual uncertainty belongs in risks and does not by itself become a hard defect.
 
-Seed acceptance requires both independent and adversarial verdicts to pass with confidence >= 0.8. Verifier disagreement blocks acceptance.
+The trusted runner independently computes the cumulative frozen-likelihood support set. A verifier verdict passes only when the final hypothesis is the **unique** mechanical best, the model verifier supports only that same hypothesis, and no direct evidence/protocol defect is present. Seed acceptance requires both independent and adversarial verdicts to pass with confidence >= 0.8.
 
 ## Fail-closed behavior
 
@@ -52,7 +54,7 @@ For both Raw and Seed:
 - max steps: **16**;
 - max model calls: **16**;
 - max tool calls: **0**;
-- max tokens: **12,000**;
+- max tokens: **15,000**;
 - max cost: **$0**.
 The evaluated local model is `qwen3:8b`, model digest `500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41`, temperature 0, thinking disabled, context 4096.
 

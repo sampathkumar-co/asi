@@ -125,21 +125,22 @@ Full audit: [`GATE1_LOCAL_HOLDOUT_V5_RESULT.md`](GATE1_LOCAL_HOLDOUT_V5_RESULT.m
 
 ## Gate 2 — scientific-method workflow
 
-**Empirically tested on private/OOD holdout v1; NOT empirically certified.**
+**Empirically tested; private v1 failed verifier acceptance; v2 development candidate is ready to freeze for a new private/OOD certification attempt. Gate 2 is NOT empirically certified.**
 
-Frozen v1 candidate:
-- source commit `ec1e98315a0baa2fe47d344702790b86bbc6132f`;
-- preregistration commit `2126f64b7d37964edf019794507cd19d021f2fd8`;
-- 28/28 deterministic Gate-2 protocol canaries pass;
-- 157/157 repository tests pass under `ResourceWarning`-as-error;
-- implementation digest `49c9db731136a98c0bef78627fd3952d5e2b9b1b1030eb8e6dbc7c5d4647ea7a`;
-- same local `qwen3:8b` artifact for Raw/Seed, 16 calls / 16 steps / 12,000 tokens / zero tools.
+Private holdout v1 remains immutable failed evidence: frozen source `ec1e98315a0baa2fe47d344702790b86bbc6132f`, Raw **0.70556**, Seed **0.94167**, gain **+0.23611**, strict wins **66.67%**, CI **[+0.11944, +0.37222]**, but verifier acceptance **9/18 = 50%** versus the frozen 75% criterion. The holdout is permanently retired.
 
-Private holdout v1 contained 18 balanced H1/H2/H3 tasks and was audited before inference. Final result: Raw **0.70556**, Seed **0.94167**, gain **+0.23611**, strict Seed wins **12/18 = 66.67%**, paired-bootstrap CI **[+0.11944, +0.37222]**, 18 valid pairs, Seed verifier acceptance **9/18 = 50%**.
+Current v2 development candidate:
+- pre-commit implementation digest `d8a028f394121ca3dc6e5c890304bd3d13cd03e5566467befecb31190540b340`;
+- **36/36** deterministic Gate-2 protocol canaries pass;
+- **157/157** repository tests pass under `ResourceWarning`-as-error;
+- same local `qwen3:8b` model digest for Raw/Seed;
+- common envelope **16 calls / 16 steps / 15,000 tokens / zero tools**;
+- blind per-hypothesis probability forecasts and runner-computed cumulative likelihood support;
+- model verifiers cannot override a mechanical tie or lower-support final.
 
-Seed mean, mean gain, strict-win rate, CI lower bound, and valid-pair count all passed their frozen thresholds. Verifier acceptance failed the frozen >=75% criterion, so Gate 2 remains **NOT EMPIRICALLY CERTIFIED**. Private holdout v1 is permanently retired.
+Fresh v2 public development run: Raw **0.75625**, Seed **0.94375**, gain **+0.18750**, strict wins **75%**, CI **[+0.025, +0.35]**, verifier acceptance **100% (8/8)**. All Seed arms succeeded with unique mechanical H2 support and zero repairs. Every frozen numerical criterion passes except the public suite's unavoidable **8 < 16 valid-pair** count.
 
-Full result: [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md). Sanitized score: [`../artifacts/gate2-private-holdout-v1-score.json`](../artifacts/gate2-private-holdout-v1-score.json).
+This public run is development-only evidence, not promotion. Full v2 record: [`GATE2_V2_PUBLIC_RESULT.md`](GATE2_V2_PUBLIC_RESULT.md). Private-v1 record: [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md).
 
 ## Gate 3 — architecture search
 
@@ -178,7 +179,7 @@ Implemented:
 
 ## Current next step
 
-Gate 1 is complete. Gate 2 private holdout v1 is completed and retired after failing only the frozen verifier-acceptance criterion. The active Gate-2 milestone is now a **new verifier-reliability development cycle** using retired evidence plus new development-only tasks. Any improved candidate must later use a completely new preregistered private/OOD holdout for certification.
+Freeze the v2 probabilistic Gate-2 candidate in Git and require green CI. Then create and independently audit a completely new >=16-pair private/OOD holdout outside the repository, preregister its hashes plus the frozen candidate/model/envelope, obtain green CI on the preregistration, and only then start private inference. Private v1 and the eight-task public suite must not be reused as fresh certification evidence.
 
 ## Overall
 

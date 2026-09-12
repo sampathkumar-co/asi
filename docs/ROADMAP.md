@@ -48,26 +48,20 @@ Frozen v5 source `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation dige
 
 ## Milestone B — Gate 2 research benchmark
 
-**Status: EMPIRICALLY TESTED; PRIVATE V1 FAILED VERIFIER CRITERION; NOT CERTIFIED.**
+**Status: EMPIRICALLY TESTED; PRIVATE V1 FAILED VERIFIER CRITERION; V2 DEVELOPMENT CANDIDATE PASSES PUBLIC CALIBRATION; NOT CERTIFIED.**
 
-Frozen candidate source `ec1e98315a0baa2fe47d344702790b86bbc6132f` and preregistration `2126f64b7d37964edf019794507cd19d021f2fd8` were both CI-green before inference.
+Private v1 remains retired failed evidence: Raw **0.70556**, Seed **0.94167**, gain **+0.23611**, strict wins **66.67%**, CI **[+0.11944, +0.37222]**, verifier acceptance **50% (9/18)**. Every frozen criterion except verifier acceptance passed.
 
-Private v1 result on 18 paired tasks:
-- Raw mean **0.70556**;
-- Seed mean **0.94167**;
-- mean gain **+0.23611**;
-- strict Seed wins **66.67%**;
-- paired-bootstrap CI **[+0.11944, +0.37222]**;
-- verifier acceptance **50% (9/18)**.
-
-Every frozen promotion check except verifier acceptance passed. Because verifier acceptance was preregistered at >=75%, Gate 2 does not promote. Private v1 is retired evidence and cannot be reused as fresh certification data after any change.
+V2 replaces brittle categorical collision rescue with probabilistic pre-reveal forecasting plus trusted cumulative-likelihood support. Fresh public-development result: Raw **0.75625**, Seed **0.94375**, gain **+0.18750**, strict wins **75%**, CI **[+0.025, +0.35]**, verifier acceptance **100%**. All eight Seed arms succeeded with unique H2 likelihood support and zero repairs. The run is not certification because the public suite has only eight pairs and has been repeatedly observed.
 
 Next:
-- analyze verifier false-rejection/acceptance behavior using retired evidence and new development-only tasks;
-- improve verifier reliability without changing the scored private-v1 result;
-- re-run deterministic qualification and public/development regression on a new candidate;
-- freeze that candidate in Git/CI;
-- create a completely new independently audited >=16-pair private/OOD holdout and preregister it before any second certification attempt.
+- freeze the v2 source, docs, tests, and sanitized public score in Git;
+- require green GitHub Actions on the exact frozen candidate;
+- create a completely new external >=16-pair private/OOD holdout and answer key;
+- independently audit every private task/key pair before inference;
+- preregister the frozen source commit, implementation/model digests, holdout hashes, 16/16/15k envelope, unchanged rubric, bootstrap, and thresholds;
+- require green CI on the preregistration;
+- only then run the second Gate-2 private certification attempt.
 
 ## Milestone C — Gate 3 architecture campaign
 
