@@ -30,11 +30,11 @@ The core engineering rule is that **the system being optimized is less privilege
 |---|---|---|
 | **0** | Measurement before optimization | **COMPLETE — infrastructure-qualified** |
 | **1** | Strong bounded baseline agent | **COMPLETE — empirically certified** |
-| **2** | Scientific-method / verification | **CANDIDATE FROZEN FOR PRIVATE/OOD CERTIFICATION** |
+| **2** | Scientific-method / verification | **EMPIRICALLY TESTED — NOT CERTIFIED (private v1 verifier criterion failed)** |
 | 3 | Automatic architecture search | Foundation implemented; empirical campaign pending |
 | 4 | Controlled self-modification | Foundation implemented; empirical campaign pending |
 
-Gate 0 remains the trusted measurement/control instrument. Gate 1 is complete and empirically certified. Gate 2 now has a frozen development candidate and completed public calibration; private/OOD certification remains pending.
+Gate 0 remains the trusted measurement/control instrument. Gate 1 is complete and empirically certified. Gate 2 has now completed one preregistered 18-pair private/OOD campaign: task-level transfer was strong, but the frozen verifier-acceptance criterion failed, so Gate 2 remains not empirically certified.
 
 ## Latest Gate-1 empirical result
 
@@ -53,6 +53,16 @@ The frozen Gate-2 development candidate uses local `qwen3:8b` with a common 16-c
 On the eight-task public calibration suite, Raw scored **0.78750** mean and Seed **0.93125**, a **+0.14375** mean gain. Strict Seed wins were **5/8 = 62.5%**, verifier acceptance **6/8 = 75%**, and the paired-bootstrap CI was **[-0.015625, +0.31875]**. This public run does **not** promote Gate 2: it has only 8 pairs, misses the frozen +0.15 mean-gain threshold by 0.00625, and its CI lower bound is not above zero.
 
 The public suite is now retired as development evidence. See [`docs/GATE2_PROTOCOL.md`](docs/GATE2_PROTOCOL.md), [`docs/GATE2_DEVELOPMENT.md`](docs/GATE2_DEVELOPMENT.md), and [`docs/GATE2_CERTIFICATION.md`](docs/GATE2_CERTIFICATION.md).
+
+## Gate-2 private holdout v1
+
+Frozen source commit `ec1e98315a0baa2fe47d344702790b86bbc6132f` and preregistration commit `2126f64b7d37964edf019794507cd19d021f2fd8` were both pushed with green CI before private inference.
+
+On the 18-task balanced private/OOD holdout, Raw mean was **0.70556** and Seed mean was **0.94167**, for a **+0.23611** gain. Strict Seed wins were **12/18 = 66.67%** and the preregistered paired-bootstrap CI was **[+0.11944, +0.37222]**. Those metrics all pass.
+
+However, Seed dual-verifier acceptance was only **9/18 = 50%**, below the frozen **75%** requirement. Therefore **Gate 2 does not promote**. The holdout is retired and cannot be reused as fresh certification evidence after any candidate change.
+
+See [`docs/GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](docs/GATE2_PRIVATE_HOLDOUT_V1_RESULT.md) and [`artifacts/gate2-private-holdout-v1-score.json`](artifacts/gate2-private-holdout-v1-score.json).
 
 ## Gate-0 measurement layer
 

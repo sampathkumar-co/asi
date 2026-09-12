@@ -1,10 +1,22 @@
 # Gate 2 Certification Plan
 
-Updated: 2026-09-11
+Updated: 2026-09-12
 
 ## Status
 
-Gate 2 is **not empirically certified**. The candidate is being frozen after public development calibration. Certification requires a new private/OOD campaign created and audited after candidate freeze and before model inference.
+Gate 2 is **not empirically certified**. Private holdout v1 completed under the frozen candidate and preregistration. Strong score transfer passed every frozen criterion except Seed dual-verifier acceptance, which was 50% versus the required 75%. The v1 holdout is retired evidence.
+
+## Private holdout v1 outcome
+
+Frozen source commit: `ec1e98315a0baa2fe47d344702790b86bbc6132f`.
+
+Preregistration commit: `2126f64b7d37964edf019794507cd19d021f2fd8`.
+
+Observed on 18 valid pairs: Raw mean **0.70556**, Seed mean **0.94167**, mean gain **+0.23611**, strict Seed wins **66.67%**, paired-bootstrap CI **[+0.11944, +0.37222]**, Seed dual-verifier acceptance **50%**.
+
+The valid-pair, Seed-mean, mean-gain, strict-win, and CI requirements passed. Verifier acceptance failed. Under the frozen all-checks rule, **promotion_pass=false** and Gate 2 remains uncertified.
+
+Private v1 is permanently retired for future certification. See [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md).
 
 ## Frozen promotion rule
 

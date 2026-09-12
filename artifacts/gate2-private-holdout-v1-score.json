@@ -1,0 +1,512 @@
+{
+  "answer_key_sha256": "43b38aa2728649e17fe9fc5fdfeb4d1695b34bd29972f4506d146ae3092b24a8",
+  "ci_high": 0.3722222222222222,
+  "ci_low": 0.11944444444444444,
+  "content_hash": "a6c7b330d3048d1237f21e3fcafd01a9a31ae34317325c3751b29a0f5986dcb6",
+  "evidence_file_sha256": "13d630283730384686150ac17e7da9697657cd9749bdde32b973a4dfdd48915e",
+  "evidence_hash": "aaae0ebbe14836b47a545da77d7702e417a616b0321625c0174b107834a96b36",
+  "gate": 2,
+  "mean_gain": 0.2361111111111111,
+  "per_task": [
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.925,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "PRV01_FERTILIZER"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.425,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": false,
+      "task_id": "PRV02_ASSAY_BATCH"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.425,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "PRV03_SATELLITE"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.0,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.8,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 0.925,
+      "seed_verifier_accepted": true,
+      "task_id": "PRV04_PLACEBO"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.425,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 0.9,
+      "seed_verifier_accepted": false,
+      "task_id": "PRV05_RECOMMENDER"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.525,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": false,
+      "task_id": "PRV06_BATTERY"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.0,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.0,
+        "prediction_consistency": 0.0,
+        "required_controls": 0.0,
+        "selected_informative_experiment": 0.0
+      },
+      "raw_failed_closed": true,
+      "raw_score": 0.0,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "PRV07_DIAGNOSTIC"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.925,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 0.925,
+      "seed_verifier_accepted": true,
+      "task_id": "PRV08_NOVELTY"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 1.0,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": false,
+      "task_id": "PRV09_FRAUD_POLICY"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 1.0,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "PRV10_ROBOTICS"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.0,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.8,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 0.925,
+      "seed_verifier_accepted": true,
+      "task_id": "PRV11_ECON_SEASON"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.425,
+      "seed_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 0.425,
+      "seed_verifier_accepted": false,
+      "task_id": "PRV12_LLM_FORMAT"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.8250000000000001,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": false,
+      "task_id": "PRV13_REGRESSION"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.525,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 0.925,
+      "seed_verifier_accepted": false,
+      "task_id": "PRV14_NETWORK"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.0,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.8500000000000001,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": false,
+      "task_id": "PRV15_COMPILER"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 1.0,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "PRV16_EDUCATION"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.8250000000000001,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 0.925,
+      "seed_verifier_accepted": true,
+      "task_id": "PRV17_SENSOR_LAG"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 1.0,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": false,
+      "task_id": "PRV18_SURVIVORSHIP"
+    }
+  ],
+  "promotion_checks": {
+    "ci_lower_bound_positive": true,
+    "mean_gain": true,
+    "seed_mean": true,
+    "seed_verifier_acceptance": false,
+    "strict_win_rate": true,
+    "valid_pairs": true
+  },
+  "promotion_criteria": {
+    "min_ci_low_exclusive": 0.0,
+    "min_mean_gain": 0.15,
+    "min_seed_mean": 0.75,
+    "min_seed_verifier_acceptance": 0.75,
+    "min_valid_pairs": 16,
+    "min_win_rate": 0.6
+  },
+  "promotion_pass": false,
+  "raw_mean": 0.7055555555555556,
+  "scoring_weights": {
+    "correct_final_hypothesis": 0.4,
+    "critical_risk_detection": 0.05,
+    "evidence_driven_rejection": 0.1,
+    "first_experiment_discriminating": 0.15,
+    "prediction_consistency": 0.15,
+    "required_controls": 0.1,
+    "selected_informative_experiment": 0.05
+  },
+  "seed_mean": 0.9416666666666667,
+  "seed_verifier_acceptance": 0.5,
+  "suite_id": "gate2-private-holdout-v1",
+  "valid_pair_count": 18,
+  "win_rate": 0.6666666666666666
+}

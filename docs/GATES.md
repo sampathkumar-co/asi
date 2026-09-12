@@ -74,7 +74,7 @@ A failed holdout becomes development evidence. Its tasks cannot be reused as fre
 Make the system reason in terms of falsifiable hypotheses and independent evidence.
 
 ### Status
-**Development candidate frozen; public calibration complete; private/OOD empirical certification pending.**
+**Empirically tested on preregistered private/OOD holdout v1; NOT empirically certified.**
 
 ### Implemented
 - falsifiable hypothesis/action selection;
@@ -85,14 +85,14 @@ Make the system reason in terms of falsifiable hypotheses and independent eviden
 - explicit post-reveal hypothesis revision and rejection;
 - bounded fail-closed schema repair with transcript evidence;
 - independent and adversarial verifier calls with runner-derived verdicts;
-- implementation/model/settings/checkpoint attestation and atomic resume.
+- external-key scoring and deterministic paired bootstrap.
 
-The frozen development candidate passes **28/28** deterministic Gate-2 canaries and **157/157** repository tests. Public calibration on 8 tasks produced Raw **0.78750** vs Seed **0.93125**, gain **+0.14375**, strict wins **62.5%**, verifier acceptance **75%**, CI **[-0.015625, +0.31875]**. This does not promote Gate 2 and the public suite is retired for certification.
+Public development calibration produced Raw **0.78750** vs Seed **0.93125**, gain **+0.14375**, strict wins **62.5%**, verifier acceptance **75%**, CI **[-0.015625, +0.31875]**. The public suite is retired development evidence.
+
+Private holdout v1 used 18 balanced H1/H2/H3 tasks. It produced Raw **0.70556** vs Seed **0.94167**, gain **+0.23611**, strict wins **66.67%**, CI **[+0.11944, +0.37222]**, and **18** valid pairs. Seed verifier acceptance was only **50% (9/18)** versus the frozen **75%** criterion. Gate 2 therefore remains not certified and private v1 is retired.
 
 ### Empirical criterion
-On a new preregistered private/OOD campaign, require >=16 valid pairs, Seed mean >=0.75, mean gain >=0.15, strict Seed wins >=60%, paired-bootstrap lower bound >0, verifier acceptance >=75%, and no identity/integrity/resource/protocol mismatch.
-
----
+Any future Gate-2 certification attempt must use a newly created preregistered private/OOD campaign and retain the frozen requirements: >=16 valid pairs, Seed mean >=0.75, mean gain >=0.15, strict Seed wins >=60%, paired-bootstrap lower bound >0, verifier acceptance >=75%, and no identity/integrity/resource/protocol mismatch.
 
 ## Gate 3 — Automatic architecture search
 

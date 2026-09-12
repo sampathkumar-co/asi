@@ -99,3 +99,14 @@ The same eight public tasks have been inspected repeatedly while fixing protocol
 Therefore this candidate is frozen for an untouched >=16-pair private/OOD campaign. The private campaign, not another pass over these eight known tasks, will decide empirical certification.
 
 No private task, answer key, or hidden outcome was used to choose the final candidate.
+## Post-freeze private holdout v1 result
+
+The frozen source commit `ec1e98315a0baa2fe47d344702790b86bbc6132f` and preregistration commit `2126f64b7d37964edf019794507cd19d021f2fd8` both passed CI before private inference.
+
+On 18 balanced private/OOD tasks, Raw mean was **0.70556** and Seed mean **0.94167**, producing **+0.23611** mean gain. Strict Seed wins were **66.67%** and the 4,000-sample paired-bootstrap interval was **[+0.11944, +0.37222]**.
+
+Seed verifier acceptance was **9/18 = 50%**, below the preregistered **75%** threshold. Therefore the private run does not promote Gate 2 even though all score-based transfer checks pass.
+
+This holdout is now retired. The next development cycle may study its verifier failures, but no changed candidate may claim certification on these same 18 tasks. A later certification attempt requires a completely new independently audited and preregistered private/OOD holdout.
+
+See [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md).

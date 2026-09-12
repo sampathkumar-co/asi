@@ -1,6 +1,6 @@
 # Implementation Status
 
-Updated: 2026-09-11
+Updated: 2026-09-12
 
 Current local validation on Sampath's Windows 11 / Python 3.13.15: **157/157 tests passing** with `ResourceWarning` promoted to an error. The repository includes permanent Ubuntu and Windows CI coverage.
 
@@ -125,18 +125,21 @@ Full audit: [`GATE1_LOCAL_HOLDOUT_V5_RESULT.md`](GATE1_LOCAL_HOLDOUT_V5_RESULT.m
 
 ## Gate 2 — scientific-method workflow
 
-**Development candidate frozen; public calibration complete; private/OOD certification pending.**
+**Empirically tested on private/OOD holdout v1; NOT empirically certified.**
 
-Current candidate:
+Frozen v1 candidate:
+- source commit `ec1e98315a0baa2fe47d344702790b86bbc6132f`;
+- preregistration commit `2126f64b7d37964edf019794507cd19d021f2fd8`;
 - 28/28 deterministic Gate-2 protocol canaries pass;
 - 157/157 repository tests pass under `ResourceWarning`-as-error;
 - implementation digest `49c9db731136a98c0bef78627fd3952d5e2b9b1b1030eb8e6dbc7c5d4647ea7a`;
-- same local `qwen3:8b` artifact for Raw/Seed, 16 calls / 16 steps / 12,000 tokens / zero tools;
-- isolated blind per-hypothesis forecasts, optional two-way first-experiment collision audit, reveal-then-mechanical comparison, explicit revision, bounded repair, and independent/adversarial verification.
+- same local `qwen3:8b` artifact for Raw/Seed, 16 calls / 16 steps / 12,000 tokens / zero tools.
 
-Final eight-task public development result: Raw **0.78750**, Seed **0.93125**, gain **+0.14375**, strict Seed wins **5/8 = 62.5%**, verifier acceptance **6/8 = 75%**, bootstrap CI **[-0.015625, +0.31875]**. This does **not** certify Gate 2: it has only 8 pairs, mean gain is below the frozen +0.15 threshold, and the CI lower bound is not positive.
+Private holdout v1 contained 18 balanced H1/H2/H3 tasks and was audited before inference. Final result: Raw **0.70556**, Seed **0.94167**, gain **+0.23611**, strict Seed wins **12/18 = 66.67%**, paired-bootstrap CI **[+0.11944, +0.37222]**, 18 valid pairs, Seed verifier acceptance **9/18 = 50%**.
 
-The public suite is retired as development evidence. Next: freeze the candidate in Git/CI, generate and independently audit a new >=16-pair external private/OOD holdout, preregister hashes and frozen criteria, then run inference once.
+Seed mean, mean gain, strict-win rate, CI lower bound, and valid-pair count all passed their frozen thresholds. Verifier acceptance failed the frozen >=75% criterion, so Gate 2 remains **NOT EMPIRICALLY CERTIFIED**. Private holdout v1 is permanently retired.
+
+Full result: [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md). Sanitized score: [`../artifacts/gate2-private-holdout-v1-score.json`](../artifacts/gate2-private-holdout-v1-score.json).
 
 ## Gate 3 — architecture search
 
@@ -175,8 +178,8 @@ Implemented:
 
 ## Current next step
 
-Gate 1 is complete. The active empirical milestone is **Gate 2 private/OOD certification**: commit and CI-freeze the current candidate, create and independently audit a new external >=16-pair holdout, preregister hashes/identity/budgets/rubric/thresholds, then run the sealed paired campaign without post-inference tuning.
+Gate 1 is complete. Gate 2 private holdout v1 is completed and retired after failing only the frozen verifier-acceptance criterion. The active Gate-2 milestone is now a **new verifier-reliability development cycle** using retired evidence plus new development-only tasks. Any improved candidate must later use a completely new preregistered private/OOD holdout for certification.
 
 ## Overall
 
-Gate 0 is complete and Gate 1 is **empirically certified**. Gate 2 has a frozen development candidate with strong but non-promoting public calibration evidence; empirical certification still depends on a new preregistered private/OOD >=16-pair campaign. Gates 3-4 remain implemented foundations awaiting later empirical qualification.
+Gate 0 is complete and Gate 1 is **empirically certified**. Gate 2 is **empirically tested but not certified**: private v1 showed strong task-level transfer but failed verifier acceptance. Gates 3-4 remain implemented foundations awaiting later empirical qualification.

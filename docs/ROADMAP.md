@@ -48,16 +48,26 @@ Frozen v5 source `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation dige
 
 ## Milestone B — Gate 2 research benchmark
 
-**Status: CANDIDATE FROZEN FOR PRIVATE/OOD CERTIFICATION.** The final public development suite is complete and retired. The candidate passes 28/28 deterministic Gate-2 canaries and 157/157 repository tests.
+**Status: EMPIRICALLY TESTED; PRIVATE V1 FAILED VERIFIER CRITERION; NOT CERTIFIED.**
 
-Public development result: Raw **0.78750**, Seed **0.93125**, gain **+0.14375**, strict wins **62.5%**, verifier acceptance **75%**, bootstrap CI **[-0.015625, +0.31875]**. This is strong development evidence but not promotion: the suite has 8 pairs, the gain is below +0.15, and the CI lower bound is not positive.
+Frozen candidate source `ec1e98315a0baa2fe47d344702790b86bbc6132f` and preregistration `2126f64b7d37964edf019794507cd19d021f2fd8` were both CI-green before inference.
+
+Private v1 result on 18 paired tasks:
+- Raw mean **0.70556**;
+- Seed mean **0.94167**;
+- mean gain **+0.23611**;
+- strict Seed wins **66.67%**;
+- paired-bootstrap CI **[+0.11944, +0.37222]**;
+- verifier acceptance **50% (9/18)**.
+
+Every frozen promotion check except verifier acceptance passed. Because verifier acceptance was preregistered at >=75%, Gate 2 does not promote. Private v1 is retired evidence and cannot be reused as fresh certification data after any change.
 
 Next:
-- commit/push/CI-freeze the candidate;
-- create a new external >=16-pair private/OOD scientific-method holdout;
-- independently audit tasks and answers before inference;
-- preregister candidate/model/task/key identities, resource envelope, rubric, verifier rule, bootstrap procedure, and thresholds;
-- run the paired campaign once without post-inference tuning.
+- analyze verifier false-rejection/acceptance behavior using retired evidence and new development-only tasks;
+- improve verifier reliability without changing the scored private-v1 result;
+- re-run deterministic qualification and public/development regression on a new candidate;
+- freeze that candidate in Git/CI;
+- create a completely new independently audited >=16-pair private/OOD holdout and preregister it before any second certification attempt.
 
 ## Milestone C — Gate 3 architecture campaign
 
