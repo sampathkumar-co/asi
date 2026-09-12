@@ -48,20 +48,13 @@ Frozen v5 source `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation dige
 
 ## Milestone B — Gate 2 research benchmark
 
-**Status: EMPIRICALLY TESTED; PRIVATE V1 FAILED VERIFIER CRITERION; V2 DEVELOPMENT CANDIDATE PASSES PUBLIC CALIBRATION; NOT CERTIFIED.**
+**Status: EMPIRICALLY TESTED TWICE; PRIVATE V1 AND V2 FAILED DIFFERENT FROZEN CRITERIA; NOT CERTIFIED.**
 
-Private v1 remains retired failed evidence: Raw **0.70556**, Seed **0.94167**, gain **+0.23611**, strict wins **66.67%**, CI **[+0.11944, +0.37222]**, verifier acceptance **50% (9/18)**. Every frozen criterion except verifier acceptance passed.
+Private v1 transferred strongly but failed verifier acceptance: Raw **0.70556**, Seed **0.94167**, gain **+0.23611**, strict wins **66.67%**, CI **[+0.11944, +0.37222]**, verifier acceptance **50%**.
 
-V2 replaces brittle categorical collision rescue with probabilistic pre-reveal forecasting plus trusted cumulative-likelihood support. Fresh public-development result: Raw **0.75625**, Seed **0.94375**, gain **+0.18750**, strict wins **75%**, CI **[+0.025, +0.35]**, verifier acceptance **100%**. All eight Seed arms succeeded with unique H2 likelihood support and zero repairs. The run is not certification because the public suite has only eight pairs and has been repeatedly observed.
+Private v2 fixed verifier acceptance but failed transfer: Raw **0.81250**, Seed **0.82083**, gain **+0.00833**, strict wins **33.33%**, CI **[-0.07361, +0.09583]**, verifier acceptance **88.89%**.
 
-Next:
-- freeze the v2 source, docs, tests, and sanitized public score in Git;
-- require green GitHub Actions on the exact frozen candidate;
-- create a completely new external >=16-pair private/OOD holdout and answer key;
-- independently audit every private task/key pair before inference;
-- preregister the frozen source commit, implementation/model digests, holdout hashes, 16/16/15k envelope, unchanged rubric, bootstrap, and thresholds;
-- require green CI on the preregistration;
-- only then run the second Gate-2 private certification attempt.
+Both holdouts are permanently retired. V3 development must target genuine Raw-to-Seed capability gain on new development tasks. Any future certification requires a newly frozen candidate and a completely new audited/preregistered private/OOD holdout.
 
 ## Milestone C — Gate 3 architecture campaign
 

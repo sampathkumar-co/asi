@@ -138,4 +138,10 @@ Raw mean **0.75625**; Seed mean **0.94375**; mean gain **+0.18750**; strict Seed
 
 This development run passes every frozen numerical criterion except `valid_pairs >= 16`, which cannot be satisfied by the eight-task public suite by construction. It is **not** certification evidence. The public suite has been repeatedly observed and remains retired for certification.
 
-The next legitimate step is to freeze v2 in Git/CI, create a completely new external private/OOD holdout, independently audit it, preregister hashes and the frozen candidate identity, and only then begin a second private certification attempt.
+### v2 private certification result
+
+Frozen candidate `261cc0d486830b3219a58d499661ccf1c7f1327b` and preregistration `f7a461881e691640f0a822548bd39de473ef2536` both passed CI before inference. On 18 balanced private/OOD pairs, Raw mean was **0.81250** and Seed mean **0.82083**, for only **+0.00833** mean gain. Strict Seed wins were **33.33%**, bootstrap CI **[-0.07361, +0.09583]**, and verifier acceptance **88.89%**.
+
+Thus v2 fixed the dominant v1 verifier false-negative failure but did not demonstrate the preregistered incremental capability gain. Mean gain, strict-win rate, and positive-CI checks failed; Gate 2 remains uncertified. Private v2 is permanently retired. See [`GATE2_PRIVATE_HOLDOUT_V2_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V2_RESULT.md).
+
+The next legitimate development cycle is **v3**, focused on actual Raw-to-Seed capability gain rather than further verifier-threshold tuning. Private v1/v2 may be used only diagnostically. Any new certification attempt requires a new frozen candidate and a completely new audited/preregistered private/OOD holdout.

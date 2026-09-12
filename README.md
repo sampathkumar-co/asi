@@ -30,11 +30,11 @@ The core engineering rule is that **the system being optimized is less privilege
 |---|---|---|
 | **0** | Measurement before optimization | **COMPLETE — infrastructure-qualified** |
 | **1** | Strong bounded baseline agent | **COMPLETE — empirically certified** |
-| **2** | Scientific-method / verification | **EMPIRICALLY TESTED — NOT CERTIFIED (private v1 verifier criterion failed)** |
+| **2** | Scientific-method / verification | **EMPIRICALLY TESTED — NOT CERTIFIED (private v1 verifier failure; private v2 transfer failure)** |
 | 3 | Automatic architecture search | Foundation implemented; empirical campaign pending |
 | 4 | Controlled self-modification | Foundation implemented; empirical campaign pending |
 
-Gate 0 remains the trusted measurement/control instrument. Gate 1 is complete and empirically certified. Gate 2 has now completed one preregistered 18-pair private/OOD campaign: task-level transfer was strong, but the frozen verifier-acceptance criterion failed, so Gate 2 remains not empirically certified.
+Gate 0 remains the trusted measurement/control instrument. Gate 1 is complete and empirically certified. Gate 2 has now completed two preregistered 18-pair private/OOD campaigns. Private v1 transferred strongly but failed verifier acceptance; private v2 fixed verifier acceptance but failed the frozen mean-gain, strict-win, and positive-CI transfer criteria. Gate 2 therefore remains not empirically certified.
 
 ## Latest Gate-1 empirical result
 
@@ -65,6 +65,15 @@ On the 18-task balanced private/OOD holdout, Raw mean was **0.70556** and Seed m
 However, Seed dual-verifier acceptance was only **9/18 = 50%**, below the frozen **75%** requirement. Therefore **Gate 2 does not promote**. The holdout is retired and cannot be reused as fresh certification evidence after any candidate change.
 
 See [`docs/GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](docs/GATE2_PRIVATE_HOLDOUT_V1_RESULT.md) and [`artifacts/gate2-private-holdout-v1-score.json`](artifacts/gate2-private-holdout-v1-score.json).
+
+## Gate-2 private holdout v2
+
+Frozen probabilistic candidate commit `261cc0d486830b3219a58d499661ccf1c7f1327b` and preregistration commit `f7a461881e691640f0a822548bd39de473ef2536` both passed CI before inference. The 18-task private/OOD suite was balanced H1/H2/H3 at 6/6/6 and passed structural, identifiability, overlap, identity, and resource audits before scoring.
+
+Final result: Raw mean **0.81250**, Seed mean **0.82083**, mean gain **+0.00833**, strict Seed wins **6/18 = 33.33%**, paired-bootstrap CI **[-0.07361, +0.09583]**, and verifier acceptance **16/18 = 88.89%**. Valid-pair count, Seed mean, and verifier acceptance passed; mean gain, strict-win rate, and CI lower bound failed. Therefore **Gate 2 v2 does not promote**.
+
+Private v2 is permanently retired and may be used only for diagnostics. See [`docs/GATE2_PRIVATE_HOLDOUT_V2_RESULT.md`](docs/GATE2_PRIVATE_HOLDOUT_V2_RESULT.md), [`docs/GATE2_PRIVATE_HOLDOUT_V2_PREREGISTRATION.md`](docs/GATE2_PRIVATE_HOLDOUT_V2_PREREGISTRATION.md), and [`artifacts/gate2-private-holdout-v2-score.json`](artifacts/gate2-private-holdout-v2-score.json).
+
 
 ## Gate-0 measurement layer
 

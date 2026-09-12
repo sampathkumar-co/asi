@@ -74,7 +74,7 @@ A failed holdout becomes development evidence. Its tasks cannot be reused as fre
 Make the system reason in terms of falsifiable hypotheses and independent evidence.
 
 ### Status
-**Empirically tested; private v1 failed verifier acceptance; v2 development candidate passes public calibration; NOT empirically certified.**
+**Empirically tested twice on preregistered private/OOD holdouts; NOT empirically certified.**
 
 ### Implemented
 - falsifiable hypothesis/action and experiment/control selection;
@@ -88,7 +88,7 @@ Make the system reason in terms of falsifiable hypotheses and independent eviden
 - trusted verdicts that reject mechanical ties, lower-support finals, or concrete direct evidence defects;
 - external-key scoring and deterministic paired bootstrap.
 
-Private holdout v1 remains retired after failing only verifier acceptance (50% vs 75%). The v2 public-development run produced Raw **0.75625** vs Seed **0.94375**, gain **+0.18750**, strict wins **75%**, CI **[+0.025, +0.35]**, and verifier acceptance **100%** on 8/8 pairs. It is development evidence only.
+Private holdout v1 remains retired after failing verifier acceptance (50% vs 75%). Private holdout v2 is also retired: Raw **0.81250**, Seed **0.82083**, gain **+0.00833**, strict wins **33.33%**, CI **[-0.07361, +0.09583]**, verifier acceptance **88.89%**. V2 passed valid-pair count, Seed mean, and verifier acceptance, but failed mean gain, strict-win rate, and positive-CI criteria. See [`GATE2_PRIVATE_HOLDOUT_V2_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V2_RESULT.md).
 
 ### Empirical criterion
 Any future Gate-2 certification attempt must use a newly created preregistered private/OOD campaign and retain the frozen requirements: >=16 valid pairs, Seed mean >=0.75, mean gain >=0.15, strict Seed wins >=60%, paired-bootstrap lower bound >0, verifier acceptance >=75%, and no identity/integrity/resource/protocol mismatch.
