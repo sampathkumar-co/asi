@@ -137,6 +137,8 @@ The exact v3.1 candidate is frozen at `2b98491641426f9ebe1678b8491a18a583e6c784`
 
 Post-v31 vNext development now hardens execution integrity: provider/transport failures and trusted-runner failures are explicitly classified as campaign-invalidating incidents, while model/protocol failures and budget exhaustion continue to fail closed at arm level. Current development validation is **163/163 tests PASS**, compileall PASS, and **48/48 Gate-2 canaries PASS** with qualification hash `32227a5665ab34e409eb594b426857760a0f2980fb23a6f30f9daa993e43390a` and implementation digest `685ef4b1c4d31202eac16da1881c96115409965863abd96346175f382a0b5b37`. This is development evidence only; no retired holdout is rerun.
 
+The same post-v31 development line now also uses bounded purpose-specific Ollama JSON Schemas for every normal Gate-2 structured call while leaving repair stage-generic. Current validation is **168/168 tests PASS** and **54/54 Gate-2 canaries PASS** with qualification hash `71401491db4d22ec3111c5e109319cb623ad4ed8f9f51c5942675842dfee18d2` and implementation digest `56d144466987e62295830dc3335fda4dde1ebafb4dfb4a6d65563cc92f25bb82`. On the eight-task public development suite: Raw **0.821875**, Seed **0.98750**, gain **+0.165625**, wins **75%**, CI **[+0.06250, +0.303125]**, verifier acceptance **100%**, zero repairs, and zero execution incidents. See [GATE2_VNEXT_STRUCTURED_PUBLIC_RESULT.md](GATE2_VNEXT_STRUCTURED_PUBLIC_RESULT.md).
+
 See [`GATE2_V31_PUBLIC_RESULT.md`](GATE2_V31_PUBLIC_RESULT.md), [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md), and [`GATE2_PRIVATE_HOLDOUT_V2_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V2_RESULT.md).
 
 ## Gate 3 — architecture search
@@ -176,7 +178,7 @@ Implemented:
 
 ## Current next step
 
-Gate 2 remains uncertified after private v1, v2, and v3.1. Do not rerun or tune on any retired holdout. The next certification cycle must begin with diagnostic work on retired evidence/public development data only, then freeze a genuinely new candidate, create a completely new external >=16-pair private/OOD holdout after the freeze, preregister it, require green CI, and only then infer.
+Gate 2 remains uncertified after private v1, v2, and v3.1. Do not rerun or tune on any retired holdout. Post-v31 execution-integrity and structured-output hardening are development-only and are being evaluated on public/dev data. Once the new candidate is finalized, freeze it, require green CI, create a completely new external >=16-pair private/OOD holdout after the freeze, preregister it, require preregistration CI, and only then infer.
 
 ## Overall
 

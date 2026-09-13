@@ -44,7 +44,81 @@ _STRUCTURED_FORMATS: dict[str, dict] = {
         "required": ["done", "confidence", "reason", "final_answer"],
         "additionalProperties": False,
     },
+    "gate2_raw_action": {
+        "type": "object",
+        "properties": {
+            "hypothesis_id": {"type": "string", "minLength": 1},
+            "experiment_id": {"anyOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+            "prediction_outcome_id": {"anyOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+            "control_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": True},
+            "rejected_hypothesis_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": True},
+            "risk_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": True},
+            "reason": {"type": "string", "maxLength": 320},
+        },
+        "required": ["hypothesis_id", "experiment_id", "prediction_outcome_id", "control_ids", "rejected_hypothesis_ids", "risk_ids", "reason"],
+        "additionalProperties": False,
+    },
+    "gate2_seed_attribute_outcomes": {
+        "type": "object",
+        "properties": {
+            "outcome_support": {
+                "type": "object",
+                "additionalProperties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {"type": "string", "minLength": 1},
+                        "minItems": 1,
+                        "uniqueItems": True,
+                    },
+                },
+            },
+            "notes": {"type": "object", "additionalProperties": {"type": "string", "maxLength": 240}},
+        },
+        "required": ["outcome_support"],
+        "additionalProperties": False,
+    },
+    "gate2_seed_design": {
+        "type": "object",
+        "properties": {
+            "control_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": True},
+            "risk_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": True},
+            "reason": {"type": "string", "maxLength": 320},
+        },
+        "required": ["control_ids", "risk_ids", "reason"],
+        "additionalProperties": False,
+    },
+    "gate2_raw_final": {
+        "type": "object",
+        "properties": {
+            "final_hypothesis_id": {"type": "string", "minLength": 1},
+            "rejected_hypothesis_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": True},
+            "risk_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": True},
+            "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+            "reason": {"type": "string", "maxLength": 320},
+        },
+        "required": ["final_hypothesis_id", "rejected_hypothesis_ids", "risk_ids", "confidence", "reason"],
+        "additionalProperties": False,
+    },
 }
+
+
+_STRUCTURED_FORMATS["gate2_seed_final"] = _STRUCTURED_FORMATS["gate2_raw_final"]
+_GATE2_VERIFIER_FORMAT = {
+    "type": "object",
+    "properties": {
+        "supported_hypothesis_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1, "uniqueItems": True},
+        "has_direct_evidence_defect": {"type": "boolean"},
+        "defect_summary": {"type": "string", "maxLength": 240},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "risk_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": True},
+        "reason": {"type": "string", "maxLength": 320},
+    },
+    "required": ["supported_hypothesis_ids", "has_direct_evidence_defect", "defect_summary", "confidence", "risk_ids", "reason"],
+    "additionalProperties": False,
+}
+_STRUCTURED_FORMATS["gate2_independent"] = _GATE2_VERIFIER_FORMAT
+_STRUCTURED_FORMATS["gate2_adversarial"] = _GATE2_VERIFIER_FORMAT
 
 
 class OllamaProvider:

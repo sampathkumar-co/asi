@@ -7,6 +7,7 @@ from pathlib import Path
 from seed.core.budget import Budget, BudgetExceeded
 from seed.providers.base import Message, ModelResponse
 from seed.providers.budgeted import BudgetedProvider
+from seed.providers.ollama import OllamaProvider
 from seed.providers.scripted import ScriptedProvider
 from .local_campaign import (
     ResearchArmEvidence, ResearchPairEvidence, _body, _budget,
@@ -158,6 +159,38 @@ def run_gate2_qualification() -> Gate2Certificate:
         "max_steps": 16, "max_model_calls": 16, "max_tool_calls": 0,
         "max_tokens": 15000, "max_cost_usd": 0.0,
     }
+
+    schema_purposes = (
+        "gate2_raw_action", "gate2_raw_final", "gate2_seed_attribute_outcomes",
+        "gate2_seed_design", "gate2_seed_final", "gate2_independent",
+        "gate2_adversarial", "gate2_repair",
+    )
+    schema_probe = OllamaProvider("qwen", json_purposes=schema_purposes)
+    attribution_format = schema_probe._payload([], "gate2_seed_attribute_outcomes").get("format")
+    raw_action_format = schema_probe._payload([], "gate2_raw_action").get("format")
+    seed_design_format = schema_probe._payload([], "gate2_seed_design").get("format")
+    raw_final_format = schema_probe._payload([], "gate2_raw_final").get("format")
+    seed_final_format = schema_probe._payload([], "gate2_seed_final").get("format")
+    independent_format = schema_probe._payload([], "gate2_independent").get("format")
+    adversarial_format = schema_probe._payload([], "gate2_adversarial").get("format")
+    repair_format = schema_probe._payload([], "gate2_repair").get("format")
+
+    attribution_schema_active = (
+        isinstance(attribution_format, dict)
+        and attribution_format.get("required") == ["outcome_support"]
+        and attribution_format["properties"]["outcome_support"]["additionalProperties"]["additionalProperties"].get("minItems") == 1
+    )
+    action_schema_active = isinstance(raw_action_format, dict) and "prediction_outcome_id" in raw_action_format.get("required", [])
+    design_schema_active = isinstance(seed_design_format, dict) and seed_design_format.get("required") == ["control_ids", "risk_ids", "reason"]
+    final_schema_active = (
+        isinstance(raw_final_format, dict) and raw_final_format == seed_final_format
+        and raw_final_format["properties"]["confidence"].get("maximum") == 1
+    )
+    verifier_schema_active = (
+        isinstance(independent_format, dict) and independent_format == adversarial_format
+        and independent_format["properties"]["supported_hypothesis_ids"].get("minItems") == 1
+    )
+    repair_schema_is_stage_generic = repair_format == "json"
 
     valid_pair = ResearchPairEvidence(_arm("raw"), _arm("seed"))
     pair_validates = True
@@ -322,6 +355,12 @@ def run_gate2_qualification() -> Gate2Certificate:
         "verifier_confidence_is_audit_confidence_not_posterior": verifier_confidence_semantics_explicit,
         "mechanical_tie_blocks_verifier": _verifier_verdict("H2", ("H2",), ("H1", "H2"), False) == "fail",
         "lower_support_final_blocks_verifier": _verifier_verdict("H2", ("H2",), ("H1",), False) == "fail",
+        "provider_schema_constrains_attribution_shape": attribution_schema_active,
+        "provider_schema_constrains_raw_action_shape": action_schema_active,
+        "provider_schema_constrains_seed_design_shape": design_schema_active,
+        "provider_schema_constrains_final_shape": final_schema_active,
+        "provider_schema_constrains_verifier_shape": verifier_schema_active,
+        "provider_repair_schema_remains_stage_generic": repair_schema_is_stage_generic,
         "resource_envelope_matches_runner": resource_envelope_matches,
         "same_identity_pair_validates": pair_validates,
         "model_identity_mismatch_rejected": model_mismatch_rejected,

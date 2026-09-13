@@ -1,0 +1,255 @@
+{
+  "answer_key_sha256": "ea2affbda2d53e478414efab3041290fecc0be403779ceee38541a382e9266a4",
+  "campaign_valid": true,
+  "ci_high": 0.303125,
+  "ci_low": 0.06249999999999997,
+  "content_hash": "5316e7fd71653f77bfc7a709da83eaa8339f59bd74f6c7709ea4352f2d93944c",
+  "evidence_file_sha256": "c4e2178f192c158d357d1e4707cc824773065878b4587615320cb273f6592afe",
+  "evidence_hash": "ef4ec68d123d43950be8c63ef1ca7ec5df831117f1d40526c0fd22c66ff305e7",
+  "execution_incidents": [],
+  "gate": 2,
+  "mean_gain": 0.16562499999999997,
+  "per_task": [
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.425,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "CAL01_SELECTION"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 1.0,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "CAL02_CACHE"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.925,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "CAL03_CONTAMINATION"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 1.0,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "CAL04_SENSOR"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.8250000000000001,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "CAL05_SUBGROUP"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.0,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.75,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "CAL06_WORKLOAD"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.8250000000000001,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "CAL07_RETRIEVAL"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.0,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.8250000000000001,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.0,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 0.9,
+      "seed_verifier_accepted": true,
+      "task_id": "CAL08_SEEDS"
+    }
+  ],
+  "promotion_checks": {
+    "ci_lower_bound_positive": true,
+    "clean_execution": true,
+    "mean_gain": true,
+    "seed_mean": true,
+    "seed_verifier_acceptance": true,
+    "strict_win_rate": true,
+    "valid_pairs": false
+  },
+  "promotion_criteria": {
+    "min_ci_low_exclusive": 0.0,
+    "min_mean_gain": 0.15,
+    "min_seed_mean": 0.75,
+    "min_seed_verifier_acceptance": 0.75,
+    "min_valid_pairs": 16,
+    "min_win_rate": 0.6
+  },
+  "promotion_pass": false,
+  "raw_mean": 0.821875,
+  "scoring_weights": {
+    "correct_final_hypothesis": 0.4,
+    "critical_risk_detection": 0.05,
+    "evidence_driven_rejection": 0.1,
+    "first_experiment_discriminating": 0.15,
+    "prediction_consistency": 0.15,
+    "required_controls": 0.1,
+    "selected_informative_experiment": 0.05
+  },
+  "seed_mean": 0.9875,
+  "seed_verifier_acceptance": 1.0,
+  "suite_id": "gate2-public-calibration-v1",
+  "valid_pair_count": 8,
+  "win_rate": 0.75
+}

@@ -84,6 +84,49 @@ class OllamaProviderTests(unittest.TestCase):
                 provider.complete([Message("user", "x")], purpose="raw")
         self.assertIn("Ollama request failed", str(caught.exception))
 
+    def _gate2_payload(self, purpose: str) -> dict:
+        purposes = {
+            "gate2_raw_action", "gate2_raw_final", "gate2_seed_attribute_outcomes",
+            "gate2_seed_design", "gate2_seed_final", "gate2_independent",
+            "gate2_adversarial", "gate2_repair",
+        }
+        provider = OllamaProvider("qwen-local", json_purposes=purposes)
+        return provider._payload([Message("user", "x")], purpose)
+
+    def test_gate2_attribution_uses_nested_support_schema(self):
+        fmt = self._gate2_payload("gate2_seed_attribute_outcomes")["format"]
+        self.assertEqual(fmt["required"], ["outcome_support"])
+        support = fmt["properties"]["outcome_support"]["additionalProperties"]["additionalProperties"]
+        self.assertEqual(support["type"], "array")
+        self.assertEqual(support["minItems"], 1)
+        self.assertTrue(support["uniqueItems"])
+
+    def test_gate2_action_and_design_schemas_are_explicit(self):
+        action = self._gate2_payload("gate2_raw_action")["format"]
+        self.assertIn("prediction_outcome_id", action["required"])
+        self.assertEqual(action["properties"]["experiment_id"]["anyOf"][1]["type"], "null")
+        design = self._gate2_payload("gate2_seed_design")["format"]
+        self.assertEqual(design["required"], ["control_ids", "risk_ids", "reason"])
+
+    def test_gate2_final_schema_bounds_confidence(self):
+        raw = self._gate2_payload("gate2_raw_final")["format"]
+        seed = self._gate2_payload("gate2_seed_final")["format"]
+        self.assertEqual(raw, seed)
+        self.assertEqual(raw["properties"]["confidence"]["minimum"], 0)
+        self.assertEqual(raw["properties"]["confidence"]["maximum"], 1)
+
+    def test_gate2_verifier_schema_requires_support_and_audit_fields(self):
+        independent = self._gate2_payload("gate2_independent")["format"]
+        adversarial = self._gate2_payload("gate2_adversarial")["format"]
+        self.assertEqual(independent, adversarial)
+        self.assertIn("supported_hypothesis_ids", independent["required"])
+        self.assertEqual(independent["properties"]["supported_hypothesis_ids"]["minItems"], 1)
+        self.assertEqual(independent["properties"]["confidence"]["maximum"], 1)
+
+    def test_gate2_repair_stays_generic_for_stage_specific_shape(self):
+        payload = self._gate2_payload("gate2_repair")
+        self.assertEqual(payload["format"], "json")
+
     def test_empty_model_rejected(self):
         with self.assertRaises(ValueError):
             OllamaProvider("  ")

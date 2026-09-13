@@ -58,7 +58,7 @@ This does **not** certify Gate 2: the public suite has only eight pairs and has 
 
 The exact v3.1 candidate is frozen at `2b98491641426f9ebe1678b8491a18a583e6c784`; preregistration commit `393c22abf67e70675870f7f054eed023685cc08b` passed GitHub Actions CI #156 before inference. On the 18-task private-v31 holdout, the official frozen score was Raw **0.78750**, Seed **0.93472**, gain **+0.14722**, strict wins **77.78%**, CI **[+0.01806, +0.28472]**, and verifier acceptance **83.33%**. Mean gain missed the frozen **+0.15000** threshold, so Gate 2 does not promote. See [docs/GATE2_PRIVATE_HOLDOUT_V31_RESULT.md](docs/GATE2_PRIVATE_HOLDOUT_V31_RESULT.md).
 
-Post-v31 development hardens execution integrity before any new candidate freeze: provider/transport and trusted-runner failures now invalidate the campaign instead of becoming ordinary arm zeros. The current development tree passes **163/163** tests and **48/48** Gate-2 canaries; this is development evidence only and no retired holdout is reused.
+Post-v31 development hardens execution integrity before any new candidate freeze: provider/transport and trusted-runner failures now invalidate the campaign instead of becoming ordinary arm zeros. The current development tree passes **163/163** tests and **48/48** Gate-2 canaries; this is development evidence only and no retired holdout is reused. The next reliability pass adds task-independent purpose-specific JSON Schemas for normal Gate-2 Ollama calls. Current validation is **168/168** tests and **54/54** canaries; the eight-task public-development run remains Seed **0.98750** with **100%** verifier acceptance and zero repairs/incidents, while Raw improves to **0.821875** and measured gain becomes **+0.165625**.
 
 ## Gate-2 private holdout v1
 
