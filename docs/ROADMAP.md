@@ -48,13 +48,13 @@ Frozen v5 source `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation dige
 
 ## Milestone B — Gate 2 research benchmark
 
-**Status: EMPIRICALLY TESTED TWICE; PRIVATE V1 AND V2 FAILED DIFFERENT FROZEN CRITERIA; NOT CERTIFIED.**
+**Status: V3.1 DEVELOPMENT-QUALIFIED; NEW PRIVATE CERTIFICATION CAMPAIGN PENDING.**
 
-Private v1 transferred strongly but failed verifier acceptance: Raw **0.70556**, Seed **0.94167**, gain **+0.23611**, strict wins **66.67%**, CI **[+0.11944, +0.37222]**, verifier acceptance **50%**.
+Private v1 transferred strongly but failed verifier acceptance: Raw **0.70556**, Seed **0.94167**, gain **+0.23611**, strict wins **66.67%**, CI **[+0.11944, +0.37222]**, verifier acceptance **50%**. Private v2 fixed verifier acceptance but failed transfer: Raw **0.81250**, Seed **0.82083**, gain **+0.00833**, strict wins **33.33%**, CI **[-0.07361, +0.09583]**, verifier acceptance **88.89%**. Both are retired.
 
-Private v2 fixed verifier acceptance but failed transfer: Raw **0.81250**, Seed **0.82083**, gain **+0.00833**, strict wins **33.33%**, CI **[-0.07361, +0.09583]**, verifier acceptance **88.89%**.
+V3.1 uses hidden-safe outcome-to-hypothesis attribution plus runner-fixed 3:1 canonical likelihoods. It passes **46/46** deterministic protocol canaries and **157/157** repository tests. Public development result: Raw **0.76875**, Seed **0.98750**, gain **+0.21875**, strict wins **75%**, CI **[+0.06250, +0.46875]**, verifier acceptance **100%**.
 
-Both holdouts are permanently retired. V3 development must target genuine Raw-to-Seed capability gain on new development tasks. Any future certification requires a newly frozen candidate and a completely new audited/preregistered private/OOD holdout.
+The eight-task public suite is development-only and cannot satisfy the >=16-pair certification rule. The commit containing this record freezes the exact v3.1 candidate. Require green CI, then generate a completely new external private/OOD suite, independently audit it, preregister all identities/hashes, and only then run inference.
 
 ## Milestone C — Gate 3 architecture campaign
 

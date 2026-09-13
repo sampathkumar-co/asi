@@ -1,6 +1,6 @@
 # Gate 2 Development Record
 
-Updated: 2026-09-12
+Updated: 2026-09-13
 
 ## Scope
 
@@ -144,4 +144,16 @@ Frozen candidate `261cc0d486830b3219a58d499661ccf1c7f1327b` and preregistration 
 
 Thus v2 fixed the dominant v1 verifier false-negative failure but did not demonstrate the preregistered incremental capability gain. Mean gain, strict-win rate, and positive-CI checks failed; Gate 2 remains uncertified. Private v2 is permanently retired. See [`GATE2_PRIVATE_HOLDOUT_V2_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V2_RESULT.md).
 
-The next legitimate development cycle is **v3**, focused on actual Raw-to-Seed capability gain rather than further verifier-threshold tuning. Private v1/v2 may be used only diagnostically. Any new certification attempt requires a new frozen candidate and a completely new audited/preregistered private/OOD holdout.
+At that point, the next legitimate development cycle was **v3**, focused on actual Raw-to-Seed capability gain rather than further verifier-threshold tuning. Private v1/v2 may be used only diagnostically. Any new certification attempt requires a new frozen candidate and a completely new audited/preregistered private/OOD holdout.
+
+## Gate-2 v3 and v3.1 development
+
+V3 moved experiment selection, posterior updates, Bayes-factor rejection, and final hypothesis choice into the trusted runner, but its independent per-hypothesis probability forecasts were not cross-hypothesis calibrated. On a fresh eight-task public run, v3 scored Raw **0.821875**, Seed **0.59375**, gain **-0.228125**, strict wins **12.5%**, CI **[-0.484375, +0.059375]**, verifier acceptance **62.5%**. Forecast-signature collisions and arbitrary confidence magnitudes caused the regression. V3 is failed development evidence and is not a certification candidate.
+
+V3.1 reverses the forecasting direction. One pre-reveal call attributes each possible outcome to the declared hypothesis/hypotheses that would naturally cause it. Across the repeatedly observed public suite, the diagnostic attribution probe recovered **48/48** E1/E2 development-key relations exactly. The runner then uses a task-independent fixed **3:1** support likelihood ratio; the model no longer emits probability magnitudes.
+
+The resulting candidate passes **46/46** deterministic qualification canaries, **157/157** repository tests, compileall, and diff hygiene. Implementation digest: `c0abee591ed723a46ba57b527c2189efc0d711f3d3a423866a611503e8f16ce8`.
+
+Fresh v3.1 public-development evidence hash: `b760625388757dd810785d474e5777cd1fed8d0c89d83790f04df3de4f8273ce`. Score: Raw **0.76875**, Seed **0.98750**, gain **+0.21875**, strict wins **75%**, CI **[+0.06250, +0.46875]**, verifier acceptance **100%**. All eight Seed arms succeeded with six calls and zero repairs. See [`GATE2_V31_PUBLIC_RESULT.md`](GATE2_V31_PUBLIC_RESULT.md).
+
+The public suite and retired private v1/v2 evidence were used diagnostically during development. Therefore none of these results can establish v3.1 transfer. The commit containing this record freezes v3.1. After green CI, test it exactly once on a newly created, externally stored, audited, preregistered private/OOD holdout without further candidate tuning.

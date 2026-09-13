@@ -1,10 +1,10 @@
 # Gate 2 Certification Plan
 
-Updated: 2026-09-12
+Updated: 2026-09-13
 
 ## Status
 
-Gate 2 is **not empirically certified** after two preregistered private/OOD attempts. Private v1 failed verifier acceptance. Private v2 raised verifier acceptance to 88.89% but failed the frozen mean-gain, strict-win, and positive-bootstrap-CI transfer criteria. Both holdouts are permanently retired.
+Gate 2 is **not empirically certified** after two preregistered private/OOD attempts. Private v1 failed verifier acceptance; private v2 fixed verifier acceptance but failed transfer. Both are permanently retired. The v3.1 development candidate now passes **46/46** deterministic canaries and every frozen numerical criterion on the eight-task public development suite except the required >=16 pair count; it therefore still requires a completely new private/OOD certification campaign.
 
 ## Private holdout v1 outcome
 
@@ -18,7 +18,7 @@ The valid-pair, Seed-mean, mean-gain, strict-win, and CI requirements passed. Ve
 
 Private v1 is permanently retired for future certification. See [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md).
 
-Private-v2 result: Raw **0.81250**, Seed **0.82083**, gain **+0.00833**, strict wins **33.33%**, CI **[-0.07361, +0.09583]**, verifier acceptance **88.89%**, 18 valid pairs. `promotion_pass=false`. See [`GATE2_PRIVATE_HOLDOUT_V2_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V2_RESULT.md). The earlier public-v2 run remains development-only evidence in [`GATE2_V2_PUBLIC_RESULT.md`](GATE2_V2_PUBLIC_RESULT.md).
+Private-v2 result: Raw **0.81250**, Seed **0.82083**, gain **+0.00833**, strict wins **33.33%**, CI **[-0.07361, +0.09583]**, verifier acceptance **88.89%**, 18 valid pairs. `promotion_pass=false`. The current v3.1 public-development result is Raw **0.76875**, Seed **0.98750**, gain **+0.21875**, strict wins **75%**, CI **[+0.06250, +0.46875]**, acceptance **100%**; it is explicitly non-certifying. See [`GATE2_PRIVATE_HOLDOUT_V2_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V2_RESULT.md) and [`GATE2_V31_PUBLIC_RESULT.md`](GATE2_V31_PUBLIC_RESULT.md).
 
 ## Frozen promotion rule
 

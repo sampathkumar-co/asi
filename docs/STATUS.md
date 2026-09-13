@@ -125,15 +125,15 @@ Full audit: [`GATE1_LOCAL_HOLDOUT_V5_RESULT.md`](GATE1_LOCAL_HOLDOUT_V5_RESULT.m
 
 ## Gate 2 — scientific-method workflow
 
-**Empirically tested twice on preregistered private/OOD holdouts; NOT empirically certified.**
+**V3.1 development-qualified; NOT empirically certified.**
 
-Private v1 remains retired failed evidence: Raw **0.70556**, Seed **0.94167**, gain **+0.23611**, strict wins **66.67%**, CI **[+0.11944, +0.37222]**, but verifier acceptance **50%** versus the frozen 75% criterion.
+Private v1 remains retired failed evidence: Raw **0.70556**, Seed **0.94167**, gain **+0.23611**, strict wins **66.67%**, CI **[+0.11944, +0.37222]**, verifier acceptance **50%**. Private v2 is also retired: Raw **0.81250**, Seed **0.82083**, gain **+0.00833**, strict wins **33.33%**, CI **[-0.07361, +0.09583]**, verifier acceptance **88.89%**.
 
-Private v2 used frozen candidate commit `261cc0d486830b3219a58d499661ccf1c7f1327b`, implementation digest `d8a028f394121ca3dc6e5c890304bd3d13cd03e5566467befecb31190540b340`, preregistration commit `f7a461881e691640f0a822548bd39de473ef2536`, the same `qwen3:8b` model, and the common **16 calls / 16 steps / 15,000 tokens / zero tools** envelope.
+V3.1 changes the scientific representation rather than thresholds: one hidden-safe outcome-to-hypothesis attribution call is converted by the trusted runner into fixed 3:1 canonical likelihoods. Experiment choice, posterior updates, Bayes-factor rejection, final hypothesis, and verifier verdicts remain runner-derived.
 
-Private-v2 result on 18 valid pairs: Raw **0.81250**, Seed **0.82083**, gain **+0.00833**, strict Seed wins **33.33%**, CI **[-0.07361, +0.09583]**, verifier acceptance **88.89% (16/18)**. Valid-pair count, Seed mean, and verifier acceptance passed; mean gain, strict-win rate, and positive CI failed. `promotion_pass=false`.
+Deterministic qualification is **46/46 PASS** with implementation digest `c0abee591ed723a46ba57b527c2189efc0d711f3d3a423866a611503e8f16ce8`; repository regression is **157/157 PASS**. On the eight-task public development suite, Raw **0.76875**, Seed **0.98750**, gain **+0.21875**, strict wins **75%**, CI **[+0.06250, +0.46875]**, verifier acceptance **100%**. The public suite is repeatedly observed and cannot certify Gate 2.
 
-V2 therefore solved the dominant v1 verifier false-negative problem without demonstrating the required incremental scientific-method capability gain. Both private v1 and v2 are permanently retired. Full records: [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md), [`GATE2_PRIVATE_HOLDOUT_V2_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V2_RESULT.md), and [`GATE2_V2_PUBLIC_RESULT.md`](GATE2_V2_PUBLIC_RESULT.md).
+See [`GATE2_V31_PUBLIC_RESULT.md`](GATE2_V31_PUBLIC_RESULT.md), [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md), and [`GATE2_PRIVATE_HOLDOUT_V2_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V2_RESULT.md).
 
 ## Gate 3 — architecture search
 
@@ -172,8 +172,8 @@ Implemented:
 
 ## Current next step
 
-Begin a **Gate-2 v3 development cycle** focused on genuine Raw-to-Seed capability gain. Diagnose private-v2 losses and the V2P08 false acceptance only as retired evidence; do not tune or recertify on private v1/v2. Use new development tasks to improve experiment choice, revision quality, and incremental value over the strong Raw baseline. Any later certification requires a newly frozen candidate and a completely new audited/preregistered private/OOD holdout.
+The commit containing this record freezes the exact Gate-2 v3.1 candidate. Require green CI, then create a completely new external >=16-pair private/OOD holdout. Audit and preregister task/key hashes, candidate/model identity, unchanged thresholds and the common envelope before any private inference. Do not reuse private v1/v2 as certification evidence.
 
 ## Overall
 
-Gate 0 is complete and Gate 1 is **empirically certified**. Gate 2 is **empirically tested twice but not certified**: private v1 passed transfer but failed verifier acceptance; private v2 passed verifier acceptance but failed transfer. Gates 3-4 remain implemented foundations awaiting later empirical qualification.
+Gate 0 is complete and Gate 1 is **empirically certified**. Gate 2 remains **not certified** after private v1/v2 failures, but v3.1 is now development-qualified and ready for a new preregistered private/OOD attempt. Gates 3-4 remain implemented foundations awaiting later empirical qualification.

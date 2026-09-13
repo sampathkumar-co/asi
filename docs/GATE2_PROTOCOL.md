@@ -1,6 +1,6 @@
 # Gate 2 Scientific-Method Protocol
 
-Updated: 2026-09-12
+Updated: 2026-09-13
 
 ## Purpose
 
@@ -19,25 +19,26 @@ The candidate never receives the private answer key. Hidden observations are wit
 
 ## Seed research loop
 
-For each permitted experiment:
+Before any experiment result is revealed:
 
-1. choose the currently best-supported hypothesis, an unused experiment, controls, rejected hypotheses, and material risks;
-2. before reveal, forecast that experiment independently once for **each hypothesis** as an integer probability distribution over every declared outcome;
-3. validate that supplied probabilities use only declared outcome IDs, are integers in 0..100, and sum to exactly 100; an omitted declared outcome is normalized to zero only when the supplied declared probabilities already sum to 100;
-4. derive each hypothesis's categorical prediction mechanically from the probability argmax for rubric compatibility;
-5. reveal only that experiment's observed outcome and observation;
-6. mechanically accumulate hypothesis support by multiplying the frozen pre-reveal probability assigned to each observed outcome across experiments;
-7. revise the best-supported hypothesis, explicitly reject contradicted alternatives, and update risks;
-8. repeat until the task's experiment limit is reached, then produce a final report;
-9. run distinct independent and adversarial verifier calls.
+1. make one blind model call that sees only the public question, declared hypotheses, experiment descriptions, and declared possible outcomes;
+2. for every possible outcome, attribute the declared hypothesis or hypotheses whose truth would make that outcome a natural/direct result;
+3. fail closed unless every experiment and every declared outcome is covered exactly once, each support set is non-empty, contains only declared hypothesis IDs, and contains no duplicates;
+4. convert the support relation mechanically into canonical likelihoods: support-consistent outcomes receive weight **3**, unsupported outcomes weight **1**, then each hypothesis/experiment row is normalized; if a hypothesis supports all or none of an experiment's outcomes, that row remains uniform;
+5. compute expected information gain from those runner-generated likelihoods and mechanically select the unused experiment with maximum information gain;
+6. ask the model only for declared controls and risks for the already selected experiment; this call cannot choose a different experiment and receives no unrevealed result;
+7. reveal that experiment's hidden outcome, update the Bayesian posterior mechanically, and derive rejected alternatives using the fixed Bayes-factor rule;
+8. repeat selection/reveal/update up to the task's experiment limit;
+9. mechanically fix the final posterior winner and rejection set; the final model call may explain the conclusion but cannot override them;
+10. run distinct independent and adversarial verifier calls.
 
-Probability distributions preserve graded pre-evidence commitments without forcing arbitrary categorical distinctions. Exact cumulative-likelihood ties remain ambiguity and block trusted acceptance.
+The model never supplies cross-hypothesis probability magnitudes. This prevents arbitrary confidence calibration (for example 100% versus 85% for the same qualitative prediction) from determining the trusted posterior. The raw attribution relation and runner-generated canonical likelihood matrix are both retained in evidence.
 
 ## Verification contract
 
 Each verifier returns the declared hypothesis IDs it judges tied for strongest support, a `has_direct_evidence_defect` boolean, confidence, declared risks, and rationale. Generic residual uncertainty belongs in risks and does not by itself become a hard defect.
 
-The trusted runner independently computes the cumulative frozen-likelihood support set. A verifier verdict passes only when the final hypothesis is the **unique** mechanical best, the model verifier supports only that same hypothesis, and no direct evidence/protocol defect is present. Seed acceptance requires both independent and adversarial verdicts to pass with confidence >= 0.8.
+The trusted runner independently computes cumulative support from the frozen canonical likelihood assigned to each observed outcome. A verifier verdict passes only when the final hypothesis is the **unique** mechanical best, the model verifier supports only that same hypothesis, and no direct evidence/protocol defect is present. Verifier confidence means confidence in the support-set audit, not posterior mass. Seed acceptance requires both independent and adversarial verdicts to pass with confidence >= 0.8.
 
 ## Fail-closed behavior
 

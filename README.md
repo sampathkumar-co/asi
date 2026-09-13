@@ -30,11 +30,11 @@ The core engineering rule is that **the system being optimized is less privilege
 |---|---|---|
 | **0** | Measurement before optimization | **COMPLETE — infrastructure-qualified** |
 | **1** | Strong bounded baseline agent | **COMPLETE — empirically certified** |
-| **2** | Scientific-method / verification | **EMPIRICALLY TESTED — NOT CERTIFIED (private v1 verifier failure; private v2 transfer failure)** |
+| **2** | Scientific-method / verification | **V3.1 DEVELOPMENT-QUALIFIED — PRIVATE CERTIFICATION PENDING** |
 | 3 | Automatic architecture search | Foundation implemented; empirical campaign pending |
 | 4 | Controlled self-modification | Foundation implemented; empirical campaign pending |
 
-Gate 0 remains the trusted measurement/control instrument. Gate 1 is complete and empirically certified. Gate 2 has now completed two preregistered 18-pair private/OOD campaigns. Private v1 transferred strongly but failed verifier acceptance; private v2 fixed verifier acceptance but failed the frozen mean-gain, strict-win, and positive-CI transfer criteria. Gate 2 therefore remains not empirically certified.
+Gate 0 remains the trusted measurement/control instrument. Gate 1 is complete and empirically certified. Gate 2 remains not empirically certified after two failed private attempts, but the new v3.1 development candidate now passes deterministic qualification and every frozen public numerical criterion except the public suite's built-in 8-pair count. A new preregistered private/OOD campaign is still required.
 
 ## Latest Gate-1 empirical result
 
@@ -46,15 +46,15 @@ See [`docs/GATE1_LOCAL_HOLDOUT_V5_RESULT.md`](docs/GATE1_LOCAL_HOLDOUT_V5_RESULT
 
 Historical v2/v3/v4 campaigns remain published as failed promotion attempts. They are retired evidence and are not rewritten or reused as fresh certification data.
 
-## Gate-2 public development calibration
+## Gate-2 v3.1 public development calibration
 
-The current Gate-2 v2 development candidate uses local `qwen3:8b` with a common **16-call / 15,000-token** envelope. Deterministic protocol qualification passes **36/36** canaries and the repository passes **157/157** tests with `ResourceWarning` treated as an error.
+The current Gate-2 v3.1 candidate uses local `qwen3:8b` with the common **16-call / 15,000-token** envelope. Deterministic protocol qualification passes **46/46** canaries and the repository passes **157/157** tests.
 
-V2 replaces brittle categorical collision rescue with blind per-hypothesis **probability distributions** over declared outcomes. The trusted runner accumulates frozen observed-outcome likelihood across experiments and requires the final hypothesis to be the unique mechanical best before either verifier can pass it.
+V3.1 replaces model-generated cross-hypothesis probability magnitudes with one blind pre-reveal **outcome-to-hypothesis causal-attribution** call. The trusted runner validates the support relation, converts it into fixed **3:1** canonical likelihoods, selects experiments by information gain, updates Bayesian posteriors, derives Bayes-factor rejections, and fixes the final hypothesis mechanically.
 
-On a fresh eight-task public-development run, Raw scored **0.75625** and Seed **0.94375**, a **+0.18750** mean gain. Strict Seed wins were **6/8 = 75%**, Seed verifier acceptance **8/8 = 100%**, and the paired-bootstrap CI was **[+0.025, +0.35]**. All eight Seed arms succeeded, selected H2, had unique mechanical H2 support, and used zero repairs.
+On the fresh eight-task public-development run under implementation digest `c0abee591ed723a46ba57b527c2189efc0d711f3d3a423866a611503e8f16ce8`, Raw scored **0.76875** and Seed **0.98750**, a **+0.21875** mean gain. Strict Seed wins were **6/8 = 75%**, verifier acceptance **8/8 = 100%**, and the paired-bootstrap CI was **[+0.06250, +0.46875]**. All eight Seed arms used six calls, zero repairs, and selected E1 then E2.
 
-This still does **not** promote Gate 2 because the public suite contains only 8 pairs versus the frozen requirement of >=16. It is development-only evidence and is retired for certification. See [`docs/GATE2_V2_PUBLIC_RESULT.md`](docs/GATE2_V2_PUBLIC_RESULT.md), [`docs/GATE2_PROTOCOL.md`](docs/GATE2_PROTOCOL.md), and [`docs/GATE2_DEVELOPMENT.md`](docs/GATE2_DEVELOPMENT.md).
+This does **not** certify Gate 2: the public suite has only eight pairs and has been repeatedly inspected during development. It is development-only evidence. See [`docs/GATE2_V31_PUBLIC_RESULT.md`](docs/GATE2_V31_PUBLIC_RESULT.md), [`docs/GATE2_PROTOCOL.md`](docs/GATE2_PROTOCOL.md), and [`artifacts/gate2-v31-public-calibration-score.json`](artifacts/gate2-v31-public-calibration-score.json).
 
 ## Gate-2 private holdout v1
 
@@ -143,7 +143,7 @@ No external LLM API is required for Gate-0 infrastructure qualification. Gate-1 
 ## Gates 1-4 foundation
 
 - **Gate 1:** provider-neutral model interface; local Ollama adapter; goal/state models; planner/executor/critic loop; deterministic relevant-tool routing; persistent provenance; implementation/model attestation; strict evidence-only critic; exact reusable tools for graphs, scheduling, CRT, semantic transactions/reconciliation, aggregation, assignment/CSP, exact Python tracing and constrained subset optimization; sandboxed computation fallback; hard budgets and checkpointed paired campaigns.
-- **Gate 2:** falsifiable action selection; isolated blind per-hypothesis probability forecasts; runner-derived categorical argmax; reveal-then cumulative frozen-likelihood comparison; explicit evidence-driven revision; bounded repair; independent/adversarial support-set verification; trusted runner-derived verdicts; attested paired campaigns.
+- **Gate 2:** blind pre-reveal outcome-to-hypothesis causal attribution; runner-fixed canonical likelihoods; information-gain experiment selection; Bayesian evidence updates; Bayes-factor rejection; bounded repair; independent/adversarial support-set verification; trusted runner-derived verdicts; attested paired campaigns.
 - **Gate 3:** declarative `AgentGenome`, bounded seeded mutation, archive and capability/cost fitness search.
 - **Gate 4:** copy-on-write descendants, mutation allow/deny policy, stale-hash protection, lineage, no in-place parent mutation, Docker no-network/read-only/resource limits and explicit promotion evidence.
 
@@ -154,7 +154,7 @@ Candidate source execution is intended to happen with network disabled, a read-o
 ## What Project Seed deliberately does not claim
 
 - Gate 0 completion does not mean a frontier model has become smarter.
-- Gate 1 is empirically certified; Gate 2 is **not** yet empirically certified and its eight-task public calibration is development evidence only.
+- Gate 1 is empirically certified; Gate 2 is **not** yet empirically certified. V3.1 is development-qualified, while the eight-task public calibration remains development evidence only.
 - A positive task-level capability delta is not evidence of recursive amplification.
 - The project does not demonstrate AGI or ASI.
 - Candidates do not get to rewrite their evaluator/control plane.
