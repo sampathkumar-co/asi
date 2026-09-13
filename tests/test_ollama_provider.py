@@ -127,6 +127,29 @@ class OllamaProviderTests(unittest.TestCase):
         payload = self._gate2_payload("gate2_repair")
         self.assertEqual(payload["format"], "json")
 
+    def test_gate2_preflight_is_task_independent_bounded_plain_text(self):
+        provider = OllamaProvider("qwen-local", purpose_num_predict={"gate2_preflight": 8})
+        with patch("seed.providers.ollama.urlopen", return_value=self._response("READY")) as mocked:
+            result = provider.gate2_preflight()
+        payload = json.loads(mocked.call_args.args[0].data)
+        self.assertEqual(payload["options"]["num_predict"], 8)
+        self.assertNotIn("format", payload)
+        self.assertEqual(payload["messages"], [
+            {"role": "system", "content": "Provider readiness probe. Reply with READY and no task reasoning."},
+            {"role": "user", "content": "READY"},
+        ])
+        policy = provider.gate2_preflight_policy()
+        self.assertTrue(policy["task_independent"])
+        self.assertTrue(policy["outside_scored_envelope"])
+        self.assertEqual(result["prompt_sha256"], policy["prompt_sha256"])
+        self.assertEqual(result["output_tokens"], 9)
+
+    def test_gate2_preflight_rejects_empty_content(self):
+        provider = OllamaProvider("qwen-local", purpose_num_predict={"gate2_preflight": 8})
+        with patch("seed.providers.ollama.urlopen", return_value=self._response("   ")):
+            with self.assertRaises(ProviderError):
+                provider.gate2_preflight()
+
     def test_empty_model_rejected(self):
         with self.assertRaises(ValueError):
             OllamaProvider("  ")

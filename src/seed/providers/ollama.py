@@ -1,11 +1,21 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from typing import Iterable, Mapping
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from .base import Message, ModelResponse, ProviderError
+
+
+_GATE2_PREFLIGHT_MESSAGES = (
+    Message("system", "Provider readiness probe. Reply with READY and no task reasoning."),
+    Message("user", "READY"),
+)
+_GATE2_PREFLIGHT_PROMPT_SHA256 = hashlib.sha256(
+    json.dumps([(m.role, m.content) for m in _GATE2_PREFLIGHT_MESSAGES], separators=(",", ":")).encode()
+).hexdigest()
 
 
 _STRUCTURED_FORMATS: dict[str, dict] = {
@@ -177,6 +187,29 @@ class OllamaProvider:
                 size = item.get("size", 0)
                 return {"name": self.model, "digest": digest, "size": max(int(size), 0)}
         raise ProviderError(f"Ollama model is not installed locally: {self.model}")
+
+    @staticmethod
+    def gate2_preflight_policy() -> dict[str, str | int | bool]:
+        return {
+            "version": 1,
+            "purpose": "gate2_preflight",
+            "prompt_sha256": _GATE2_PREFLIGHT_PROMPT_SHA256,
+            "num_predict": 8,
+            "task_independent": True,
+            "outside_scored_envelope": True,
+        }
+
+    def gate2_preflight(self) -> dict[str, str | int]:
+        response = self.complete(list(_GATE2_PREFLIGHT_MESSAGES), purpose="gate2_preflight")
+        if not response.text.strip():
+            raise ProviderError("Ollama preflight returned empty content")
+        return {
+            "purpose": "gate2_preflight",
+            "prompt_sha256": _GATE2_PREFLIGHT_PROMPT_SHA256,
+            "response_sha256": hashlib.sha256(response.text.encode()).hexdigest(),
+            "input_tokens": response.input_tokens,
+            "output_tokens": response.output_tokens,
+        }
 
     def _payload(self, messages: list[Message], purpose: str) -> dict:
         payload: dict = {

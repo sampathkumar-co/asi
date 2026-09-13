@@ -11,6 +11,7 @@ from seed.providers.ollama import OllamaProvider
 from seed.providers.scripted import ScriptedProvider
 from .local_campaign import (
     ResearchArmEvidence, ResearchPairEvidence, _body, _budget,
+    _GATE2_OLLAMA_JSON_PURPOSES, _GATE2_OLLAMA_PURPOSE_NUM_PREDICT,
     _attribute_outcomes, _canonical_matrices, _information_gain, _mechanical_rejections,
     _posterior_best, _run_arm, _select_experiment, _update_posterior,
     _validated_attribution, _verifier_verdict, validate_checkpoint_identity,
@@ -191,6 +192,18 @@ def run_gate2_qualification() -> Gate2Certificate:
         and independent_format["properties"]["supported_hypothesis_ids"].get("minItems") == 1
     )
     repair_schema_is_stage_generic = repair_format == "json"
+    preflight_policy = OllamaProvider.gate2_preflight_policy()
+    preflight_policy_safe = (
+        preflight_policy.get("purpose") == "gate2_preflight"
+        and preflight_policy.get("task_independent") is True
+        and preflight_policy.get("outside_scored_envelope") is True
+        and isinstance(preflight_policy.get("prompt_sha256"), str)
+        and len(str(preflight_policy.get("prompt_sha256"))) == 64
+    )
+    preflight_runtime_bounded = (
+        _GATE2_OLLAMA_PURPOSE_NUM_PREDICT.get("gate2_preflight") == 8
+        and "gate2_preflight" not in _GATE2_OLLAMA_JSON_PURPOSES
+    )
 
     valid_pair = ResearchPairEvidence(_arm("raw"), _arm("seed"))
     pair_validates = True
@@ -361,6 +374,8 @@ def run_gate2_qualification() -> Gate2Certificate:
         "provider_schema_constrains_final_shape": final_schema_active,
         "provider_schema_constrains_verifier_shape": verifier_schema_active,
         "provider_repair_schema_remains_stage_generic": repair_schema_is_stage_generic,
+        "provider_preflight_policy_is_task_independent": preflight_policy_safe,
+        "provider_preflight_runtime_is_bounded": preflight_runtime_bounded,
         "resource_envelope_matches_runner": resource_envelope_matches,
         "same_identity_pair_validates": pair_validates,
         "model_identity_mismatch_rejected": model_mismatch_rejected,

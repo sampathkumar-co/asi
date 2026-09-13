@@ -20,6 +20,18 @@ class ModelProtocolError(ValueError):
     """Model output remained invalid after the frozen bounded repair path."""
 
 
+_GATE2_OLLAMA_JSON_PURPOSES = (
+    "gate2_raw_action", "gate2_raw_final", "gate2_seed_attribute_outcomes", "gate2_seed_design",
+    "gate2_seed_final", "gate2_independent", "gate2_adversarial", "gate2_repair",
+)
+_GATE2_OLLAMA_PURPOSE_NUM_PREDICT = {
+    "gate2_raw_action": 640, "gate2_seed_attribute_outcomes": 640, "gate2_seed_design": 384,
+    "gate2_raw_final": 512, "gate2_seed_final": 512,
+    "gate2_independent": 384, "gate2_adversarial": 384, "gate2_repair": 256,
+    "gate2_preflight": 8,
+}
+
+
 @dataclass(frozen=True)
 class ResearchStep:
     hypothesis_id: str
@@ -732,20 +744,26 @@ def run_ollama_research_suite(task_path: str | Path, model: str, *, checkpoint_p
     task_file_sha256 = hashlib.sha256(task_file.read_bytes()).hexdigest()
     suite_id, tasks = load_research_tasks(task_file)
     provider_id = f"ollama:{model}"
-    json_purposes = (
-        "gate2_raw_action", "gate2_raw_final", "gate2_seed_attribute_outcomes", "gate2_seed_design", "gate2_seed_final",
-        "gate2_independent", "gate2_adversarial", "gate2_repair",
-    )
-    caps = {
-        "gate2_raw_action": 640, "gate2_seed_attribute_outcomes": 640, "gate2_seed_design": 384,
-        "gate2_raw_final": 512, "gate2_seed_final": 512,
-        "gate2_independent": 384, "gate2_adversarial": 384, "gate2_repair": 256,
-    }
+    json_purposes = _GATE2_OLLAMA_JSON_PURPOSES
+    caps = dict(_GATE2_OLLAMA_PURPOSE_NUM_PREDICT)
+    checkpoint = Path(checkpoint_path) if checkpoint_path else None
+    if progress_path:
+        progress_file = Path(progress_path)
+    elif checkpoint:
+        progress_file = checkpoint.with_suffix(checkpoint.suffix + ".progress.jsonl")
+    else:
+        progress_file = None
+
+    def emit(event: dict) -> None:
+        if progress_file:
+            _append_jsonl(progress_file, event)
+
     probe = OllamaProvider(
         model, temperature=0.0, num_ctx=num_ctx, num_predict=640, think=False,
         json_purposes=json_purposes, purpose_num_predict=caps,
     )
     manifest = probe.model_manifest()
+    preflight_policy = probe.gate2_preflight_policy()
     implementation = implementation_manifest()
     settings = {
         "temperature": 0.0,
@@ -756,19 +774,13 @@ def run_ollama_research_suite(task_path: str | Path, model: str, *, checkpoint_p
         "seed_protocol": "blind pre-reveal outcome-to-hypothesis causal attribution -> runner-fixed 3:1 canonical likelihoods -> information-gain experiment selection -> controlled reveal -> Bayesian posterior update + Bayes-factor rejection -> runner-derived final -> independent/adversarial verification",
         "resource_envelope": _budget().limits(),
         "task_file_sha256": task_file_sha256,
+        "provider_preflight": preflight_policy,
     }
     factory = lambda: OllamaProvider(
         model, temperature=0.0, num_ctx=num_ctx, num_predict=640, think=False,
         json_purposes=json_purposes, purpose_num_predict=caps,
     )
 
-    checkpoint = Path(checkpoint_path) if checkpoint_path else None
-    if progress_path:
-        progress_file = Path(progress_path)
-    elif checkpoint:
-        progress_file = checkpoint.with_suffix(checkpoint.suffix + ".progress.jsonl")
-    else:
-        progress_file = None
     pairs: list[dict] = []
     if checkpoint and resume and checkpoint.exists():
         prior = json.loads(checkpoint.read_text(encoding="utf-8"))
@@ -784,9 +796,18 @@ def run_ollama_research_suite(task_path: str | Path, model: str, *, checkpoint_p
     if not completed.issubset(task_ids):
         raise ValueError("Gate-2 checkpoint contains unknown task")
 
-    def emit(event: dict) -> None:
-        if progress_file:
-            _append_jsonl(progress_file, event)
+    if any(task.task_id not in completed for task in tasks):
+        try:
+            preflight_result = probe.gate2_preflight()
+        except ProviderError as exc:
+            emit({
+                "event": "provider_preflight_failed",
+                "purpose": "gate2_preflight",
+                "prompt_sha256": str(preflight_policy["prompt_sha256"]),
+                "failure_message_sha256": hashlib.sha256(str(exc).encode()).hexdigest(),
+            })
+            raise
+        emit({"event": "provider_preflight_passed", **preflight_result})
 
     for task in tasks:
         if task.task_id in completed:
