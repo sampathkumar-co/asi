@@ -48,7 +48,7 @@ Historical v2/v3/v4 campaigns remain published as failed promotion attempts. The
 
 ## Gate-2 v3.1 public development calibration
 
-The current Gate-2 v3.1 candidate uses local `qwen3:8b` with the common **16-call / 15,000-token** envelope. Deterministic protocol qualification passes **46/46** canaries and the repository passes **157/157** tests.
+The evaluated Gate-2 v3.1 candidate used local `qwen3:8b` with the common **16-call / 15,000-token** envelope. At its freeze point, deterministic protocol qualification passed **46/46** canaries and the repository passed **157/157** tests. That candidate and its private-v31 holdout are now retired evidence.
 
 V3.1 replaces model-generated cross-hypothesis probability magnitudes with one blind pre-reveal **outcome-to-hypothesis causal-attribution** call. The trusted runner validates the support relation, converts it into fixed **3:1** canonical likelihoods, selects experiments by information gain, updates Bayesian posteriors, derives Bayes-factor rejections, and fixes the final hypothesis mechanically.
 
@@ -57,6 +57,8 @@ On the fresh eight-task public-development run under implementation digest `c0ab
 This does **not** certify Gate 2: the public suite has only eight pairs and has been repeatedly inspected during development. It is development-only evidence. See [`docs/GATE2_V31_PUBLIC_RESULT.md`](docs/GATE2_V31_PUBLIC_RESULT.md), [`docs/GATE2_PROTOCOL.md`](docs/GATE2_PROTOCOL.md), and [`artifacts/gate2-v31-public-calibration-score.json`](artifacts/gate2-v31-public-calibration-score.json).
 
 The exact v3.1 candidate is frozen at `2b98491641426f9ebe1678b8491a18a583e6c784`; preregistration commit `393c22abf67e70675870f7f054eed023685cc08b` passed GitHub Actions CI #156 before inference. On the 18-task private-v31 holdout, the official frozen score was Raw **0.78750**, Seed **0.93472**, gain **+0.14722**, strict wins **77.78%**, CI **[+0.01806, +0.28472]**, and verifier acceptance **83.33%**. Mean gain missed the frozen **+0.15000** threshold, so Gate 2 does not promote. See [docs/GATE2_PRIVATE_HOLDOUT_V31_RESULT.md](docs/GATE2_PRIVATE_HOLDOUT_V31_RESULT.md).
+
+Post-v31 development hardens execution integrity before any new candidate freeze: provider/transport and trusted-runner failures now invalidate the campaign instead of becoming ordinary arm zeros. The current development tree passes **163/163** tests and **48/48** Gate-2 canaries; this is development evidence only and no retired holdout is reused.
 
 ## Gate-2 private holdout v1
 

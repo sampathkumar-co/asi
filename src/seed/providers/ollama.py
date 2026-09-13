@@ -5,7 +5,7 @@ from typing import Iterable, Mapping
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from .base import Message, ModelResponse
+from .base import Message, ModelResponse, ProviderError
 
 
 _STRUCTURED_FORMATS: dict[str, dict] = {
@@ -91,18 +91,18 @@ class OllamaProvider:
             with urlopen(request, timeout=self.timeout_s) as response:
                 data = json.load(response)
         except (HTTPError, URLError, TimeoutError, OSError) as exc:
-            raise RuntimeError(f"Ollama tag query failed: {exc}") from exc
+            raise ProviderError(f"Ollama tag query failed: {exc}") from exc
         models = data.get("models", [])
         if not isinstance(models, list):
-            raise RuntimeError("Ollama tag response missing models list")
+            raise ProviderError("Ollama tag response missing models list")
         for item in models:
             if isinstance(item, dict) and item.get("name") == self.model:
                 digest = item.get("digest")
                 if not isinstance(digest, str) or len(digest) < 16:
-                    raise RuntimeError("Ollama model manifest missing digest")
+                    raise ProviderError("Ollama model manifest missing digest")
                 size = item.get("size", 0)
                 return {"name": self.model, "digest": digest, "size": max(int(size), 0)}
-        raise RuntimeError(f"Ollama model is not installed locally: {self.model}")
+        raise ProviderError(f"Ollama model is not installed locally: {self.model}")
 
     def _payload(self, messages: list[Message], purpose: str) -> dict:
         payload: dict = {
@@ -131,12 +131,12 @@ class OllamaProvider:
             with urlopen(request, timeout=self.timeout_s) as response:
                 data = json.load(response)
         except (HTTPError, URLError, TimeoutError, OSError) as exc:
-            raise RuntimeError(f"Ollama request failed: {exc}") from exc
+            raise ProviderError(f"Ollama request failed: {exc}") from exc
 
         message = data.get("message")
         text = message.get("content") if isinstance(message, dict) else None
         if not isinstance(text, str):
-            raise RuntimeError("Ollama response missing message.content")
+            raise ProviderError("Ollama response missing message.content")
 
         def _count(name: str) -> int:
             value = data.get(name, 0)

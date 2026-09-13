@@ -65,6 +65,8 @@ The campaign must checkpoint atomically after each sealed pair. Resume is allowe
 
 Malformed output, invalid IDs, repeated experiments, verifier disagreement, resource overspend, or integrity mismatch fail closed according to the frozen protocol. Bounded repair remains permitted only because it is already part of the frozen candidate and consumes the shared envelope.
 
+For future post-v31 campaigns, provider/transport failures and trusted-runner failures are distinct execution incidents rather than model failures. Any such incident makes `clean_execution=false` and therefore makes the campaign non-promotable. Model/protocol output failures and budget exhaustion remain arm-level fail-closed outcomes. Trusted mechanical-support defects are outside the model-repair path and cannot be repaired away.
+
 Raw evidence and private task/key contents remain external. GitHub may contain sanitized score artifacts, hashes, preregistration metadata, and the final audit report.
 
 ## No post-inference tuning

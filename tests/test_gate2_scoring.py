@@ -111,6 +111,32 @@ class Gate2ScoringTests(unittest.TestCase):
         self.assertFalse(report["promotion_pass"])
         self.assertEqual(len(report["content_hash"]), 64)
 
+    def test_provider_incident_invalidates_campaign(self):
+        evidence = evidence_for_two_pairs()
+        raw = evidence["pairs"][0]["raw"]
+        raw["status"] = "infrastructure_error"
+        raw["failure_kind"] = "provider"
+        raw["failure_message"] = "Ollama request failed: HTTP 500"
+        pair = evidence["pairs"][0]
+        pair["pair_hash"] = __import__("hashlib").sha256(
+            json.dumps({"raw": pair["raw"], "seed": pair["seed"]}, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        evidence["content_hash"] = __import__("hashlib").sha256(
+            json.dumps({k: v for k, v in evidence.items() if k != "content_hash"}, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        key = {"suite_id": "suite", "answers": {"R1": answer(), "R2": answer()}}
+        with tempfile.TemporaryDirectory() as td:
+            evidence_path = Path(td) / "evidence.json"
+            key_path = Path(td) / "answers.json"
+            evidence_path.write_text(json.dumps(evidence), encoding="utf-8")
+            key_path.write_text(json.dumps(key), encoding="utf-8")
+            report = score_research_campaign(evidence_path, key_path)
+        self.assertFalse(report["campaign_valid"])
+        self.assertFalse(report["promotion_checks"]["clean_execution"])
+        self.assertFalse(report["promotion_pass"])
+        self.assertEqual(len(report["execution_incidents"]), 1)
+        self.assertEqual(report["execution_incidents"][0]["kind"], "provider")
+
     def test_resource_overage_is_rejected(self):
         evidence = evidence_for_two_pairs()
         evidence["pairs"][0]["raw"]["usage"]["steps"] = 99

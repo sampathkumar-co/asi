@@ -4,6 +4,10 @@ from dataclasses import dataclass, field
 from typing import Protocol
 
 
+class ProviderError(RuntimeError):
+    """Provider/transport execution failed independently of model reasoning."""
+
+
 @dataclass(frozen=True)
 class Message:
     role: str

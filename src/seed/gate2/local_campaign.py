@@ -9,11 +9,15 @@ import time
 from typing import Callable
 
 from seed.core.budget import Budget, BudgetExceeded
-from seed.providers.base import Message, ModelProvider
+from seed.providers.base import Message, ModelProvider, ProviderError
 from seed.providers.budgeted import BudgetedProvider, ModelCallRecord
 from seed.providers.ollama import OllamaProvider
 from .attestation import implementation_manifest
 from .schema import ResearchTask, load_research_tasks
+
+
+class ModelProtocolError(ValueError):
+    """Model output remained invalid after the frozen bounded repair path."""
 
 
 @dataclass(frozen=True)
@@ -79,6 +83,8 @@ class ResearchArmEvidence:
     precommitted_probability_matrix: tuple[tuple[str, str, tuple[tuple[str, float], ...]], ...] = ()
     precommitted_outcome_support: tuple[tuple[str, str, tuple[str, ...]], ...] = ()
     final_posterior: tuple[tuple[str, float], ...] = ()
+    failure_kind: str | None = None
+    failure_message: str | None = None
 
     @property
     def content_hash(self) -> str:
@@ -139,13 +145,16 @@ def _json_call(provider: BudgetedProvider, budget: Budget, messages: list[Messag
         data = json.loads(response.text)
     except json.JSONDecodeError as exc:
         if purpose == "gate2_repair":
-            raise
+            raise ModelProtocolError(f"repair returned invalid JSON: {exc}") from exc
         repair = {"stage": purpose, "validation_error": str(exc)[:240], "invalid_output": response.text[:3000]}
         budget.charge_step()
         response = provider.complete([Message("system", "Return only one corrected JSON object. Fix syntax only; preserve all substantive choices and add no evidence."), Message("user", json.dumps(repair))], purpose="gate2_repair")
-        data = json.loads(response.text)
+        try:
+            data = json.loads(response.text)
+        except json.JSONDecodeError as repair_exc:
+            raise ModelProtocolError(f"repair returned invalid JSON: {repair_exc}") from repair_exc
     if not isinstance(data, dict):
-        raise ValueError("model output must be a JSON object")
+        raise ModelProtocolError("model output must be a JSON object")
     return data
 
 
@@ -494,6 +503,7 @@ def _verify(provider: BudgetedProvider, budget: Budget, task: ResearchTask, hist
         system = "Act as an adversarial scientific reviewer and actively search for falsifiers and competing declared hypotheses. " + common
         purpose = "gate2_adversarial"
     data = _json_call(provider, budget, [Message("system", system), Message("user", json.dumps(payload))], purpose)
+    _, mechanical_best = _mechanical_support(task, history)
 
     def validate(value: dict) -> VerificationEvidence:
         supported = _strings(value.get("supported_hypothesis_ids", []))
@@ -509,7 +519,6 @@ def _verify(provider: BudgetedProvider, budget: Budget, task: ResearchTask, hist
         if not isinstance(defect_summary, str):
             raise ValueError("verifier defect_summary must be string")
         final_id = str(final.get("final_hypothesis_id", ""))
-        _, mechanical_best = _mechanical_support(task, history)
         verdict = _verifier_verdict(final_id, supported, mechanical_best, direct_defect)
         confidence = float(value.get("confidence", 0.0))
         if not 0.0 <= confidence <= 1.0:
@@ -522,10 +531,13 @@ def _verify(provider: BudgetedProvider, budget: Budget, task: ResearchTask, hist
         return validate(data)
     except ValueError as exc:
         repaired = _repair_schema(provider, budget, task, arm="seed", stage=f"{kind}_verifier", invalid_output=data, error=exc, history=history, revisions=list(revisions or []))
-        return validate(repaired)
+        try:
+            return validate(repaired)
+        except ValueError as repair_exc:
+            raise ModelProtocolError(str(repair_exc)) from repair_exc
 
 
-def _arm_evidence(task: ResearchTask, arm: str, meter: BudgetedProvider, budget: Budget, history: list[ResearchStep], final: tuple | None, status: str, independent=None, adversarial=None, revisions: list[ResearchRevision] | None = None, repair_events: list[dict[str, str]] | None = None, precommitted_probability_matrix: tuple[tuple[str, str, tuple[tuple[str, float], ...]], ...] = (), precommitted_outcome_support: tuple[tuple[str, str, tuple[str, ...]], ...] = (), final_posterior: tuple[tuple[str, float], ...] = ()) -> ResearchArmEvidence:
+def _arm_evidence(task: ResearchTask, arm: str, meter: BudgetedProvider, budget: Budget, history: list[ResearchStep], final: tuple | None, status: str, independent=None, adversarial=None, revisions: list[ResearchRevision] | None = None, repair_events: list[dict[str, str]] | None = None, precommitted_probability_matrix: tuple[tuple[str, str, tuple[tuple[str, float], ...]], ...] = (), precommitted_outcome_support: tuple[tuple[str, str, tuple[str, ...]], ...] = (), final_posterior: tuple[tuple[str, float], ...] = (), failure_kind: str | None = None, failure_message: str | None = None) -> ResearchArmEvidence:
     if final is None:
         hypothesis_id, rejected, risks, confidence = None, (), (), 0.0
     else:
@@ -542,6 +554,7 @@ def _arm_evidence(task: ResearchTask, arm: str, meter: BudgetedProvider, budget:
         status, budget.limits(), budget.usage(), meter.transcript_hash, tuple(revisions or []),
         tuple(record.purpose for record in meter.records), tuple(repair_events or []),
         tuple(precommitted_probability_matrix), tuple(precommitted_outcome_support), tuple(final_posterior),
+        failure_kind, failure_message,
     )
 
 
@@ -554,6 +567,7 @@ def _run_arm(task: ResearchTask, provider: BudgetedProvider, budget: Budget, arm
     posterior_evidence: tuple[tuple[str, float], ...] = ()
     final = None
     independent = adversarial = None
+    failure_kind = failure_message = None
     try:
         def validate_or_repair(stage: str, data: dict, validator):
             try:
@@ -561,7 +575,10 @@ def _run_arm(task: ResearchTask, provider: BudgetedProvider, budget: Budget, arm
             except ValueError as exc:
                 repair_events.append({"stage": stage, "error": str(exc)[:240], "invalid_output_sha256": hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":")).encode()).hexdigest()})
                 repaired = _repair_schema(provider, budget, task, arm=arm, stage=stage, invalid_output=data, error=exc, history=history, revisions=revisions)
-                return validator(repaired)
+                try:
+                    return validator(repaired)
+                except ValueError as repair_exc:
+                    raise ModelProtocolError(str(repair_exc)) from repair_exc
 
         if arm == "seed":
             attribution_data = _attribute_outcomes(provider, budget, task)
@@ -620,13 +637,22 @@ def _run_arm(task: ResearchTask, provider: BudgetedProvider, budget: Budget, arm
             final_data = _final_report(provider, budget, task, history, arm, revisions)
             final = validate_or_repair("final", final_data, lambda value: _validated_final(task, value))
         status = "succeeded"
-    except BudgetExceeded:
+    except BudgetExceeded as exc:
         status = "budget_exhausted"
+        failure_kind, failure_message = "budget", str(exc)[:500]
+    except ProviderError as exc:
+        status = "infrastructure_error"
+        failure_kind, failure_message = "provider", str(exc)[:500]
+    except ModelProtocolError as exc:
+        status = "failed:ModelProtocolError"
+        failure_kind, failure_message = "model_protocol", str(exc)[:500]
     except Exception as exc:
         status = f"failed:{type(exc).__name__}"
+        failure_kind = "runner"
+        failure_message = f"{type(exc).__name__}: {exc}"[:500]
     return _arm_evidence(
         task, arm, provider, budget, history, final, status, independent, adversarial, revisions, repair_events,
-        precommitted_matrix, precommitted_support, posterior_evidence,
+        precommitted_matrix, precommitted_support, posterior_evidence, failure_kind, failure_message,
     )
 
 

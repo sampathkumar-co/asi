@@ -53,6 +53,28 @@ def _usage_within_limits(arm: dict[str, Any]) -> bool:
         return False
 
 
+_ALLOWED_FAILURE_KINDS = {None, "budget", "model_protocol", "provider", "runner"}
+
+
+def _execution_incidents(pairs: list[dict[str, Any]]) -> list[dict[str, str]]:
+    incidents: list[dict[str, str]] = []
+    for pair in pairs:
+        for arm_name in ("raw", "seed"):
+            arm = pair[arm_name]
+            kind = arm.get("failure_kind")
+            if kind not in {"provider", "runner"}:
+                continue
+            message = str(arm.get("failure_message") or "")
+            incidents.append({
+                "task_id": str(arm.get("task_id", "")),
+                "arm": arm_name,
+                "kind": str(kind),
+                "status": str(arm.get("status", "")),
+                "failure_message_sha256": hashlib.sha256(message.encode()).hexdigest(),
+            })
+    return incidents
+
+
 def validate_evidence(evidence: dict[str, Any]) -> list[dict[str, Any]]:
     if evidence.get("gate") != 2:
         raise ValueError("not Gate-2 evidence")
@@ -81,6 +103,12 @@ def validate_evidence(evidence: dict[str, Any]) -> list[dict[str, Any]]:
             raise ValueError("Gate-2 raw/seed model identity mismatch")
         if raw.get("limits") != seed.get("limits"):
             raise ValueError("Gate-2 raw/seed resource envelope mismatch")
+        for arm_data in (raw, seed):
+            failure_kind = arm_data.get("failure_kind")
+            if failure_kind not in _ALLOWED_FAILURE_KINDS:
+                raise ValueError("Gate-2 arm has invalid failure classification")
+            if arm_data.get("status") == "infrastructure_error" and failure_kind != "provider":
+                raise ValueError("Gate-2 infrastructure status lacks provider classification")
         if not _usage_within_limits(raw) or not _usage_within_limits(seed):
             raise ValueError("Gate-2 arm exceeded declared resource envelope")
         if raw.get("provider_id") != evidence.get("provider_id") or seed.get("provider_id") != evidence.get("provider_id"):
@@ -182,6 +210,7 @@ def _promotion_checks(report: dict[str, Any], criteria: dict[str, Any]) -> dict[
         "strict_win_rate": report["win_rate"] >= float(criteria["min_win_rate"]),
         "ci_lower_bound_positive": report["ci_low"] > float(criteria["min_ci_low_exclusive"]),
         "seed_verifier_acceptance": report["seed_verifier_acceptance"] >= float(criteria["min_seed_verifier_acceptance"]),
+        "clean_execution": bool(report.get("campaign_valid", False)),
     }
 
 
@@ -200,6 +229,7 @@ def score_research_campaign(evidence_path: str | Path, answer_path: str | Path) 
     if not isinstance(criteria, dict):
         raise ValueError("Gate-2 promotion criteria must be an object")
 
+    execution_incidents = _execution_incidents(pairs)
     raw_scores: list[float] = []
     seed_scores: list[float] = []
     per_task: list[dict[str, Any]] = []
@@ -241,6 +271,8 @@ def score_research_campaign(evidence_path: str | Path, answer_path: str | Path) 
         "ci_high": comparison.ci_high,
         "win_rate": comparison.win_rate,
         "seed_verifier_acceptance": fmean(seed_acceptance),
+        "campaign_valid": not execution_incidents,
+        "execution_incidents": execution_incidents,
         "promotion_criteria": dict(criteria),
         "per_task": per_task,
     }

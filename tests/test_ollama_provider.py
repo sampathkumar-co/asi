@@ -3,7 +3,7 @@ import json
 import unittest
 from unittest.mock import patch
 
-from seed.providers.base import Message
+from seed.providers.base import Message, ProviderError
 from seed.providers.ollama import OllamaProvider
 
 
@@ -74,8 +74,15 @@ class OllamaProviderTests(unittest.TestCase):
         provider = OllamaProvider("qwen-local")
         bad = io.BytesIO(json.dumps({"model": "qwen-local", "message": {}}).encode("utf-8"))
         with patch("seed.providers.ollama.urlopen", return_value=bad):
-            with self.assertRaises(RuntimeError):
+            with self.assertRaises(ProviderError):
                 provider.complete([Message("user", "x")], purpose="raw")
+
+    def test_transport_failure_is_provider_error(self):
+        provider = OllamaProvider("qwen-local")
+        with patch("seed.providers.ollama.urlopen", side_effect=OSError("connection reset")):
+            with self.assertRaises(ProviderError) as caught:
+                provider.complete([Message("user", "x")], purpose="raw")
+        self.assertIn("Ollama request failed", str(caught.exception))
 
     def test_empty_model_rejected(self):
         with self.assertRaises(ValueError):

@@ -2,7 +2,7 @@
 
 Updated: 2026-09-13
 
-Current local validation on Sampath's Windows 11 / Python 3.13.15: **157/157 tests passing** with `ResourceWarning` promoted to an error. The repository includes permanent Ubuntu and Windows CI coverage.
+Current local validation on Sampath's Windows 11 / Python 3.13.15: **163/163 tests passing** with `ResourceWarning` promoted to an error. The repository includes permanent Ubuntu and Windows CI coverage.
 
 ## Meaning of status labels
 
@@ -134,6 +134,8 @@ V3.1 changes the scientific representation rather than thresholds: one hidden-sa
 Deterministic qualification is **46/46 PASS** with implementation digest `c0abee591ed723a46ba57b527c2189efc0d711f3d3a423866a611503e8f16ce8`; repository regression is **157/157 PASS**. On the eight-task public development suite, Raw **0.76875**, Seed **0.98750**, gain **+0.21875**, strict wins **75%**, CI **[+0.06250, +0.46875]**, verifier acceptance **100%**. The public suite is repeatedly observed and cannot certify Gate 2.
 
 The exact v3.1 candidate is frozen at `2b98491641426f9ebe1678b8491a18a583e6c784`; preregistration commit `393c22abf67e70675870f7f054eed023685cc08b` passed GitHub Actions CI #156 before inference. The 18-task private-v31 campaign completed under the frozen candidate/model/envelope. Official score: Raw **0.78750**, Seed **0.93472**, mean gain **+0.14722**, strict wins **14/18 = 77.78%**, paired-bootstrap CI **[+0.01806, +0.28472]**, verifier acceptance **15/18 = 83.33%**. `promotion_pass=false` because mean gain missed the frozen **+0.15000** threshold. A first-call Raw CUDA/Ollama crash on V31P01 is documented as an infrastructure incident; excluding that contaminated pair diagnostically reduces gain to **+0.09706**, so it cannot rescue promotion. The holdout is retired. See [GATE2_PRIVATE_HOLDOUT_V31_RESULT.md](GATE2_PRIVATE_HOLDOUT_V31_RESULT.md).
+
+Post-v31 vNext development now hardens execution integrity: provider/transport failures and trusted-runner failures are explicitly classified as campaign-invalidating incidents, while model/protocol failures and budget exhaustion continue to fail closed at arm level. Current development validation is **163/163 tests PASS**, compileall PASS, and **48/48 Gate-2 canaries PASS** with qualification hash `32227a5665ab34e409eb594b426857760a0f2980fb23a6f30f9daa993e43390a` and implementation digest `685ef4b1c4d31202eac16da1881c96115409965863abd96346175f382a0b5b37`. This is development evidence only; no retired holdout is rerun.
 
 See [`GATE2_V31_PUBLIC_RESULT.md`](GATE2_V31_PUBLIC_RESULT.md), [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md), and [`GATE2_PRIVATE_HOLDOUT_V2_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V2_RESULT.md).
 

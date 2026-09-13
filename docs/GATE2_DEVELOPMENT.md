@@ -156,4 +156,12 @@ The resulting candidate passes **46/46** deterministic qualification canaries, *
 
 Fresh v3.1 public-development evidence hash: `b760625388757dd810785d474e5777cd1fed8d0c89d83790f04df3de4f8273ce`. Score: Raw **0.76875**, Seed **0.98750**, gain **+0.21875**, strict wins **75%**, CI **[+0.06250, +0.46875]**, verifier acceptance **100%**. All eight Seed arms succeeded with six calls and zero repairs. See [`GATE2_V31_PUBLIC_RESULT.md`](GATE2_V31_PUBLIC_RESULT.md).
 
-The public suite and retired private v1/v2 evidence were used diagnostically during development. Therefore none of these results can establish v3.1 transfer. The commit containing this record freezes v3.1. After green CI, test it exactly once on a newly created, externally stored, audited, preregistered private/OOD holdout without further candidate tuning.
+The public suite and retired private v1/v2 evidence were used diagnostically during development. V3.1 was then frozen and evaluated exactly once on `gate2-private-holdout-v31`; that attempt did not promote because mean gain was **+0.14722 < +0.15000**, and the holdout is permanently retired. See [`GATE2_PRIVATE_HOLDOUT_V31_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V31_RESULT.md).
+
+## Post-v31 vNext execution-integrity hardening
+
+The first post-v31 change addresses the infrastructure incident observed on `V31P01_CORROSION`. Provider/transport failures are now represented separately from model/protocol failures. `provider` and trusted-`runner` failures are recorded as execution incidents and force `clean_execution=false`, making the whole campaign non-promotable rather than silently converting an infrastructure failure into a score-like zero. Budget exhaustion and malformed model output remain ordinary fail-closed arm outcomes.
+
+The runner also separates trusted mechanical-support failures from repairable model-output validation. A trusted-runner consistency defect can no longer be caught by the model schema-repair path and repaired away. Failure telemetry records a bounded classification/message while the scorer exposes only a hash of infrastructure-failure detail in sanitized incident summaries.
+
+Current post-v31 development-tree validation is **163/163 tests PASS**, compileall PASS, and **48/48 Gate-2 deterministic canaries PASS**. Qualification hash: `32227a5665ab34e409eb594b426857760a0f2980fb23a6f30f9daa993e43390a`. Development implementation digest: `685ef4b1c4d31202eac16da1881c96115409965863abd96346175f382a0b5b37`. This is infrastructure hardening only; it is **not** a new empirical certification candidate and does not authorize reuse of any retired holdout.

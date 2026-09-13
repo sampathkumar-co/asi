@@ -1,7 +1,7 @@
 import unittest
 
 from seed.core.budget import Budget, BudgetExceeded
-from seed.providers.base import Message
+from seed.providers.base import Message, ProviderError
 from seed.providers.budgeted import BudgetedProvider
 from seed.providers.scripted import ScriptedProvider
 
@@ -39,6 +39,15 @@ class Gate1BudgetTests(unittest.TestCase):
         before = p.transcript_hash
         p.complete([Message("user", "x")], purpose="one")
         self.assertNotEqual(before, p.transcript_hash)
+
+    def test_provider_exceptions_are_classified(self):
+        b = Budget(max_model_calls=2, max_tokens=100)
+        p = BudgetedProvider(ScriptedProvider([]), b, provider_id="m")
+        with self.assertRaises(ProviderError) as caught:
+            p.complete([Message("user", "x")], purpose="one")
+        self.assertIn("RuntimeError", str(caught.exception))
+        self.assertEqual(b.model_calls, 0)
+        self.assertEqual(p.records, [])
 
     def test_negative_limits_rejected(self):
         with self.assertRaises(ValueError):

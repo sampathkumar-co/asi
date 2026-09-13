@@ -7,7 +7,7 @@ import time
 from typing import Callable
 
 from seed.core.budget import Budget, BudgetExceeded
-from .base import Message, ModelProvider, ModelResponse
+from .base import Message, ModelProvider, ModelResponse, ProviderError
 
 
 @dataclass(frozen=True)
@@ -51,7 +51,12 @@ class BudgetedProvider:
             raise BudgetExceeded("model-call budget exhausted before request")
         request_hash = self._hash([asdict(m) for m in messages])
         started = time.perf_counter()
-        response = self.inner.complete(messages, purpose=purpose)
+        try:
+            response = self.inner.complete(messages, purpose=purpose)
+        except ProviderError:
+            raise
+        except Exception as exc:
+            raise ProviderError(f"{type(exc).__name__}: {exc}") from exc
         wall_time_s = time.perf_counter() - started
         def record_call(*, budget_accepted: bool) -> ModelCallRecord:
             record = ModelCallRecord(

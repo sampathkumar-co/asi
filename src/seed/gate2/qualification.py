@@ -15,6 +15,7 @@ from .local_campaign import (
     _validated_attribution, _verifier_verdict, validate_checkpoint_identity,
 )
 from .schema import CatalogItem, ResearchExperiment, ResearchTask
+from .scoring import _execution_incidents
 
 
 @dataclass(frozen=True)
@@ -186,9 +187,23 @@ def run_gate2_qualification() -> Gate2Certificate:
     checkpoint_tamper_rejected = _raises_value_error(lambda: validate_checkpoint_identity(tampered, changed_body))
 
     malformed_budget = _budget()
-    malformed_meter = BudgetedProvider(ScriptedProvider(["not-json"]), malformed_budget, provider_id="ollama:qwen")
+    malformed_meter = BudgetedProvider(ScriptedProvider(["not-json", "still-not-json"]), malformed_budget, provider_id="ollama:qwen")
     malformed_arm = _run_arm(task, malformed_meter, malformed_budget, "raw")
-    malformed_fails_closed = malformed_arm.status.startswith("failed:") and malformed_arm.final_hypothesis_id is None
+    malformed_fails_closed = (
+        malformed_arm.status == "failed:ModelProtocolError"
+        and malformed_arm.failure_kind == "model_protocol"
+        and malformed_arm.final_hypothesis_id is None
+    )
+
+    provider_failure_budget = _budget()
+    provider_failure_meter = BudgetedProvider(ScriptedProvider([]), provider_failure_budget, provider_id="ollama:qwen")
+    provider_failure_arm = _run_arm(task, provider_failure_meter, provider_failure_budget, "raw")
+    provider_failure_classified = (
+        provider_failure_arm.status == "infrastructure_error"
+        and provider_failure_arm.failure_kind == "provider"
+        and provider_failure_arm.final_hypothesis_id is None
+    )
+    provider_failure_detected = len(_execution_incidents([{"raw": asdict(provider_failure_arm), "seed": asdict(_arm("seed"))}])) == 1
 
     audit_budget = Budget(max_model_calls=2, max_tokens=1, max_cost_usd=1)
     audit_meter = BudgetedProvider(ScriptedProvider(["two words"]), audit_budget, provider_id="ollama:qwen")
@@ -315,6 +330,8 @@ def run_gate2_qualification() -> Gate2Certificate:
         "implementation_change_invalidates_resume": implementation_change_rejected,
         "checkpoint_hash_tamper_rejected": checkpoint_tamper_rejected,
         "malformed_model_json_fails_closed": malformed_fails_closed,
+        "provider_failure_is_classified_as_infrastructure": provider_failure_classified,
+        "provider_failure_is_detected_as_execution_incident": provider_failure_detected,
         "overbudget_response_is_transcript_audited": overbudget_audited,
         "private_answer_key_external_to_candidate_prompt": private_key_external,
     }
