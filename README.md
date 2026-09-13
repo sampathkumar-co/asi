@@ -56,6 +56,8 @@ On the fresh eight-task public-development run under implementation digest `c0ab
 
 This does **not** certify Gate 2: the public suite has only eight pairs and has been repeatedly inspected during development. It is development-only evidence. See [`docs/GATE2_V31_PUBLIC_RESULT.md`](docs/GATE2_V31_PUBLIC_RESULT.md), [`docs/GATE2_PROTOCOL.md`](docs/GATE2_PROTOCOL.md), and [`artifacts/gate2-v31-public-calibration-score.json`](artifacts/gate2-v31-public-calibration-score.json).
 
+The exact v3.1 candidate is frozen at `2b98491641426f9ebe1678b8491a18a583e6c784` and passed GitHub Actions CI #155. A new external 18-task balanced private/OOD suite has been audited before inference and its task/key/audit hashes are fixed in [docs/GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md](docs/GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md). No private-v3.1 inference is allowed until that preregistration commit is also CI-green.
+
 ## Gate-2 private holdout v1
 
 Frozen source commit `ec1e98315a0baa2fe47d344702790b86bbc6132f` and preregistration commit `2126f64b7d37964edf019794507cd19d021f2fd8` were both pushed with green CI before private inference.

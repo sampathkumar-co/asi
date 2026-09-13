@@ -1,6 +1,6 @@
 # Implementation Status
 
-Updated: 2026-09-12
+Updated: 2026-09-13
 
 Current local validation on Sampath's Windows 11 / Python 3.13.15: **157/157 tests passing** with `ResourceWarning` promoted to an error. The repository includes permanent Ubuntu and Windows CI coverage.
 
@@ -133,6 +133,8 @@ V3.1 changes the scientific representation rather than thresholds: one hidden-sa
 
 Deterministic qualification is **46/46 PASS** with implementation digest `c0abee591ed723a46ba57b527c2189efc0d711f3d3a423866a611503e8f16ce8`; repository regression is **157/157 PASS**. On the eight-task public development suite, Raw **0.76875**, Seed **0.98750**, gain **+0.21875**, strict wins **75%**, CI **[+0.06250, +0.46875]**, verifier acceptance **100%**. The public suite is repeatedly observed and cannot certify Gate 2.
 
+The exact v3.1 candidate is frozen at `2b98491641426f9ebe1678b8491a18a583e6c784`; GitHub Actions CI #155 (run `34750969236`) passed on that SHA. A new external 18-task holdout `gate2-private-holdout-v31` has been audited before inference: H1/H2/H3 = 6/6/6, structural/key validation 18/18, exact overlap 0, maximum fuzzy similarity 0.696078 < 0.72, and E1/E2 semantic identifiability 18/18. Its task/key/audit hashes are preregistered in [GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md](GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md). No private-v3.1 inference may begin until that preregistration commit itself is pushed and CI-green.
+
 See [`GATE2_V31_PUBLIC_RESULT.md`](GATE2_V31_PUBLIC_RESULT.md), [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md), and [`GATE2_PRIVATE_HOLDOUT_V2_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V2_RESULT.md).
 
 ## Gate 3 — architecture search
@@ -172,7 +174,7 @@ Implemented:
 
 ## Current next step
 
-The commit containing this record freezes the exact Gate-2 v3.1 candidate. Require green CI, then create a completely new external >=16-pair private/OOD holdout. Audit and preregister task/key hashes, candidate/model identity, unchanged thresholds and the common envelope before any private inference. Do not reuse private v1/v2 as certification evidence.
+The Gate-2 v3.1 candidate freeze is CI-green and the new external 18-task holdout has been audited. Commit and push `GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md`, require green CI on that exact preregistration SHA, and only then run the single frozen private campaign. Do not reuse public calibration or private v1/v2 as certification evidence.
 
 ## Overall
 

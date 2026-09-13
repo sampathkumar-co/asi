@@ -1,6 +1,6 @@
 # Roadmap after the Gates 0-4 foundation
 
-Updated: 2026-09-11
+Updated: 2026-09-13
 
 ## Milestone A — Empirical Gate 0/1 baseline
 
@@ -48,13 +48,13 @@ Frozen v5 source `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation dige
 
 ## Milestone B — Gate 2 research benchmark
 
-**Status: V3.1 DEVELOPMENT-QUALIFIED; NEW PRIVATE CERTIFICATION CAMPAIGN PENDING.**
+**Status: V3.1 FROZEN + CI-GREEN; NEW PRIVATE HOLDOUT AUDITED; PREREGISTRATION PENDING CI.**
 
 Private v1 transferred strongly but failed verifier acceptance: Raw **0.70556**, Seed **0.94167**, gain **+0.23611**, strict wins **66.67%**, CI **[+0.11944, +0.37222]**, verifier acceptance **50%**. Private v2 fixed verifier acceptance but failed transfer: Raw **0.81250**, Seed **0.82083**, gain **+0.00833**, strict wins **33.33%**, CI **[-0.07361, +0.09583]**, verifier acceptance **88.89%**. Both are retired.
 
 V3.1 uses hidden-safe outcome-to-hypothesis attribution plus runner-fixed 3:1 canonical likelihoods. It passes **46/46** deterministic protocol canaries and **157/157** repository tests. Public development result: Raw **0.76875**, Seed **0.98750**, gain **+0.21875**, strict wins **75%**, CI **[+0.06250, +0.46875]**, verifier acceptance **100%**.
 
-The eight-task public suite is development-only and cannot satisfy the >=16-pair certification rule. The commit containing this record freezes the exact v3.1 candidate. Require green CI, then generate a completely new external private/OOD suite, independently audit it, preregister all identities/hashes, and only then run inference.
+The eight-task public suite is development-only and cannot satisfy the >=16-pair certification rule. Candidate commit `2b98491641426f9ebe1678b8491a18a583e6c784` is frozen and passed GitHub Actions CI #155. A new external 18-task balanced holdout has passed structural/key, overlap, fuzzy-similarity, and E1/E2 semantic-identifiability audits before inference. Its hashes and the frozen candidate/model/scorer/envelope/threshold identities are recorded in [`GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md`](GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md). Private inference remains blocked until the preregistration commit is itself CI-green.
 
 ## Milestone C — Gate 3 architecture campaign
 
