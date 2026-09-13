@@ -125,7 +125,7 @@ Full audit: [`GATE1_LOCAL_HOLDOUT_V5_RESULT.md`](GATE1_LOCAL_HOLDOUT_V5_RESULT.m
 
 ## Gate 2 — scientific-method workflow
 
-**V3.1 development-qualified; NOT empirically certified.**
+**V3.1 private-v31 completed; NOT empirically certified.**
 
 Private v1 remains retired failed evidence: Raw **0.70556**, Seed **0.94167**, gain **+0.23611**, strict wins **66.67%**, CI **[+0.11944, +0.37222]**, verifier acceptance **50%**. Private v2 is also retired: Raw **0.81250**, Seed **0.82083**, gain **+0.00833**, strict wins **33.33%**, CI **[-0.07361, +0.09583]**, verifier acceptance **88.89%**.
 
@@ -133,7 +133,7 @@ V3.1 changes the scientific representation rather than thresholds: one hidden-sa
 
 Deterministic qualification is **46/46 PASS** with implementation digest `c0abee591ed723a46ba57b527c2189efc0d711f3d3a423866a611503e8f16ce8`; repository regression is **157/157 PASS**. On the eight-task public development suite, Raw **0.76875**, Seed **0.98750**, gain **+0.21875**, strict wins **75%**, CI **[+0.06250, +0.46875]**, verifier acceptance **100%**. The public suite is repeatedly observed and cannot certify Gate 2.
 
-The exact v3.1 candidate is frozen at `2b98491641426f9ebe1678b8491a18a583e6c784`; GitHub Actions CI #155 (run `34750969236`) passed on that SHA. A new external 18-task holdout `gate2-private-holdout-v31` has been audited before inference: H1/H2/H3 = 6/6/6, structural/key validation 18/18, exact overlap 0, maximum fuzzy similarity 0.696078 < 0.72, and E1/E2 semantic identifiability 18/18. Its task/key/audit hashes are preregistered in [GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md](GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md). No private-v3.1 inference may begin until that preregistration commit itself is pushed and CI-green.
+The exact v3.1 candidate is frozen at `2b98491641426f9ebe1678b8491a18a583e6c784`; preregistration commit `393c22abf67e70675870f7f054eed023685cc08b` passed GitHub Actions CI #156 before inference. The 18-task private-v31 campaign completed under the frozen candidate/model/envelope. Official score: Raw **0.78750**, Seed **0.93472**, mean gain **+0.14722**, strict wins **14/18 = 77.78%**, paired-bootstrap CI **[+0.01806, +0.28472]**, verifier acceptance **15/18 = 83.33%**. `promotion_pass=false` because mean gain missed the frozen **+0.15000** threshold. A first-call Raw CUDA/Ollama crash on V31P01 is documented as an infrastructure incident; excluding that contaminated pair diagnostically reduces gain to **+0.09706**, so it cannot rescue promotion. The holdout is retired. See [GATE2_PRIVATE_HOLDOUT_V31_RESULT.md](GATE2_PRIVATE_HOLDOUT_V31_RESULT.md).
 
 See [`GATE2_V31_PUBLIC_RESULT.md`](GATE2_V31_PUBLIC_RESULT.md), [`GATE2_PRIVATE_HOLDOUT_V1_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V1_RESULT.md), and [`GATE2_PRIVATE_HOLDOUT_V2_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V2_RESULT.md).
 
@@ -174,8 +174,8 @@ Implemented:
 
 ## Current next step
 
-The Gate-2 v3.1 candidate freeze is CI-green and the new external 18-task holdout has been audited. Commit and push `GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md`, require green CI on that exact preregistration SHA, and only then run the single frozen private campaign. Do not reuse public calibration or private v1/v2 as certification evidence.
+Gate 2 remains uncertified after private v1, v2, and v3.1. Do not rerun or tune on any retired holdout. The next certification cycle must begin with diagnostic work on retired evidence/public development data only, then freeze a genuinely new candidate, create a completely new external >=16-pair private/OOD holdout after the freeze, preregister it, require green CI, and only then infer.
 
 ## Overall
 
-Gate 0 is complete and Gate 1 is **empirically certified**. Gate 2 remains **not certified** after private v1/v2 failures, but v3.1 is now development-qualified and ready for a new preregistered private/OOD attempt. Gates 3-4 remain implemented foundations awaiting later empirical qualification.
+Gate 0 is complete and Gate 1 is **empirically certified**. Gate 2 remains **not certified** after three private attempts; v3.1 was a strong near-miss but failed the frozen mean-gain requirement and is retired evidence. Gates 3-4 remain implemented foundations awaiting later empirical qualification.

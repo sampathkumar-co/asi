@@ -1,0 +1,512 @@
+{
+  "answer_key_sha256": "d7e104467cc80a472d60ba2a3de32c50c224d5c7d1f0c6a7918c1d3433d364f9",
+  "ci_high": 0.2847222222222222,
+  "ci_low": 0.018055555555555523,
+  "content_hash": "e6e773232c5a9f67f35167866ffdd680819e32a334b77196bfc374ca0d8533e9",
+  "evidence_file_sha256": "4c86cbfaa9882bd56a0b256d8b4685fb95a655ed02325704f10366e4d875e4a1",
+  "evidence_hash": "4c39ef68987158aa43ff348b3369e8b8d2fdc25e0b5e312a73cc5f70f0db4181",
+  "gate": 2,
+  "mean_gain": 0.1472222222222222,
+  "per_task": [
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.0,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.0,
+        "prediction_consistency": 0.0,
+        "required_controls": 0.0,
+        "selected_informative_experiment": 0.0
+      },
+      "raw_failed_closed": true,
+      "raw_score": 0.0,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P01_CORROSION"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 1.0,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P02_BEAMFORM"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 1.0,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P03_CERAMIC"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.8250000000000001,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 0.9,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P04_ORBIT"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.9,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P05_FISH"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.525,
+      "seed_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.0,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.0,
+        "prediction_consistency": 0.0,
+        "required_controls": 0.0,
+        "selected_informative_experiment": 0.0
+      },
+      "seed_failed_closed": true,
+      "seed_score": 0.0,
+      "seed_verifier_accepted": false,
+      "task_id": "V31P06_PRINT"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.8250000000000001,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P07_DESICCANT"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.9,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P08_INTERFERO"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.5,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P09_AERATION"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.9,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P10_ROUTE"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.9,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P11_DISSOLVE"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.9,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P12_PHISH"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.925,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P13_WINGLET"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.8250000000000001,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P14_SEISMIC"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 1.0,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P15_DYE"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.9,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": false,
+      "task_id": "V31P16_MRI"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.0,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.0,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.425,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 0.925,
+      "seed_verifier_accepted": false,
+      "task_id": "V31P17_COMPRESSOR"
+    },
+    {
+      "raw_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.075,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "raw_failed_closed": false,
+      "raw_score": 0.925,
+      "seed_components": {
+        "correct_final_hypothesis": 0.4,
+        "critical_risk_detection": 0.05,
+        "evidence_driven_rejection": 0.1,
+        "first_experiment_discriminating": 0.15,
+        "prediction_consistency": 0.15,
+        "required_controls": 0.1,
+        "selected_informative_experiment": 0.05
+      },
+      "seed_failed_closed": false,
+      "seed_score": 1.0,
+      "seed_verifier_accepted": true,
+      "task_id": "V31P18_DRONE"
+    }
+  ],
+  "promotion_checks": {
+    "ci_lower_bound_positive": true,
+    "mean_gain": false,
+    "seed_mean": true,
+    "seed_verifier_acceptance": true,
+    "strict_win_rate": true,
+    "valid_pairs": true
+  },
+  "promotion_criteria": {
+    "min_ci_low_exclusive": 0.0,
+    "min_mean_gain": 0.15,
+    "min_seed_mean": 0.75,
+    "min_seed_verifier_acceptance": 0.75,
+    "min_valid_pairs": 16,
+    "min_win_rate": 0.6
+  },
+  "promotion_pass": false,
+  "raw_mean": 0.7875000000000001,
+  "scoring_weights": {
+    "correct_final_hypothesis": 0.4,
+    "critical_risk_detection": 0.05,
+    "evidence_driven_rejection": 0.1,
+    "first_experiment_discriminating": 0.15,
+    "prediction_consistency": 0.15,
+    "required_controls": 0.1,
+    "selected_informative_experiment": 0.05
+  },
+  "seed_mean": 0.9347222222222222,
+  "seed_verifier_acceptance": 0.8333333333333334,
+  "suite_id": "gate2-private-holdout-v31",
+  "valid_pair_count": 18,
+  "win_rate": 0.7777777777777778
+}

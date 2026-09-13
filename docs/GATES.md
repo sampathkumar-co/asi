@@ -74,7 +74,7 @@ A failed holdout becomes development evidence. Its tasks cannot be reused as fre
 Make the system reason in terms of falsifiable hypotheses and independent evidence.
 
 ### Status
-**V3.1 frozen and CI-green; new private holdout audited and preregistered before inference; NOT empirically certified.**
+**V3.1 private-v31 completed; frozen mean-gain criterion failed; NOT empirically certified.**
 
 ### Implemented
 - one hidden-safe pre-reveal outcome-to-hypothesis causal-attribution call;
@@ -88,9 +88,9 @@ Make the system reason in terms of falsifiable hypotheses and independent eviden
 - trusted verdicts that reject mechanical ties, lower-support finals, or concrete direct evidence defects;
 - external-key scoring and deterministic paired bootstrap.
 
-Private v1 and v2 are permanently retired. The current v3.1 implementation digest is `c0abee591ed723a46ba57b527c2189efc0d711f3d3a423866a611503e8f16ce8`; deterministic qualification is **46/46 PASS**. Public development scoring is Raw **0.76875**, Seed **0.98750**, gain **+0.21875**, strict wins **75%**, CI **[+0.06250, +0.46875]**, verifier acceptance **100%**. This is not certification evidence.
+Private v1, v2, and private-v31 are permanently retired as fresh certification evidence. The evaluated v3.1 implementation digest is `c0abee591ed723a46ba57b527c2189efc0d711f3d3a423866a611503e8f16ce8`; deterministic qualification is **46/46 PASS**. Public development scoring is Raw **0.76875**, Seed **0.98750**, gain **+0.21875**, strict wins **75%**, CI **[+0.06250, +0.46875]**, verifier acceptance **100%**. This is not certification evidence.
 
-Frozen source commit `2b98491641426f9ebe1678b8491a18a583e6c784` passed GitHub Actions CI #155. The new external `gate2-private-holdout-v31` contains 18 balanced tasks (H1/H2/H3 = 6/6/6), passed structural/key validation and semantic-identifiability audit 18/18, has zero exact overlap with public/v1/v2, and stays below the 0.72 fuzzy-overlap guard at 0.696078. Task/key/audit hashes are fixed in [GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md](GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md); inference is forbidden until that preregistration commit is CI-green.
+Frozen source commit `2b98491641426f9ebe1678b8491a18a583e6c784` and preregistration commit `393c22abf67e70675870f7f054eed023685cc08b` were CI-green before inference. Private-v31 completed all 18 pairs: Raw **0.78750**, Seed **0.93472**, mean gain **+0.14722**, strict wins **77.78%**, CI **[+0.01806, +0.28472]**, verifier acceptance **83.33%**. Mean gain failed the frozen **>=0.15** requirement, so `promotion_pass=false`. V31P01 Raw was additionally contaminated by a confirmed Ollama/CUDA startup crash; excluding that pair diagnostically lowers gain to **+0.09706**, so the incident cannot convert the attempt into a pass. The holdout is retired; see [GATE2_PRIVATE_HOLDOUT_V31_RESULT.md](GATE2_PRIVATE_HOLDOUT_V31_RESULT.md).
 
 ### Empirical criterion
 Any future Gate-2 certification attempt must use a newly created preregistered private/OOD campaign and retain the frozen requirements: >=16 valid pairs, Seed mean >=0.75, mean gain >=0.15, strict Seed wins >=60%, paired-bootstrap lower bound >0, verifier acceptance >=75%, and no identity/integrity/resource/protocol mismatch.

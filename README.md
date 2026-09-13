@@ -30,11 +30,11 @@ The core engineering rule is that **the system being optimized is less privilege
 |---|---|---|
 | **0** | Measurement before optimization | **COMPLETE — infrastructure-qualified** |
 | **1** | Strong bounded baseline agent | **COMPLETE — empirically certified** |
-| **2** | Scientific-method / verification | **V3.1 DEVELOPMENT-QUALIFIED — PRIVATE CERTIFICATION PENDING** |
+| **2** | Scientific-method / verification | **V3.1 PRIVATE V31 FAILED - NOT CERTIFIED** |
 | 3 | Automatic architecture search | Foundation implemented; empirical campaign pending |
 | 4 | Controlled self-modification | Foundation implemented; empirical campaign pending |
 
-Gate 0 remains the trusted measurement/control instrument. Gate 1 is complete and empirically certified. Gate 2 remains not empirically certified after two failed private attempts, but the new v3.1 development candidate now passes deterministic qualification and every frozen public numerical criterion except the public suite's built-in 8-pair count. A new preregistered private/OOD campaign is still required.
+Gate 0 remains the trusted measurement/control instrument. Gate 1 is complete and empirically certified. Gate 2 remains not empirically certified: private v1 failed verifier acceptance, private v2 failed transfer, and the preregistered v3.1 private-v31 campaign narrowly failed the frozen mean-gain criterion. The v3.1 holdout is retired and cannot be rerun as fresh certification evidence.
 
 ## Latest Gate-1 empirical result
 
@@ -56,7 +56,7 @@ On the fresh eight-task public-development run under implementation digest `c0ab
 
 This does **not** certify Gate 2: the public suite has only eight pairs and has been repeatedly inspected during development. It is development-only evidence. See [`docs/GATE2_V31_PUBLIC_RESULT.md`](docs/GATE2_V31_PUBLIC_RESULT.md), [`docs/GATE2_PROTOCOL.md`](docs/GATE2_PROTOCOL.md), and [`artifacts/gate2-v31-public-calibration-score.json`](artifacts/gate2-v31-public-calibration-score.json).
 
-The exact v3.1 candidate is frozen at `2b98491641426f9ebe1678b8491a18a583e6c784` and passed GitHub Actions CI #155. A new external 18-task balanced private/OOD suite has been audited before inference and its task/key/audit hashes are fixed in [docs/GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md](docs/GATE2_PRIVATE_HOLDOUT_V31_PREREGISTRATION.md). No private-v3.1 inference is allowed until that preregistration commit is also CI-green.
+The exact v3.1 candidate is frozen at `2b98491641426f9ebe1678b8491a18a583e6c784`; preregistration commit `393c22abf67e70675870f7f054eed023685cc08b` passed GitHub Actions CI #156 before inference. On the 18-task private-v31 holdout, the official frozen score was Raw **0.78750**, Seed **0.93472**, gain **+0.14722**, strict wins **77.78%**, CI **[+0.01806, +0.28472]**, and verifier acceptance **83.33%**. Mean gain missed the frozen **+0.15000** threshold, so Gate 2 does not promote. See [docs/GATE2_PRIVATE_HOLDOUT_V31_RESULT.md](docs/GATE2_PRIVATE_HOLDOUT_V31_RESULT.md).
 
 ## Gate-2 private holdout v1
 
@@ -156,7 +156,7 @@ Candidate source execution is intended to happen with network disabled, a read-o
 ## What Project Seed deliberately does not claim
 
 - Gate 0 completion does not mean a frontier model has become smarter.
-- Gate 1 is empirically certified; Gate 2 is **not** yet empirically certified. V3.1 is development-qualified, while the eight-task public calibration remains development evidence only.
+- Gate 1 is empirically certified; Gate 2 is **not** empirically certified. Private v3.1 produced a strong but non-promoting near-miss and is retired evidence; the next certification attempt requires a newly frozen candidate and a completely new private/OOD holdout.
 - A positive task-level capability delta is not evidence of recursive amplification.
 - The project does not demonstrate AGI or ASI.
 - Candidates do not get to rewrite their evaluator/control plane.
