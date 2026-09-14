@@ -1,6 +1,6 @@
 # Roadmap after the Gates 0-4 foundation
 
-Updated: 2026-09-13
+Updated: 2026-09-14
 
 ## Milestone A — Empirical Gate 0/1 baseline
 
@@ -48,7 +48,7 @@ Frozen v5 source `c34e1cd31c61efebc513f289ba9ac11cdd4412d0`, implementation dige
 
 ## Milestone B — Gate 2 research benchmark
 
-**Status: V3.1 PRIVATE V31 COMPLETED - FAILED FROZEN MEAN-GAIN CRITERION; GATE 2 NOT CERTIFIED.**
+**Status: vNext candidate frozen; fresh 18-pair holdout audited and preregistration prepared; GATE 2 NOT CERTIFIED.**
 
 Private v1 transferred strongly but failed verifier acceptance: Raw **0.70556**, Seed **0.94167**, gain **+0.23611**, strict wins **66.67%**, CI **[+0.11944, +0.37222]**, verifier acceptance **50%**. Private v2 fixed verifier acceptance but failed transfer: Raw **0.81250**, Seed **0.82083**, gain **+0.00833**, strict wins **33.33%**, CI **[-0.07361, +0.09583]**, verifier acceptance **88.89%**. Both are retired.
 
@@ -56,7 +56,7 @@ V3.1 uses hidden-safe outcome-to-hypothesis attribution plus runner-fixed 3:1 ca
 
 The eight-task public suite remains development-only. Candidate commit `2b98491641426f9ebe1678b8491a18a583e6c784` and preregistration commit `393c22abf67e70675870f7f054eed023685cc08b` were CI-green before private inference. Private-v31 official result: Raw **0.78750**, Seed **0.93472**, gain **+0.14722**, strict wins **77.78%**, CI **[+0.01806, +0.28472]**, verifier acceptance **83.33%**. Only the frozen mean-gain >=0.15 check failed. V31P01 also contains a documented Raw-side CUDA/Ollama infrastructure crash that artificially favors Seed in the official score; excluding that pair diagnostically lowers gain to **+0.09706**. Therefore the attempt cannot be promoted under any defensible treatment and the holdout is retired. See [`GATE2_PRIVATE_HOLDOUT_V31_RESULT.md`](GATE2_PRIVATE_HOLDOUT_V31_RESULT.md).
 
-Post-v31 vNext work hardens the campaign boundary before any new freeze: provider/transport and trusted-runner failures are explicit execution incidents, `clean_execution` is mandatory for promotion, trusted mechanical-support defects cannot enter the model-repair path, and bounded task-independent JSON Schemas constrain normal Raw/Seed/verifier Ollama calls. A fixed task-independent provider preflight aborts before scored evidence on provider failure. Schema recovery is capped at **two repair calls total per arm**, shared across stages and verifiers, with qualification proving maximum three-experiment worst cases of Raw **10** and Seed **16** model calls inside the unchanged 16-call envelope. Current validation is **181/181 tests** and **59/59 canaries**. The exact unchanged candidate at source commit `62bf1db71f329abc095d8122214c551f3e1a9cd7` completed a final eight-task public-development run with Raw **0.80000**, Seed **0.98750**, gain **+0.18750**, strict wins **87.5%**, CI **[+0.090625, +0.31875]**, verifier acceptance **100%**, zero repairs, and zero incidents. Every frozen numerical criterion except `valid_pairs >= 16` passes, but this public suite remains non-certifying. The next step is a freeze commit and green CI; only then may a completely fresh private/OOD holdout be created.
+Post-v31 vNext work hardens the campaign boundary before any new freeze: provider/transport and trusted-runner failures are explicit execution incidents, `clean_execution` is mandatory for promotion, trusted mechanical-support defects cannot enter the model-repair path, and bounded task-independent JSON Schemas constrain normal Raw/Seed/verifier Ollama calls. A fixed task-independent provider preflight aborts before scored evidence on provider failure. Schema recovery is capped at **two repair calls total per arm**, shared across stages and verifiers, with qualification proving maximum three-experiment worst cases of Raw **10** and Seed **16** model calls inside the unchanged 16-call envelope. Current validation is **181/181 tests** and **59/59 canaries**. The exact unchanged candidate at source commit `62bf1db71f329abc095d8122214c551f3e1a9cd7` completed a final eight-task public-development run with Raw **0.80000**, Seed **0.98750**, gain **+0.18750**, strict wins **87.5%**, CI **[+0.090625, +0.31875]**, verifier acceptance **100%**, zero repairs, and zero incidents. Every frozen numerical criterion except `valid_pairs >= 16` passes, but this public suite remains non-certifying. The vNext candidate is now frozen at `ce67ac5517115af85b0ce5b424426d0c1a1d351f` and freeze CI #162 is green. A completely fresh external 18-pair private/OOD holdout was created only after that green freeze and passed structural/key/identifiability plus exact/fuzzy overlap audits with no inference. The next gate is the preregistration commit and green preregistration CI; only then may private Raw/Seed inference begin.
 
 ## Milestone C — Gate 3 architecture campaign
 

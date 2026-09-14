@@ -1,10 +1,10 @@
 # Gate 2 Certification Plan
 
-Updated: 2026-09-13
+Updated: 2026-09-14
 
 ## Status
 
-Gate 2 is **not empirically certified** after three preregistered private/OOD attempts. Private v1 failed verifier acceptance; private v2 failed transfer; private v3.1 narrowly failed the frozen mean-gain criterion. All three are permanently retired as fresh certification evidence.
+Gate 2 is **not empirically certified** after three completed preregistered private/OOD attempts. Private v1 failed verifier acceptance; private v2 failed transfer; private v3.1 narrowly failed the frozen mean-gain criterion. All three are permanently retired as fresh certification evidence. The post-v31 vNext candidate is now frozen at `ce67ac5517115af85b0ce5b424426d0c1a1d351f` with green freeze CI #162, and a new external 18-pair holdout has passed pre-inference audit. Its rules/hashes are recorded in [`GATE2_PRIVATE_HOLDOUT_VNEXT_PREREGISTRATION.md`](GATE2_PRIVATE_HOLDOUT_VNEXT_PREREGISTRATION.md); **no private-vNext inference may begin until CI is green on that preregistration commit**.
 
 ## Private holdout v1 outcome
 
@@ -59,7 +59,7 @@ The private answer key must remain external to GitHub and external to candidate 
 
 The candidate implementation, model artifact, resource envelope, scoring weights, acceptance rule, bootstrap procedure, and promotion thresholds become immutable once private inference starts.
 
-The post-v31 vNext development implementation is ready for a separate freeze boundary after an exact-candidate public run at source commit `62bf1db71f329abc095d8122214c551f3e1a9cd7`: Raw **0.80000**, Seed **0.98750**, gain **+0.18750**, strict wins **87.5%**, CI **[+0.090625, +0.31875]**, verifier acceptance **100%**, zero repairs, and zero execution incidents. This public result is development evidence only.
+The post-v31 vNext candidate is frozen at `ce67ac5517115af85b0ce5b424426d0c1a1d351f` after the exact-candidate public run at source commit `62bf1db71f329abc095d8122214c551f3e1a9cd7`: Raw **0.80000**, Seed **0.98750**, gain **+0.18750**, strict wins **87.5%**, CI **[+0.090625, +0.31875]**, verifier acceptance **100%**, zero repairs, and zero execution incidents. Freeze CI #162 is green. This public result is development evidence only; the fresh external holdout was created afterward and has not yet been inferred.
 
 ## Evidence handling
 

@@ -74,7 +74,7 @@ A failed holdout becomes development evidence. Its tasks cannot be reused as fre
 Make the system reason in terms of falsifiable hypotheses and independent evidence.
 
 ### Status
-**V3.1 private-v31 completed; frozen mean-gain criterion failed; NOT empirically certified.**
+**vNext candidate frozen; fresh private holdout audited and preregistration prepared; NOT empirically certified.**
 
 ### Implemented
 - one hidden-safe pre-reveal outcome-to-hypothesis causal-attribution call;
@@ -95,7 +95,7 @@ Frozen source commit `2b98491641426f9ebe1678b8491a18a583e6c784` and preregistrat
 Post-v31 vNext development adds explicit execution-integrity failure classes. Provider/transport and trusted-runner defects invalidate the campaign through a mandatory `clean_execution` check; model/protocol failures and budget exhaustion continue to fail closed at arm level. Purpose-specific, task-independent JSON Schemas constrain normal Gate-2 Ollama outputs without encoding scientific IDs or answers. A fixed task-independent provider-readiness preflight runs outside the scored envelope before the first unfinished pair and aborts before scored evidence on provider failure. Schema recovery is capped at **two repair calls total per arm**, shared across stages and verifiers; qualification proves maximum three-experiment worst cases of Raw **10** and Seed **16** model calls inside the unchanged 16-call envelope. Current validation is **181/181 tests** and **59/59 deterministic Gate-2 canaries**. The exact-candidate final public-development run remains non-certifying but clean: Raw **0.80000**, Seed **0.98750**, gain **+0.18750**, strict wins **87.5%**, CI **[+0.090625, +0.31875]**, verifier acceptance **100%**, zero repairs, and zero incidents. See [GATE2_VNEXT_FINAL_PUBLIC_RESULT.md](GATE2_VNEXT_FINAL_PUBLIC_RESULT.md).
 
 ### Empirical criterion
-Any future Gate-2 certification attempt must use a newly created preregistered private/OOD campaign and retain the frozen requirements: >=16 valid pairs, Seed mean >=0.75, mean gain >=0.15, strict Seed wins >=60%, paired-bootstrap lower bound >0, verifier acceptance >=75%, and no identity/integrity/resource/protocol mismatch.
+The vNext candidate is frozen at `ce67ac5517115af85b0ce5b424426d0c1a1d351f`; freeze CI #162 is green, and a new external 18-pair holdout created afterward has passed pre-inference audit. Its hashes and rules are recorded in [`GATE2_PRIVATE_HOLDOUT_VNEXT_PREREGISTRATION.md`](GATE2_PRIVATE_HOLDOUT_VNEXT_PREREGISTRATION.md). Private inference is forbidden until preregistration CI is green. The attempt retains the frozen requirements: >=16 valid pairs, Seed mean >=0.75, mean gain >=0.15, strict Seed wins >=60%, paired-bootstrap lower bound >0, verifier acceptance >=75%, and no identity/integrity/resource/protocol mismatch.
 
 ## Gate 3 — Automatic architecture search
 

@@ -1,8 +1,8 @@
 # Implementation Status
 
-Updated: 2026-09-13
+Updated: 2026-09-14
 
-Current local validation on Sampath's Windows 11 / Python 3.13.15: **163/163 tests passing** with `ResourceWarning` promoted to an error. The repository includes permanent Ubuntu and Windows CI coverage.
+Current local validation on Sampath's Windows 11 / Python 3.13.15: **181/181 tests passing**. Gate-2 deterministic qualification is **59/59 PASS**; the repository includes permanent Ubuntu and Windows CI coverage.
 
 ## Meaning of status labels
 
@@ -182,7 +182,7 @@ Implemented:
 
 ## Current next step
 
-Gate 2 remains uncertified after private v1, v2, and v3.1. Do not rerun or tune on any retired holdout. The post-v31 vNext implementation has now completed its exact-candidate public development run: Raw **0.80000**, Seed **0.98750**, gain **+0.18750**, wins **87.5%**, CI **[+0.090625, +0.31875]**, verifier acceptance **100%**, zero repairs/incidents. The next step is to freeze this unchanged implementation, require freeze CI green, create a completely new external >=16-pair private/OOD holdout after the freeze, audit it, preregister it, require preregistration CI, and only then infer.
+Gate 2 remains uncertified after private v1, v2, and v3.1. Do not rerun or tune on any retired holdout. The vNext candidate is frozen at `ce67ac5517115af85b0ce5b424426d0c1a1d351f` and freeze CI #162 is green. A completely new external 18-pair holdout was then created and independently audited with **no model inference**; its task/key/audit hashes are preregistered in [`GATE2_PRIVATE_HOLDOUT_VNEXT_PREREGISTRATION.md`](GATE2_PRIVATE_HOLDOUT_VNEXT_PREREGISTRATION.md). **Do not begin private inference until the exact preregistration commit is pushed and its GitHub Actions CI is green.**
 
 ## Overall
 
