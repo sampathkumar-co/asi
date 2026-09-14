@@ -30,6 +30,12 @@ _GATE2_OLLAMA_PURPOSE_NUM_PREDICT = {
     "gate2_independent": 384, "gate2_adversarial": 384, "gate2_repair": 256,
     "gate2_preflight": 8,
 }
+_SCHEMA_REPAIR_CALL_LIMIT_PER_ARM = 2
+
+
+@dataclass
+class _SchemaRepairState:
+    used: int = 0
 
 
 @dataclass(frozen=True)
@@ -184,6 +190,45 @@ def _repair_schema(provider: BudgetedProvider, budget: Budget, task: ResearchTas
     }
     system = ("Return only one corrected JSON object. Change only fields needed to satisfy validation_error and allowed_ids. Preserve the original scientific choice whenever it has a valid representation. Do not explain, invent evidence, or add any hidden information.")
     return _json_call(provider, budget, [Message("system", system), Message("user", json.dumps(payload, separators=(",", ":")))], "gate2_repair")
+
+def _validate_with_schema_repairs(
+    provider: BudgetedProvider,
+    budget: Budget,
+    task: ResearchTask,
+    *,
+    arm: str,
+    stage: str,
+    data: dict,
+    validator: Callable[[dict], object],
+    history: list[ResearchStep],
+    revisions: list[ResearchRevision],
+    repair_state: _SchemaRepairState,
+    repair_events: list[dict[str, str]],
+):
+    current = data
+    stage_attempt = 0
+    while True:
+        try:
+            return validator(current)
+        except ValueError as exc:
+            if repair_state.used >= _SCHEMA_REPAIR_CALL_LIMIT_PER_ARM:
+                raise ModelProtocolError(str(exc)) from exc
+            repair_state.used += 1
+            stage_attempt += 1
+            repair_events.append({
+                "stage": stage,
+                "attempt": str(stage_attempt),
+                "repair_index": str(repair_state.used),
+                "error": str(exc)[:240],
+                "invalid_output_sha256": hashlib.sha256(
+                    json.dumps(current, sort_keys=True, separators=(",", ":")).encode()
+                ).hexdigest(),
+            })
+            current = _repair_schema(
+                provider, budget, task, arm=arm, stage=stage, invalid_output=current,
+                error=exc, history=history, revisions=revisions,
+            )
+
 
 def _action(provider: BudgetedProvider, budget: Budget, task: ResearchTask, history: list[ResearchStep], arm: str, revisions: list[ResearchRevision] | None = None) -> dict:
     if arm != "raw":
@@ -485,7 +530,18 @@ def _verifier_verdict(final_id: str, model_supported: tuple[str, ...], mechanica
     ) else "fail"
 
 
-def _verify(provider: BudgetedProvider, budget: Budget, task: ResearchTask, history: list[ResearchStep], final: dict, kind: str, revisions: list[ResearchRevision] | None = None) -> VerificationEvidence:
+def _verify(
+    provider: BudgetedProvider,
+    budget: Budget,
+    task: ResearchTask,
+    history: list[ResearchStep],
+    final: dict,
+    kind: str,
+    revisions: list[ResearchRevision] | None = None,
+    *,
+    repair_state: _SchemaRepairState | None = None,
+    repair_events: list[dict[str, str]] | None = None,
+) -> VerificationEvidence:
     payload = {
         "task": task.public_dict(),
         "history": [asdict(x) for x in history],
@@ -539,14 +595,13 @@ def _verify(provider: BudgetedProvider, budget: Budget, task: ResearchTask, hist
         if not set(risks).issubset(_ids(task.risks)):
             raise ValueError("invalid verifier risk id")
         return VerificationEvidence(kind, verdict, confidence, risks, str(value.get("reason", ""))[:320], supported, direct_defect, defect_summary[:240], mechanical_best)
-    try:
-        return validate(data)
-    except ValueError as exc:
-        repaired = _repair_schema(provider, budget, task, arm="seed", stage=f"{kind}_verifier", invalid_output=data, error=exc, history=history, revisions=list(revisions or []))
-        try:
-            return validate(repaired)
-        except ValueError as repair_exc:
-            raise ModelProtocolError(str(repair_exc)) from repair_exc
+    state = repair_state if repair_state is not None else _SchemaRepairState()
+    events = repair_events if repair_events is not None else []
+    return _validate_with_schema_repairs(
+        provider, budget, task, arm="seed", stage=f"{kind}_verifier", data=data,
+        validator=validate, history=history, revisions=list(revisions or []),
+        repair_state=state, repair_events=events,
+    )
 
 
 def _arm_evidence(task: ResearchTask, arm: str, meter: BudgetedProvider, budget: Budget, history: list[ResearchStep], final: tuple | None, status: str, independent=None, adversarial=None, revisions: list[ResearchRevision] | None = None, repair_events: list[dict[str, str]] | None = None, precommitted_probability_matrix: tuple[tuple[str, str, tuple[tuple[str, float], ...]], ...] = (), precommitted_outcome_support: tuple[tuple[str, str, tuple[str, ...]], ...] = (), final_posterior: tuple[tuple[str, float], ...] = (), failure_kind: str | None = None, failure_message: str | None = None) -> ResearchArmEvidence:
@@ -574,6 +629,7 @@ def _run_arm(task: ResearchTask, provider: BudgetedProvider, budget: Budget, arm
     history: list[ResearchStep] = []
     revisions: list[ResearchRevision] = []
     repair_events: list[dict[str, str]] = []
+    repair_state = _SchemaRepairState()
     precommitted_matrix: tuple[tuple[str, str, tuple[tuple[str, float], ...]], ...] = ()
     precommitted_support: tuple[tuple[str, str, tuple[str, ...]], ...] = ()
     posterior_evidence: tuple[tuple[str, float], ...] = ()
@@ -582,15 +638,11 @@ def _run_arm(task: ResearchTask, provider: BudgetedProvider, budget: Budget, arm
     failure_kind = failure_message = None
     try:
         def validate_or_repair(stage: str, data: dict, validator):
-            try:
-                return validator(data)
-            except ValueError as exc:
-                repair_events.append({"stage": stage, "error": str(exc)[:240], "invalid_output_sha256": hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":")).encode()).hexdigest()})
-                repaired = _repair_schema(provider, budget, task, arm=arm, stage=stage, invalid_output=data, error=exc, history=history, revisions=revisions)
-                try:
-                    return validator(repaired)
-                except ValueError as repair_exc:
-                    raise ModelProtocolError(str(repair_exc)) from repair_exc
+            return _validate_with_schema_repairs(
+                provider, budget, task, arm=arm, stage=stage, data=data, validator=validator,
+                history=history, revisions=revisions, repair_state=repair_state,
+                repair_events=repair_events,
+            )
 
         if arm == "seed":
             attribution_data = _attribute_outcomes(provider, budget, task)
@@ -637,8 +689,14 @@ def _run_arm(task: ResearchTask, provider: BudgetedProvider, budget: Budget, arm
             final_data["rejected_hypothesis_ids"] = list(final_rejected)
             final_data["confidence"] = max(posterior.values())
             final = validate_or_repair("final", final_data, lambda value: _validated_final(task, value))
-            independent = _verify(provider, budget, task, history, final_data, "independent", revisions)
-            adversarial = _verify(provider, budget, task, history, final_data, "adversarial", revisions)
+            independent = _verify(
+                provider, budget, task, history, final_data, "independent", revisions,
+                repair_state=repair_state, repair_events=repair_events,
+            )
+            adversarial = _verify(
+                provider, budget, task, history, final_data, "adversarial", revisions,
+                repair_state=repair_state, repair_events=repair_events,
+            )
         else:
             for _ in range(task.max_experiments):
                 action = _action(provider, budget, task, history, arm, revisions)

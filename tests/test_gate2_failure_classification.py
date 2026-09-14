@@ -46,11 +46,13 @@ class Gate2FailureClassificationTests(unittest.TestCase):
         meter, budget = self.meter(ScriptedProvider([]))
         malformed = {"outcome_support": {}}
         with patch("seed.gate2.local_campaign._attribute_outcomes", return_value=malformed), \
-             patch("seed.gate2.local_campaign._repair_schema", return_value=malformed):
+             patch("seed.gate2.local_campaign._repair_schema", return_value=malformed) as repair:
             arm = _run_arm(self.task, meter, budget, "seed")
         self.assertEqual(arm.status, "failed:ModelProtocolError")
         self.assertEqual(arm.failure_kind, "model_protocol")
         self.assertIn("attribution must cover", arm.failure_message)
+        self.assertEqual(repair.call_count, 2)
+        self.assertEqual(len(arm.repair_events), 2)
 
 
 if __name__ == "__main__":

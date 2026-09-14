@@ -10,11 +10,13 @@ from seed.providers.budgeted import BudgetedProvider
 from seed.providers.ollama import OllamaProvider
 from seed.providers.scripted import ScriptedProvider
 from .local_campaign import (
-    ResearchArmEvidence, ResearchPairEvidence, _body, _budget,
+    ModelProtocolError, ResearchArmEvidence, ResearchPairEvidence, _body, _budget,
     _GATE2_OLLAMA_JSON_PURPOSES, _GATE2_OLLAMA_PURPOSE_NUM_PREDICT,
+    _SCHEMA_REPAIR_CALL_LIMIT_PER_ARM, _SchemaRepairState,
     _attribute_outcomes, _canonical_matrices, _information_gain, _mechanical_rejections,
     _posterior_best, _run_arm, _select_experiment, _update_posterior,
-    _validated_attribution, _verifier_verdict, validate_checkpoint_identity,
+    _validate_with_schema_repairs, _validated_attribution, _verifier_verdict,
+    validate_checkpoint_identity,
 )
 from .schema import CatalogItem, ResearchExperiment, ResearchTask
 from .scoring import _execution_incidents
@@ -205,6 +207,66 @@ def run_gate2_qualification() -> Gate2Certificate:
         and "gate2_preflight" not in _GATE2_OLLAMA_JSON_PURPOSES
     )
 
+    repair_initial = {"outcome_support": {}}
+    repair_still_invalid = {"outcome_support": {"E1": {}}}
+    repair_valid = _attribution_response()
+    second_repair_budget = _budget()
+    second_repair_meter = BudgetedProvider(
+        ScriptedProvider([json.dumps(repair_still_invalid), json.dumps(repair_valid)]),
+        second_repair_budget, provider_id="ollama:qwen",
+    )
+    second_repair_state = _SchemaRepairState()
+    second_repair_events: list[dict[str, str]] = []
+    try:
+        recovered_attribution = _validate_with_schema_repairs(
+            second_repair_meter, second_repair_budget, task, arm="seed", stage="attribution",
+            data=repair_initial, validator=lambda value: _validated_attribution(task, value),
+            history=[], revisions=[], repair_state=second_repair_state,
+            repair_events=second_repair_events,
+        )
+        second_schema_repair_recovers = (
+            recovered_attribution == _validated_attribution(task, repair_valid)
+            and second_repair_state.used == 2
+            and len(second_repair_events) == 2
+            and len(second_repair_meter.records) == 2
+        )
+    except (ModelProtocolError, ValueError):
+        second_schema_repair_recovers = False
+
+    hard_cap_budget = _budget()
+    hard_cap_meter = BudgetedProvider(
+        ScriptedProvider([json.dumps(repair_initial), json.dumps(repair_initial), json.dumps(repair_valid)]),
+        hard_cap_budget, provider_id="ollama:qwen",
+    )
+    hard_cap_state = _SchemaRepairState()
+    hard_cap_events: list[dict[str, str]] = []
+    try:
+        _validate_with_schema_repairs(
+            hard_cap_meter, hard_cap_budget, task, arm="seed", stage="attribution",
+            data=repair_initial, validator=lambda value: _validated_attribution(task, value),
+            history=[], revisions=[], repair_state=hard_cap_state, repair_events=hard_cap_events,
+        )
+        schema_repair_hard_cap = False
+    except ModelProtocolError:
+        schema_repair_hard_cap = (
+            _SCHEMA_REPAIR_CALL_LIMIT_PER_ARM == 2
+            and hard_cap_state.used == 2
+            and len(hard_cap_events) == 2
+            and len(hard_cap_meter.records) == 2
+        )
+
+    max_experiments = 3
+    raw_normal_calls = max_experiments + 1
+    seed_normal_calls = 1 + max_experiments + 1 + 2
+    raw_worst_case_calls = 2 * raw_normal_calls + _SCHEMA_REPAIR_CALL_LIMIT_PER_ARM
+    seed_worst_case_calls = 2 * seed_normal_calls + _SCHEMA_REPAIR_CALL_LIMIT_PER_ARM
+    bounded_repair_fits_envelope = (
+        raw_worst_case_calls <= _budget().max_model_calls
+        and seed_worst_case_calls <= _budget().max_model_calls
+        and raw_worst_case_calls == 10
+        and seed_worst_case_calls == 16
+    )
+
     valid_pair = ResearchPairEvidence(_arm("raw"), _arm("seed"))
     pair_validates = True
     try:
@@ -376,6 +438,9 @@ def run_gate2_qualification() -> Gate2Certificate:
         "provider_repair_schema_remains_stage_generic": repair_schema_is_stage_generic,
         "provider_preflight_policy_is_task_independent": preflight_policy_safe,
         "provider_preflight_runtime_is_bounded": preflight_runtime_bounded,
+        "second_schema_repair_can_recover": second_schema_repair_recovers,
+        "schema_repair_hard_cap_is_two": schema_repair_hard_cap,
+        "bounded_repair_worst_case_fits_model_call_envelope": bounded_repair_fits_envelope,
         "resource_envelope_matches_runner": resource_envelope_matches,
         "same_identity_pair_validates": pair_validates,
         "model_identity_mismatch_rejected": model_mismatch_rejected,
@@ -399,7 +464,9 @@ def run_gate2_qualification() -> Gate2Certificate:
         "seed_rejected_hypothesis_ids": list(seed_arm.rejected_hypothesis_ids),
         "seed_final_posterior": dict(seed_arm.final_posterior),
         "information_gain": {"E1": ig1, "E2": ig2},
-        "qualification_note": "Deterministic Gate-2 v3.1 attribution/canonical-likelihood canaries; not empirical Gate-2 certification.",
+        "schema_repair_call_limit_per_arm": _SCHEMA_REPAIR_CALL_LIMIT_PER_ARM,
+        "worst_case_model_calls": {"raw": raw_worst_case_calls, "seed": seed_worst_case_calls},
+        "qualification_note": "Deterministic Gate-2 protocol/integrity canaries; not empirical Gate-2 certification.",
     }
 
     body = {
