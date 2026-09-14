@@ -186,3 +186,13 @@ The next generic reliability change keeps `gate2_repair` stage-generic but permi
 Qualification explicitly checks the repair cap and worst-case resource bound. With the schema allowing at most three experiments, even if every normal response also needs its existing JSON-syntax repair, the worst case is Raw **10** model calls and Seed **16**, within the unchanged **16 model-call** cap. No promotion threshold or budget limit changed.
 
 Current development validation is **181/181 tests PASS**, compileall and diff hygiene PASS, and **59/59 Gate-2 deterministic canaries PASS**. Qualification hash: `7df14fe831d3d1f5b5f247bb3e244080763e955b139c377ed06f4c833dc88fde`. Development implementation digest: `56707e7012af796b21c0304d6f2b3f4a903b95655dee28abd4181cc9a308bdf3`. A public-task fault injection exercised the complete Seed arm with malformed initial attribution and malformed repair #1; repair #2 became structurally valid, the arm completed successfully with **8 model calls**, and both repair events were auditable. This is development evidence only and does not authorize reuse of any retired holdout.
+
+## Post-v31 vNext exact-candidate public run
+
+After execution-integrity classification, purpose-specific structured outputs, provider-readiness preflight, and the two-call shared schema-repair cap were all published and CI-green, the exact implementation at source commit `62bf1db71f329abc095d8122214c551f3e1a9cd7` was run once across the repeatedly observed eight-task public development suite.
+
+All **8/8 pairs** sealed successfully. Raw mean was **0.80000**, Seed mean **0.98750**, mean gain **+0.18750**, strict Seed wins **7/8 = 87.5%**, paired-bootstrap CI **[+0.090625, +0.31875]**, and Seed verifier acceptance **100%**. There were zero repair calls and zero execution incidents. Every frozen numerical promotion check passes except `valid_pairs >= 16`, which this eight-task public suite cannot satisfy by construction.
+
+Evidence content hash: `d6ae21e88c39d71bf46d42cb419c889d005b886283047ee51f0fbb3cc95aa0ce`. Score content hash: `7e89670867663b4fd770963f24c48baa5a9efea130024727cca9a5a2a4f61c55`. See [`GATE2_VNEXT_FINAL_PUBLIC_RESULT.md`](GATE2_VNEXT_FINAL_PUBLIC_RESULT.md).
+
+This result is development-only. It supports freezing the unchanged candidate; it does not provide independent transfer evidence or certify Gate 2.

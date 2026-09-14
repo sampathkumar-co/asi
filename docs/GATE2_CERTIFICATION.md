@@ -59,6 +59,8 @@ The private answer key must remain external to GitHub and external to candidate 
 
 The candidate implementation, model artifact, resource envelope, scoring weights, acceptance rule, bootstrap procedure, and promotion thresholds become immutable once private inference starts.
 
+The post-v31 vNext development implementation is ready for a separate freeze boundary after an exact-candidate public run at source commit `62bf1db71f329abc095d8122214c551f3e1a9cd7`: Raw **0.80000**, Seed **0.98750**, gain **+0.18750**, strict wins **87.5%**, CI **[+0.090625, +0.31875]**, verifier acceptance **100%**, zero repairs, and zero execution incidents. This public result is development evidence only.
+
 ## Evidence handling
 
 The campaign must checkpoint atomically after each sealed pair. Resume is allowed only when suite, model, model manifest, implementation manifest, settings, task-file hash, and previously sealed pair hashes match exactly.

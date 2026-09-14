@@ -182,7 +182,7 @@ Implemented:
 
 ## Current next step
 
-Gate 2 remains uncertified after private v1, v2, and v3.1. Do not rerun or tune on any retired holdout. Post-v31 execution-integrity, structured-output, provider-preflight, and bounded schema-repair hardening are development-only and are evaluated only on public/dev data. Once the new candidate is finalized, freeze it, require green CI, create a completely new external >=16-pair private/OOD holdout after the freeze, preregister it, require preregistration CI, and only then infer.
+Gate 2 remains uncertified after private v1, v2, and v3.1. Do not rerun or tune on any retired holdout. The post-v31 vNext implementation has now completed its exact-candidate public development run: Raw **0.80000**, Seed **0.98750**, gain **+0.18750**, wins **87.5%**, CI **[+0.090625, +0.31875]**, verifier acceptance **100%**, zero repairs/incidents. The next step is to freeze this unchanged implementation, require freeze CI green, create a completely new external >=16-pair private/OOD holdout after the freeze, audit it, preregister it, require preregistration CI, and only then infer.
 
 ## Overall
 
